@@ -285,8 +285,13 @@ def convert_image_to_jpeg(image_url):
         traceback.print_exc()
         return None
 
+
+
+
+
+
 def fix_image_for_feed(image_bytes, target_ratio='4:5', max_width=1080):
-    """Fix image aspect ratio for Instagram Feed posts."""
+    """Resize and pad image for Instagram Feed - no cropping with black padding"""
     try:
         img = Image.open(image_bytes)
         width, height = img.size
@@ -297,39 +302,31 @@ def fix_image_for_feed(image_bytes, target_ratio='4:5', max_width=1080):
         print(f"   Feed - Original: {width}×{height}px, ratio: {current:.4f}")
         print(f"   Target ratio: 4:5 ({target:.4f})")
         
-        if abs(current - target) < 0.01:
-            print("   Ratio already acceptable, resizing...")
-            if width > max_width:
-                new_width = max_width
-                new_height = int(height * (max_width / width))
-                img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
-                print(f"   Resized to: {new_width}×{new_height}px")
+        # Calculate target dimensions
+        if current > target:
+            # Image is wider - fit to height
+            new_height = min(height, 1350)
+            new_width = int(new_height * target)
         else:
-            print(f"   Cropping to 4:5...")
-            
-            if current > target:
-                new_width = int(height * target)
-                left = (width - new_width) // 2
-                img = img.crop((left, 0, left + new_width, height))
-                print(f"   Cropped width to: {new_width}×{height}px")
-            else:
-                new_height = int(width / target)
-                top = (height - new_height) // 2
-                img = img.crop((0, top, width, top + new_height))
-                print(f"   Cropped height to: {width}×{new_height}px")
-            
-            if width > max_width:
-                new_width = max_width
-                new_height = int(img.height * (max_width / img.width))
-                img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
-                print(f"   Resized to: {new_width}×{new_height}px")
+            # Image is taller - fit to width
+            new_width = min(width, 1080)
+            new_height = int(new_width / target)
         
-        final_width, final_height = img.size
-        final_ratio = final_width / final_height
-        print(f"   Feed final: {final_width}×{final_height}px, ratio: {final_ratio:.4f}")
+        # Resize image to fit within target dimensions
+        img.thumbnail((new_width, new_height), Image.Resampling.LANCZOS)
+        
+        # Create a canvas with the target aspect ratio - BLACK background
+        canvas = Image.new('RGB', (new_width, new_height), (0, 0, 0))
+        
+        # Paste the image centered
+        x = (new_width - img.width) // 2
+        y = (new_height - img.height) // 2
+        canvas.paste(img, (x, y))
+        
+        print(f"   Feed final: {canvas.width}×{canvas.height}px (black padding)")
         
         output = BytesIO()
-        img.save(output, format='JPEG', quality=92, optimize=True)
+        canvas.save(output, format='JPEG', quality=92, optimize=True)
         output.seek(0)
         return output
         
@@ -338,50 +335,48 @@ def fix_image_for_feed(image_bytes, target_ratio='4:5', max_width=1080):
         traceback.print_exc()
         return image_bytes
 
+
 def fix_image_for_story(image_bytes, target_ratio='9:16', max_width=1080):
-    """Fix image aspect ratio for Instagram Stories."""
+    """Resize and pad image for Instagram Stories - no cropping with black padding"""
     try:
         img = Image.open(image_bytes)
         width, height = img.size
         
-        target = 9/16
+        target = 9/16  # 9:16 ratio
         current = width / height
         
         print(f"   Story - Original: {width}×{height}px, ratio: {current:.4f}")
         print(f"   Target ratio: 9:16 ({target:.4f})")
         
-        if abs(current - target) < 0.02:
-            print("   Ratio already acceptable, resizing...")
-            if width > max_width:
-                new_width = max_width
-                new_height = int(height * (max_width / width))
-                img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
-                print(f"   Resized to: {new_width}×{new_height}px")
-        else:
-            print(f"   Cropping to 9:16...")
-            
-            if current > target:
-                new_width = int(height * target)
-                left = (width - new_width) // 2
-                img = img.crop((left, 0, left + new_width, height))
-                print(f"   Cropped width to: {new_width}×{height}px")
-            else:
-                new_height = int(width / target)
-                top = (height - new_height) // 2
-                img = img.crop((0, top, width, top + new_height))
-                print(f"   Cropped height to: {width}×{new_height}px")
-            
-            story_width = 1080
-            story_height = 1920
-            img.thumbnail((story_width, story_height), Image.Resampling.LANCZOS)
-            print(f"   Thumbnailed to: {img.size[0]}×{img.size[1]}px")
+        # Target dimensions for story
+        story_width = 1080
+        story_height = 1920
         
-        final_width, final_height = img.size
-        final_ratio = final_width / final_height
-        print(f"   Story final: {final_width}×{final_height}px, ratio: {final_ratio:.4f}")
+        # Calculate dimensions to fit within story
+        if current > target:
+            # Image is wider - fit to height
+            new_height = story_height
+            new_width = int(new_height * current)
+        else:
+            # Image is taller - fit to width
+            new_width = story_width
+            new_height = int(new_width / current)
+        
+        # Resize image to fit
+        img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
+        
+        # Create a canvas with story dimensions - BLACK background
+        canvas = Image.new('RGB', (story_width, story_height), (0, 0, 0))
+        
+        # Paste the image centered
+        x = (story_width - img.width) // 2
+        y = (story_height - img.height) // 2
+        canvas.paste(img, (x, y))
+        
+        print(f"   Story final: {canvas.width}×{canvas.height}px (black padding)")
         
         output = BytesIO()
-        img.save(output, format='JPEG', quality=92, optimize=True)
+        canvas.save(output, format='JPEG', quality=92, optimize=True)
         output.seek(0)
         return output
         
@@ -389,6 +384,31 @@ def fix_image_for_story(image_bytes, target_ratio='9:16', max_width=1080):
         print(f"Error fixing story image: {e}")
         traceback.print_exc()
         return image_bytes
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # ============================================================
 # ZERNIO HELPER FUNCTIONS
