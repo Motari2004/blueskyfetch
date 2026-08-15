@@ -1,0 +1,1824 @@
+[
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-12T17:06:57.864Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreic62p2g3ofesazcagh5mo7ibxop3uk7k3iqtxy2j2eum6dm2szhzi",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreic62p2g3ofesazcagh5mo7ibxop3uk7k3iqtxy2j2eum6dm2szhzi"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 35,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 0,
+    "reposts": 7,
+    "text": "Ukrainian forces damaged four Russian warships during a joint strike on the Novorossiysk naval base overnight.\n\nThe attack hit two Kalibr-capable frigates – Admiral Essen and Admiral Makarov – along with two patrol ships, a radar system, and oil port infrastructure.",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3msvmir7re22z",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-12T17:04:23.883Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreihvbw7r6sozcwib4475jqtnpnfmqaxc2egtdgr676qy5wrsfxtwuu",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreihvbw7r6sozcwib4475jqtnpnfmqaxc2egtdgr676qy5wrsfxtwuu"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 6,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 0,
+    "reposts": 0,
+    "text": "Russian security personnel in Omsk snatched a 31-year-old man off the street and coerced him into signing a military contract.  \n\nRussian recruiters are turning to forced enlistments as volunteer recruitment slows despite rising cash bonuses.\n\nwww.kyivpost.com/post/82220",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3msvme6epac2z",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-12T16:32:14.459Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreice5cx3rnskrvgtdkqip76jvuqykikkglfcebl5gkloby2xmjgwxe",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreice5cx3rnskrvgtdkqip76jvuqykikkglfcebl5gkloby2xmjgwxe"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 24,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 1,
+    "reposts": 4,
+    "text": "Russia declared a state of emergency in Novorossiysk after Ukraine damaged infrastructure, water supplies, and grain terminals.  \n\nZelensky called the strike on Black Sea Fleet stronghold a \"unique operation\" using jet drones and Neptune missiles.\n\nwww.kyivpost.com/post/82231",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3msvkkodd522z",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-12T16:00:25.828Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreiavcbdtg55milgv4bogl5xbj2b6wgacvjsewzpfsm46lxlfocy3nq",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreiavcbdtg55milgv4bogl5xbj2b6wgacvjsewzpfsm46lxlfocy3nq"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 11,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 0,
+    "reposts": 2,
+    "text": "Kyiv authorities are compiling lists of vulnerable residents who may need temporary relocation during potential winter heating outages.  \n\nTargeting elderly and mobility-impaired citizens, the measure aims to secure emergency accommodation.\n\nwww.kyivpost.com/post/82227",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3msvirs4mm22z",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-12T15:30:42.485Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreid7dthi5x3pamfek6tmgm5bcl2pxmuzbsvu3udq2ckwfaw5aa2z3y",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreid7dthi5x3pamfek6tmgm5bcl2pxmuzbsvu3udq2ckwfaw5aa2z3y"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 22,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 0,
+    "reposts": 7,
+    "text": "Ukraine’s military intelligence identified an Nvidia Jetson Orin computer module in Russia’s new S-71 Monochrome cruise missile.  \n\nHUR documented 35 foreign components across captured Russian weapons, emphasizing Moscow's reliance on foreign technology.\n\nwww.kyivpost.com/post/82225",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3msvh4nf7rk2z",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-12T14:58:19.625Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": true,
+    "images": [],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 15,
+    "media_count": 0,
+    "original_author": null,
+    "replies": 2,
+    "reposts": 4,
+    "text": "A driver of a Bentley with Polish license plates verbally abused Ukrainian volunteers fundraising for the military in London, calling them \"Bandera followers.\"\n\nThe volunteers reminded the driver he was in the UK, not Poland, as he drove off.\n\nVideo: Telegram channels",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3msvfcqjslc2z",
+    "video": {
+      "cid": "bafkreidtngbjr37uh6i4y7tag6o3c4nnh6jy322vd6ldcf7xm32richjle",
+      "playlist": "https://video.bsky.app/watch/did%3Aplc%3Agzqhucwylp2oah35ra76oyju/bafkreidtngbjr37uh6i4y7tag6o3c4nnh6jy322vd6ldcf7xm32richjle/playlist.m3u8",
+      "thumbnail": "https://video.bsky.app/watch/did%3Aplc%3Agzqhucwylp2oah35ra76oyju/bafkreidtngbjr37uh6i4y7tag6o3c4nnh6jy322vd6ldcf7xm32richjle/thumbnail.jpg",
+      "type": "hls"
+    },
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-12T14:26:28.579Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": true,
+    "images": [],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 14,
+    "media_count": 0,
+    "original_author": null,
+    "replies": 0,
+    "reposts": 4,
+    "text": "Emergency workers are containing the aftermath of Russian strikes targeting logistics facilities in the Kyiv region.  \n\nIn the Brovary district, firefighters contained a blaze at one site while operations continue elsewhere amid persistent air raid warnings.\n\nVideo: DSNS",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3msvdjrzbqk2z",
+    "video": {
+      "cid": "bafkreigbji2uuureppghjvtdtb5yhbgrmvlpzjcvave7z2zo4ulq7megcu",
+      "playlist": "https://video.bsky.app/watch/did%3Aplc%3Agzqhucwylp2oah35ra76oyju/bafkreigbji2uuureppghjvtdtb5yhbgrmvlpzjcvave7z2zo4ulq7megcu/playlist.m3u8",
+      "thumbnail": "https://video.bsky.app/watch/did%3Aplc%3Agzqhucwylp2oah35ra76oyju/bafkreigbji2uuureppghjvtdtb5yhbgrmvlpzjcvave7z2zo4ulq7megcu/thumbnail.jpg",
+      "type": "hls"
+    },
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-12T14:20:51.105Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreibu5ulvmfrvbb53oylfixrn3yjjlc4uxoyexx3dnsw7bbuwvyt4du",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreibu5ulvmfrvbb53oylfixrn3yjjlc4uxoyexx3dnsw7bbuwvyt4du"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 6,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 1,
+    "reposts": 1,
+    "text": "67% of Poles support deporting Ukrainian men of military age who do not have legal employment in Poland, according to a poll commissioned by Rzeczpospolita.\n\nSome 23% opposed the proposal.",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3msvd7q6hak2x",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-12T13:55:29.212Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreihoklwsgue7kigvbg5ig66mfkifm3rrevv2lvuym3r7otkcrejnuu",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreihoklwsgue7kigvbg5ig66mfkifm3rrevv2lvuym3r7otkcrejnuu"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 25,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 0,
+    "reposts": 3,
+    "text": "Ukraine has retaken 26 settlements across three countries regions since January, Commander-in-Chief Mykhailo Drapatyi said.\n\nRussian forces lost at least 9,550 troops killed and more than 6,600 wounded in the fighting.",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3msvbserwn22x",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-12T13:40:40.874Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreiehvyog7bt24qzfrkfluov2yjuxou6pbv5yf4ould6knzjzef7gtq",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreiehvyog7bt24qzfrkfluov2yjuxou6pbv5yf4ould6knzjzef7gtq"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 18,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 0,
+    "reposts": 6,
+    "text": "Russia’s Supreme Court barred Yabloko, the country’s only registered anti-war party, from September's parliamentary election.  \n\nDespite zero Duma seats, Yabloko’s pro-peace campaign drew growing public support as Putin’s ratings slide.\n\nwww.kyivpost.com/analysis/82212",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3msvaxvm2z22z",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-12T10:12:22.706Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreihoklwsgue7kigvbg5ig66mfkifm3rrevv2lvuym3r7otkcrejnuu",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreihoklwsgue7kigvbg5ig66mfkifm3rrevv2lvuym3r7otkcrejnuu"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 22,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 1,
+    "reposts": 3,
+    "text": "Explosions are now being heard in Kyiv, our correspondents report.\n\nAir defense is active over the capital.",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3msuvdggat22w",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-12T04:39:29.380Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreicv24p742yvodjkwu5gm5kvtmvl4gdww5w5s4ofrlnvnld4di64ze",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreicv24p742yvodjkwu5gm5kvtmvl4gdww5w5s4ofrlnvnld4di64ze"
+      },
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreicvmybblbzusbcsu2k72ph7mrpcx4mz5rzwou4a4jagc5yqcagfta",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreicvmybblbzusbcsu2k72ph7mrpcx4mz5rzwou4a4jagc5yqcagfta"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 29,
+    "media_count": 2,
+    "original_author": null,
+    "replies": 0,
+    "reposts": 8,
+    "text": "Russia has destroyed an Epicentr shopping center in Zaporizhzhia in an overnight strike.\n\nThe store, part of one of Ukraine’s biggest home improvement and retail chains, was completely gutted by fire.\n\nNo casualties have been reported so far.\n\nPhoto: Zaporizhzhia Regional Administration",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3msucq6eslc2x",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-11T20:28:27.976Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": true,
+    "images": [],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 30,
+    "media_count": 0,
+    "original_author": null,
+    "replies": 1,
+    "reposts": 5,
+    "text": "The aftermath of a Ukrainian drone strike on a Wildberries warehouse in Russia’s Voronezh region — a facility that had been operating for less than a year.\n\nThe 152,900-square-meter logistics hub opened in November 2025 and had capacity to store more than 90 million items.\n\nVideo: Radio Liberty",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3msthc5rydc2f",
+    "video": {
+      "cid": "bafkreig7bicleafbwvu7keozzjx7ej3fko6aa7q7qjyvm642caoa72u5l4",
+      "playlist": "https://video.bsky.app/watch/did%3Aplc%3Agzqhucwylp2oah35ra76oyju/bafkreig7bicleafbwvu7keozzjx7ej3fko6aa7q7qjyvm642caoa72u5l4/playlist.m3u8",
+      "thumbnail": "https://video.bsky.app/watch/did%3Aplc%3Agzqhucwylp2oah35ra76oyju/bafkreig7bicleafbwvu7keozzjx7ej3fko6aa7q7qjyvm642caoa72u5l4/thumbnail.jpg",
+      "type": "hls"
+    },
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-11T17:44:02.459Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreic62p2g3ofesazcagh5mo7ibxop3uk7k3iqtxy2j2eum6dm2szhzi",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreic62p2g3ofesazcagh5mo7ibxop3uk7k3iqtxy2j2eum6dm2szhzi"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 20,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 3,
+    "reposts": 7,
+    "text": "The Kremlin is planning a rapid post-election mobilization wave of hundreds of thousands of troops this fall, Volodymyr Zelensky reported.\n\nAccording to Ukrainian intelligence, Moscow aims to draft hundreds of thousands more next year to sustain its war effort.",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3mst645cbfs2l",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-11T17:35:18.577Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreifpz3m2tbsc5d6tykv7kbyjt55ig5exw5iy2c6bxiwjjeudecegyu",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreifpz3m2tbsc5d6tykv7kbyjt55ig5exw5iy2c6bxiwjjeudecegyu"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 3,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 0,
+    "reposts": 0,
+    "text": "Prime Minister Serhii Koretskyi launched the Chamber of Regional Youth Congresses to give local youth leaders a direct role in decision-making.\n\nThe initiative also focuses on expanding youth housing programs across Ukrainian communities.\n\nwww.kyivpost.com/post/82155",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3mst5mjonvc2l",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-11T16:22:38.821Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreihu2stz2xoxrj35saxzqc3bcf5nhn26dl2s2w3a4toipe5r5er3ru",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreihu2stz2xoxrj35saxzqc3bcf5nhn26dl2s2w3a4toipe5r5er3ru"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 17,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 0,
+    "reposts": 4,
+    "text": "Russia’s developing “Rassvet” satellite network could soon allow real-time drone control over Ukraine.\n\nExpert Serhii “Flash” Beskrestnov urged Ukraine to prioritize electronic warfare systems to disrupt it before it achieves full operational capacity. \n\nwww.kyivpost.com/post/82145",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3msszklvink2l",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-11T15:49:22.692Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreibbzq47h6rgkf5hnjd736xwgjewi2yqi6mzp4qup4rsinvsxav5ka",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreibbzq47h6rgkf5hnjd736xwgjewi2yqi6mzp4qup4rsinvsxav5ka"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 21,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 1,
+    "reposts": 3,
+    "text": "Russian strikes on Donetsk region set fire to a church in Kramatorsk and injured at least four people at a central market in Sloviansk.  \n\nLocal authorities condemned the attack on the bustling market at midday.\n\nwww.kyivpost.com/post/82153",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3mssxp4ahwc2r",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-11T15:19:30.581Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": true,
+    "images": [],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 29,
+    "media_count": 0,
+    "original_author": null,
+    "replies": 1,
+    "reposts": 11,
+    "text": "An elderly Ukrainian man was filmed escaping through a window after a Russian guided aerial bomb struck his home in Druzhkivka, Donetsk region.\n\nThe neighbors were helping to rescue his belongings from the burning house.\n\nVideo: Khizhak Brigade/Instagram",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3mssvzp5ohc2k",
+    "video": {
+      "cid": "bafkreicmdmcml6gzmzs5la2y33rh53dvkc7uxkprs56omz4farcldprqqu",
+      "playlist": "https://video.bsky.app/watch/did%3Aplc%3Agzqhucwylp2oah35ra76oyju/bafkreicmdmcml6gzmzs5la2y33rh53dvkc7uxkprs56omz4farcldprqqu/playlist.m3u8",
+      "thumbnail": "https://video.bsky.app/watch/did%3Aplc%3Agzqhucwylp2oah35ra76oyju/bafkreicmdmcml6gzmzs5la2y33rh53dvkc7uxkprs56omz4farcldprqqu/thumbnail.jpg",
+      "type": "hls"
+    },
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-11T14:44:41.115Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreicv25ahnz6j6qepsaq4vywyupvm7c3xzn767rac3yzvu7she2gfpe",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreicv25ahnz6j6qepsaq4vywyupvm7c3xzn767rac3yzvu7she2gfpe"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 11,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 0,
+    "reposts": 3,
+    "text": "Russian forces struck a tanker truck carrying vegetable oil residue in the Odesa region, killing two people and injuring three others. \n \nThe strike set both the tanker truck and a nearby passenger vehicle on fire.  \n\nPhoto: Odesa Regional Military Administration",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3mssu3gi3gk2r",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-11T14:12:45.195Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreidvapnrx44ay5bcdcv24yl2zg4re4t4z5lucpezxpb6gf5d6wqxna",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreidvapnrx44ay5bcdcv24yl2zg4re4t4z5lucpezxpb6gf5d6wqxna"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 22,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 0,
+    "reposts": 10,
+    "text": "Ukraine has stopped reporting the total number of missiles launched during major Russian attacks as air defenses face critical interceptor shortages.  \n\nThe decision follows heavy strikes where non-interceptions reached record levels.\n\nwww.kyivpost.com/post/82140",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3mssscdcwqc2r",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-11T13:35:18.980Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreieh3nuajqojbq6yin5e3ufgddga7sftpuwdbk5qhgbrzejt4o2hr4",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreieh3nuajqojbq6yin5e3ufgddga7sftpuwdbk5qhgbrzejt4o2hr4"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 14,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 0,
+    "reposts": 4,
+    "text": "More than 260 children targeted for recruitment by Russia have contacted Ukrainian law enforcement, helping foil planned sabotage.  \n\nOperatives use financial offers and impersonation on social media to manipulate minors into targeted attacks.\n\nwww.kyivpost.com/post/82138",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3mssq7f5ugc2r",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-10T18:04:26.359Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreid67crlh3ysi7lk3g2bt5bq3ofuiwlmzpl2kppmrof4nfyvvyrsby",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreid67crlh3ysi7lk3g2bt5bq3ofuiwlmzpl2kppmrof4nfyvvyrsby"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 27,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 1,
+    "reposts": 13,
+    "text": "Russia has received a new batch of ballistic missiles from North Korea, President Volodymyr Zelensky said.\n\nHe added that Moscow is also preparing to deploy an additional contingent of North Korean troops on Russian territory.",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3msqorp227c2r",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-10T17:48:11.366Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreifidxig7eslpr3axpfderfszcvfvf4augvgf3tc3iecffr2q7cxpy",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreifidxig7eslpr3axpfderfszcvfvf4augvgf3tc3iecffr2q7cxpy"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 27,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 0,
+    "reposts": 7,
+    "text": "A Ukrainian MiG-29 fighter jet was lost over the Odesa region on Monday evening, while engaging Russian aerial targets.\n\nThe pilot attempted to save the aircraft following an in-flight emergency during a missile launch, before ejecting and being evacuated to a medical facility.",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3msqnun7knk2m",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-10T17:23:08.394Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreibnpy3iy4dm2okllc7cghcsuppdo5pqwedzvdi6szxwdu3fg6rb24",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreibnpy3iy4dm2okllc7cghcsuppdo5pqwedzvdi6szxwdu3fg6rb24"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 14,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 0,
+    "reposts": 3,
+    "text": "One person was killed and three others injured as Russian forces struck five districts in the Dnipropetrovsk region nearly 60 times.\n\nThe heaviest damage occurred in the Nikopol district, where intense attacks targeted residential areas.\n\nwww.kyivpost.com/post/82092",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3msqmhtuikk22",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-10T16:51:25.495Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreibwtiwkugcywnwewpbpt6xq7ptsc7gnxf7eeu2icvqzexnbdpl6w4",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreibwtiwkugcywnwewpbpt6xq7ptsc7gnxf7eeu2icvqzexnbdpl6w4"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 15,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 0,
+    "reposts": 7,
+    "text": "Russian strikes destroyed the primary warehouse of Intertop, Ukraine’s largest fashion retailer, causing $10.8 million in inventory losses.\n\nThe company has secured temporary logistics space to maintain operations, but some store openings will be delayed.\n\nwww.kyivpost.com/post/82089",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3msqkp54mqs22",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-10T16:19:09.961Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreiafiq36zjdk4g4o4dd4lten2uxhiha3zj7ledof6quo4y6ii42324",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreiafiq36zjdk4g4o4dd4lten2uxhiha3zj7ledof6quo4y6ii42324"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 11,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 0,
+    "reposts": 5,
+    "text": "Ukraine’s High Anti-Corruption Court has eased travel restrictions on former Presidential Office chief Andriy Yermak, allowing him to travel to eight regions.\n\nThe court rejected a request to remove Yermak's electronic monitoring device.\n\nwww.kyivpost.com/post/82088",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3msqivhaurs22",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-10T15:47:54.496Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreicupvhbfxiq4ro2gd7iosk5ajiuhcqbgk47u4pjjudsldzojannxq",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreicupvhbfxiq4ro2gd7iosk5ajiuhcqbgk47u4pjjudsldzojannxq"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 27,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 0,
+    "reposts": 9,
+    "text": "Russia plans to increase its ballistic missile salvo from 77 to 200, Unmanned Systems Forces Commander Robert Brovdi warned.  \n\nWith Patriot interceptors running low, Brovdi urged long-range strikes against Russian missile production facilities.\n\nwww.kyivpost.com/post/82086",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3msqh5ko62222",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-10T15:13:45.068Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreiepmca7ecjbf6ubaezvswdpgnvs7pofhcqjfph3c4w6egu7egbq4q",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreiepmca7ecjbf6ubaezvswdpgnvs7pofhcqjfph3c4w6egu7egbq4q"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 23,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 3,
+    "reposts": 10,
+    "text": "Cameras on Royal Navy drone boats were found sending background signal communications to China, British media reported.  \n\nThe UK Defence Ministry disconnected the devices, stating no evidence was found that sensitive military data had been compromised.\n\nwww.kyivpost.com/post/82061",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3msqfai6lj222",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-10T14:41:26.804Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreicqkhtjowezn65vxoaazn6rpuho46ampaj2sd7y3iuqm7vh5epnsi",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreicqkhtjowezn65vxoaazn6rpuho46ampaj2sd7y3iuqm7vh5epnsi"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 29,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 0,
+    "reposts": 3,
+    "text": "Ukraine plans to conduct a full-scale launch of its new domestic \"Freyja\" anti-ballistic missile interceptor by mid-2027.  \nThe system aims to partially or fully replace US-made Patriot PAC-3 interceptors to counter Russia’s ballistic strikes.\n\nwww.kyivpost.com/post/82080",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3msqdgpphl227",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-10T14:14:02.169Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": true,
+    "images": [],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 37,
+    "media_count": 0,
+    "original_author": null,
+    "replies": 0,
+    "reposts": 5,
+    "text": "Drones targeted Russia’s ZapSibNeftekhim petrochemical complex in Tobolsk, Tyumen region, over 2,200 kilometers from the Ukrainian border.  \n\nFalling drone debris triggered a fire at the facility, which ranks as Russia’s largest petrochemical plant.\n\nVideo: Exilenova+/Telegram",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3msqbvpb5q22g",
+    "video": {
+      "cid": "bafkreie2cty6t34s2x2t4jdp3yluqoqbq7qtivrxkqzr3icuvlzbu44fri",
+      "playlist": "https://video.bsky.app/watch/did%3Aplc%3Agzqhucwylp2oah35ra76oyju/bafkreie2cty6t34s2x2t4jdp3yluqoqbq7qtivrxkqzr3icuvlzbu44fri/playlist.m3u8",
+      "thumbnail": "https://video.bsky.app/watch/did%3Aplc%3Agzqhucwylp2oah35ra76oyju/bafkreie2cty6t34s2x2t4jdp3yluqoqbq7qtivrxkqzr3icuvlzbu44fri/thumbnail.jpg",
+      "type": "hls"
+    },
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-10T13:37:03.331Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreibpxkf65hu3wapeuh7fonxvilo6in2orhn5bmqkqu4tphx4zd6mdm",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreibpxkf65hu3wapeuh7fonxvilo6in2orhn5bmqkqu4tphx4zd6mdm"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 31,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 1,
+    "reposts": 5,
+    "text": "Ukraine destroyed Russia’s latest “Volna Kupol Garant” electronic warfare system, designed to disrupt Starlink satellite communications, in the Black Sea resort city of Gelendzhik.  \n\nIt is the first reported loss of the system inside Russian territory.\n\nwww.kyivpost.com/post/82062",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3msq7tl7mps27",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-10T05:05:28.820Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreifkq5yzlpqwqus5mmdhtl77vidv2onhdydrzj5hjpw35ddcvucbba",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreifkq5yzlpqwqus5mmdhtl77vidv2onhdydrzj5hjpw35ddcvucbba"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 78,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 15,
+    "reposts": 34,
+    "text": "Raytheon and Lockheed Martin fear Ukrainian engineers could improve Patriot interceptor technology and mass-produce the missiles faster and far cheaper than current US facilities.\n\nAn unnamed Republican official told The Atlantic this is one reason Washington has yet to grant Ukraine a license.",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3mspdasnkbk2w",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-09T14:28:17.023Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreiaocsjafmpmzdlbcyzd3zvviecustxk5vw2ufmzarznbudfnp6f7a",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreiaocsjafmpmzdlbcyzd3zvviecustxk5vw2ufmzarznbudfnp6f7a"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 26,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 2,
+    "reposts": 11,
+    "text": "A World Health Organization humanitarian warehouse stocking vital medical supplies was destroyed in a strike on Dnipro.  \n\nNo casualties were reported, as staff evacuated part of the inventory and left the facility shortly before the attack.\n\nwww.kyivpost.com/post/82024",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3msnsab2j2s27",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-09T13:56:31.298Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreica3nh5y4k6yhf3efpdnenks7vrnw5oksehsrbiph4pjcicfintti",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreica3nh5y4k6yhf3efpdnenks7vrnw5oksehsrbiph4pjcicfintti"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 19,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 2,
+    "reposts": 6,
+    "text": "A combat drone crashed and exploded near the village of Crocmaz in Moldova’s Ștefan Vodă district near the Ukrainian border on Sunday. \n\nLocal authorities confirmed the explosion ignited a fire, though no casualties were reported.\n\nwww.kyivpost.com/post/82022",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3msnqhhmfik27",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-09T13:24:09.230Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreicvmcjxqojnizn54dzkprtygj467givfp4c2wa62mo7pxs4epbvei",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreicvmcjxqojnizn54dzkprtygj467givfp4c2wa62mo7pxs4epbvei"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 20,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 0,
+    "reposts": 5,
+    "text": "Iran has issued a list of demands to the US as prerequisites for reopening the Strait of Hormuz to commercial shipping.  \n\nTehran’s conditions include lifting the US naval blockade, withdrawing military forces, and unfreezing Iranian assets abroad.\n\nwww.kyivpost.com/post/82014",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3msnonlj6pk27",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-09T12:52:15.030Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreiflaay2z6725onyb45l2m27s3mkksqm4dsebuf5vh4knpluh7w7ly",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreiflaay2z6725onyb45l2m27s3mkksqm4dsebuf5vh4knpluh7w7ly"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 20,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 0,
+    "reposts": 4,
+    "text": "Russia launched 11 missiles and up to 100 drones at Odesa, injuring 12 people.\n\nUkraine intercepted most of the drones and one missile, but direct impacts triggered major power, water, and communications outages across the city.\n\nwww.kyivpost.com/post/82019",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3msnmujygrk27",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-09T12:20:28.840Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreih4w455oxcrfmo57nubchnm5nhr5eqn2zbzxr5qvpnhjhxpqklhmm",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreih4w455oxcrfmo57nubchnm5nhr5eqn2zbzxr5qvpnhjhxpqklhmm"
+      },
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreie4tumcztszq2qrm4ymxe6hkbdb3ypbpf5tjs55pu7mox7wynq2ia",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreie4tumcztszq2qrm4ymxe6hkbdb3ypbpf5tjs55pu7mox7wynq2ia"
+      },
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreifk2koub4ltuzgw7u7dxliaquu2cfocqfkdfaythwq2wvajvtf2nm",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreifk2koub4ltuzgw7u7dxliaquu2cfocqfkdfaythwq2wvajvtf2nm"
+      },
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreidmarelv7wlhonu6ekapxr6lnvhubvkqgnvzlvehhgpozkrf47k64",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreidmarelv7wlhonu6ekapxr6lnvhubvkqgnvzlvehhgpozkrf47k64"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 23,
+    "media_count": 4,
+    "original_author": null,
+    "replies": 2,
+    "reposts": 8,
+    "text": "A Russian strike on the Zhytomyr region damaged a plant owned by German manufacturer Kromberg & Schubert, forcing it to suspend operations.\n\nThe facility, which produces electrical wiring harnesses for European automakers, sustained structural damage.\n\nPhotos: Vitaliy Bunechko/Facebook",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3msnl3q454227",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-09T11:47:13.042Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreidrl2iv4jakj2ibi4tajozdn23d4to3z4zuqab7bdbtwqpznuq3xq",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreidrl2iv4jakj2ibi4tajozdn23d4to3z4zuqab7bdbtwqpznuq3xq"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 21,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 1,
+    "reposts": 3,
+    "text": "Russian strikes on the Zhytomyr region injured three people and ignited multiple fires across civilian infrastructure and private businesses.  \n\nFalling debris also struck a residential home, leaving one person hospitalized with severe burns.\n\nwww.kyivpost.com/post/82011",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3msnjaar7mk27",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-09T11:14:48.958Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreif2e4bjpytodiwzk62erakyi7oadxrrewx7k6gsmi6epo2fud25tq",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreif2e4bjpytodiwzk62erakyi7oadxrrewx7k6gsmi6epo2fud25tq"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 27,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 1,
+    "reposts": 8,
+    "text": "Vladimir Putin is planning a covert mobilization and the deployment of tens of thousands of North Korean troops to sustain his war effort.\n\nVolodymyr Zelensky reiterated that Ukraine will not voluntarily retreat.\n\nwww.kyivpost.com/post/82007",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3msnhgcqi3k27",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-09T10:42:28.794Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreiermr37lbhdtlejpcys5uzrwoqojph4audwujzj72jdnycmeynasi",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreiermr37lbhdtlejpcys5uzrwoqojph4audwujzj72jdnycmeynasi"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 35,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 0,
+    "reposts": 11,
+    "text": "Russian forces launched 61 missiles, 1,560 attack drones, and 1,540 guided aerial bombs against Ukraine over the past week, Volodymyr Zelensky said.  \n\nZelensky emphasized that international pressure is vital to stop the ongoing bombardment.\n\nwww.kyivpost.com/post/82008",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3msnfmihdpc27",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-09T10:11:35.910Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": true,
+    "images": [],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 56,
+    "media_count": 0,
+    "original_author": null,
+    "replies": 1,
+    "reposts": 11,
+    "text": "Ukrainian athlete Nelli Chukanivska secured a gold medal in women’s high diving at the 2026 European Aquatics Championships in Paris.  \n\nDiving from a 20-meter platform, the 19-year-old claimed Ukraine’s first-ever European title in the event.\n\nVideo: Suspilne",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3msndvbftnk27",
+    "video": {
+      "cid": "bafkreifxjg3tku342nn57qqzitgwej6qafounajl3trinr3heahgwi2pdm",
+      "playlist": "https://video.bsky.app/watch/did%3Aplc%3Agzqhucwylp2oah35ra76oyju/bafkreifxjg3tku342nn57qqzitgwej6qafounajl3trinr3heahgwi2pdm/playlist.m3u8",
+      "thumbnail": "https://video.bsky.app/watch/did%3Aplc%3Agzqhucwylp2oah35ra76oyju/bafkreifxjg3tku342nn57qqzitgwej6qafounajl3trinr3heahgwi2pdm/thumbnail.jpg",
+      "type": "hls"
+    },
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-09T09:41:40.523Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreighcscz3kwwizuo4m2ae7ikp37wfyyrwtm66erd5rssn3vavorvzm",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreighcscz3kwwizuo4m2ae7ikp37wfyyrwtm66erd5rssn3vavorvzm"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 27,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 0,
+    "reposts": 2,
+    "text": "Ukraine’s Unmanned Systems Forces struck an S-400 system, two air defense units, two radars, and three \"shadow fleet\" ships overnight.\n\nThe S-400 targeted in Gelendzhik had launched six missiles at Ukraine earlier that day.\n\nwww.kyivpost.com/post/82005",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3msnc7r6xzs27",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-09T09:10:13.244Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreif3owxtbvwe4qaixjrlwiouj5spfnefqdbsnhkcqqbkawzttq3bgm",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreif3owxtbvwe4qaixjrlwiouj5spfnefqdbsnhkcqqbkawzttq3bgm"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 26,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 1,
+    "reposts": 2,
+    "text": "A drone that exploded near the Kardam border crossing was a Ukrainian decoy UAV, Bulgaria’s Defense Ministry confirmed.\n\nSofia summoned Ukraine’s ambassador over the crash, while Kyiv stressed the incident was unintentional and pledged full cooperation.\n\nwww.kyivpost.com/post/82003",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3msnahjds5227",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-09T08:39:02.219Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreicbw3mlcc4bacygrqqiczwtnyotvcqydivyw2fgo7nllxw3cjjtza",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreicbw3mlcc4bacygrqqiczwtnyotvcqydivyw2fgo7nllxw3cjjtza"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 50,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 0,
+    "reposts": 9,
+    "text": "The first combat deployment of a domestically produced Ukrainian ballistic missile could occur as early as this fall.  \n\nVolodymyr Zelensky noted that mass production will depend on securing critical components through international partnerships.\n\nwww.kyivpost.com/post/82001",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3msn6pqynbs27",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-09T08:07:24.956Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": true,
+    "images": [],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 31,
+    "media_count": 0,
+    "original_author": null,
+    "replies": 1,
+    "reposts": 13,
+    "text": "Russian forces launched a missile strike on Odesa using Iskander-M, Onyx, and Kh-31P missiles, leaving eight people injured.\n\nThe attack sparked fires in residential areas and damaged energy infrastructure, leaving several districts of the city without power.\n\nVideo: DSNS",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3msn4x7mqfs27",
+    "video": {
+      "cid": "bafkreibm4l3hp46fmb5rvchsy24j4r6e7oxgy2espxv2qvx73y4ptj3b5u",
+      "playlist": "https://video.bsky.app/watch/did%3Aplc%3Agzqhucwylp2oah35ra76oyju/bafkreibm4l3hp46fmb5rvchsy24j4r6e7oxgy2espxv2qvx73y4ptj3b5u/playlist.m3u8",
+      "thumbnail": "https://video.bsky.app/watch/did%3Aplc%3Agzqhucwylp2oah35ra76oyju/bafkreibm4l3hp46fmb5rvchsy24j4r6e7oxgy2espxv2qvx73y4ptj3b5u/thumbnail.jpg",
+      "type": "hls"
+    },
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-09T07:36:42.846Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreifjwcmuvn4ngbsypyeqnqnmdcjpobzkigdyzu4jli6ryerclrqe7e",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreifjwcmuvn4ngbsypyeqnqnmdcjpobzkigdyzu4jli6ryerclrqe7e"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 14,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 0,
+    "reposts": 6,
+    "text": "Turkish Foreign Minister Hakan Fidan has urged Kyiv and Moscow to implement a mutual moratorium on targeting commercial ships in the Black Sea.  \n\nTurkey is restricting vessel passage through the Dardanelles Strait toward Russian and Ukrainian ports.  \n\nwww.kyivpost.com/post/82000",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3msn3acu2ss27",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-09T07:04:13.552Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreigtafiqhum4evn7sjydthvdc3zriybqmqjjvugfouicivhxlt7cpq",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreigtafiqhum4evn7sjydthvdc3zriybqmqjjvugfouicivhxlt7cpq"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 24,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 4,
+    "reposts": 8,
+    "text": "Volodymyr Zelensky announced that establishing domestic production of Patriot air defense systems in Ukraine will take 12 months to several years due to bureaucratic procedures.\n\nwww.kyivpost.com/post/81997",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3msmzg7ucg22w",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-09T06:32:08.509Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig6kfbh43p4fpgys6jlnaw6chizs6go6fsytixpic6mcodu7eo35y",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig6kfbh43p4fpgys6jlnaw6chizs6go6fsytixpic6mcodu7eo35y"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 33,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 1,
+    "reposts": 7,
+    "text": "Ukraine is set to acquire 70 M39 ATACMS ballistic missiles and 12 M270 MLRS launchers from Turkey. \n\nThe transfer also includes over 2,500 unguided rockets and 47,000 cluster artillery shells to bolster Ukraine's strike capabilities.\n\nwww.kyivpost.com/post/81996",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3msmxmtynmc2w",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-09T06:00:36.216Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreibggofhsggpokpewn2brmpehsfmdaw2mofdff3rnvuukb3qnttvbe",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreibggofhsggpokpewn2brmpehsfmdaw2mofdff3rnvuukb3qnttvbe"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 36,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 1,
+    "reposts": 13,
+    "text": "Russian forces launched a barrage of drones, missiles, and guided aerial bombs across Ukraine. \n\nAttacks on high-rise residential buildings in Kharkiv killed two people and injured 12, while strikes in Odesa and Pavlohrad left dozens wounded.\n\nwww.kyivpost.com/post/81995",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3msmvuheha22w",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-08T14:29:14.295Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreicuq4w4kqigz2y6gzl54nkmhjjvjmjjcvdlnvn53la67meq4monom",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreicuq4w4kqigz2y6gzl54nkmhjjvjmjjcvdlnvn53la67meq4monom"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 39,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 3,
+    "reposts": 16,
+    "text": "German security services are investigating suspicious drone flights over a high-security Bundeswehr facility in Mechernich. \n\nThe base houses Europe’s only \"Patriot shipyard\" and major underground logistics depots.\n\nwww.kyivpost.com/post/81973",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3mslbt27lq22i",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-08T13:58:34.707Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreidkjqmmylcx2hwlcbbye75sw3gfv45z3wode2jeans4bq6s4rg4vm",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreidkjqmmylcx2hwlcbbye75sw3gfv45z3wode2jeans4bq6s4rg4vm"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 26,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 1,
+    "reposts": 11,
+    "text": "The Pentagon has prematurely relieved Lt. Gen. Charles Costanza, commander of the US V Corps responsible for managing American ground forces in Europe and coordinating military aid to Ukraine. \n\nwww.kyivpost.com/post/81968",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3msla47tr4k2i",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-08T13:25:11.248Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreia4unt43fjo6io3icq2hqezb7p4c7wdd7xpvgq6usgh3yrqx24yhe",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreia4unt43fjo6io3icq2hqezb7p4c7wdd7xpvgq6usgh3yrqx24yhe"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 28,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 10,
+    "reposts": 24,
+    "text": "Elon Musk continues to refuse Ukraine’s requests to use Starlink satellite network coverage to guide long-range strikes against missile launchers inside Russian territory. \n\nMusk cited escalation risks, urging Ukrainian officials \"to make a deal.\"\n\nwww.kyivpost.com/post/81977",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3msl6aj73622i",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-08T12:53:44.101Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreihxfmpnfgzuk5hear5u2fn4u2dzb6e35qssq3flrco6othg7zwps4",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreihxfmpnfgzuk5hear5u2fn4u2dzb6e35qssq3flrco6othg7zwps4"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 19,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 1,
+    "reposts": 5,
+    "text": "Ukraine has agreed to refrain from targeting non-Russian oil tankers and Caspian Pipeline Consortium infrastructure in the Black Sea. \n\nUnder the deal, non-sanctioned carriers transporting non-Russian oil will be granted safe passage.\n\nwww.kyivpost.com/post/81972",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3msl4ibhv722i",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-08T12:21:11.935Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreiaqcb3ossa5wjaa4coemqme4m3kttklp2tbqwbwobhc572wbkq27u",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreiaqcb3ossa5wjaa4coemqme4m3kttklp2tbqwbwobhc572wbkq27u"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 37,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 0,
+    "reposts": 1,
+    "text": "Aleksandar Vučić declared \"unconditional support\" for Ukraine’s territorial integrity with \"no 'buts'\" during a joint press conference with Volodymyr Zelensky in Belgrade. \n\nVučić also pledged Serbia's support for Ukraine's path toward EU accession.\n\nwww.kyivpost.com/post/81978",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3msl2o3qk2s2i",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-08T11:45:58.759Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4q3fdn7vjogctaf3evahjbw3vwlzuqclvlttc5zap4dw6nqedji",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4q3fdn7vjogctaf3evahjbw3vwlzuqclvlttc5zap4dw6nqedji"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 40,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 1,
+    "reposts": 7,
+    "text": "Volodymyr Zelensky announced that Kyiv secured agreements for monthly US deliveries of Patriot missiles, though 2026 supply volumes remain insufficient. \n\nHe urged European partners – particularly Germany and Poland – to supply additional interceptors.\n\nwww.kyivpost.com/post/81981",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3mskyp4hjms2i",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-08T11:34:17.960Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreia4y33f5mjmv5jyr3js2uskvidqsjxbawyody7hagpyocz4ge6huq",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreia4y33f5mjmv5jyr3js2uskvidqsjxbawyody7hagpyocz4ge6huq"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 21,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 0,
+    "reposts": 7,
+    "text": "Russian drone strikes targeted a Sumy–Kyiv passenger train and wounded at least four civilians in Kherson on Saturday. \n\nRailway crews evacuated passengers before the locomotive was struck, while Kherson faced daytime UAV attacks on urban areas.\n\nwww.kyivpost.com/post/81970",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3msky2a4tm22i",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-08T11:01:29.647Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreihm4aicls6ka7zgux3ysoofit7tzb7iab5los35lnd67cufqsqadq",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreihm4aicls6ka7zgux3ysoofit7tzb7iab5los35lnd67cufqsqadq"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 62,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 1,
+    "reposts": 25,
+    "text": "An explosive-laden drone found near a Ukrainian cargo plane at Germany’s Leipzig-Halle Airport is linked to the Russian government, according to US intelligence. \n\nThe incident is part of a broader campaign of Russian sabotage across Europe.\n\nwww.kyivpost.com/post/81967",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3mskw7kynxk2i",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-08T10:30:55.064Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreiesxfb4ilqg4vzokpy7fmq4qpmafupdldltm4ju3td5dxd6qls6p4",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreiesxfb4ilqg4vzokpy7fmq4qpmafupdldltm4ju3td5dxd6qls6p4"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 50,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 0,
+    "reposts": 12,
+    "text": "A sustained campaign of Ukrainian drone strikes on Wildberries logistics hubs has put Russian sellers at risk of mass bankruptcy. \n\nThe Kremlin lacks the hundreds of billions of rubles needed to cover destroyed inventory.\n\nwww.kyivpost.com/post/81955",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3mskuivfny22i",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-08T09:59:14.952Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreigcwrp7k3j36dlw5d7kigv6juvsglszkgiyxfr26my6uycbx6m2oi",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreigcwrp7k3j36dlw5d7kigv6juvsglszkgiyxfr26my6uycbx6m2oi"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 29,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 1,
+    "reposts": 8,
+    "text": "Kim Jong Un secured up to $22 billion in foreign revenue between 2022 and 2025, driven by military cooperation with Russia. \n\nThe influx of cash and troop deployments has quadrupled Pyongyang's foreign income despite international sanctions.\n\nwww.kyivpost.com/post/81965",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3msksqbcsus2i",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-08T09:28:44.825Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreihegvbawogh45daj7dfojog4rggdg3xksgvmo2aevb4dj7u4dxv6m",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreihegvbawogh45daj7dfojog4rggdg3xksgvmo2aevb4dj7u4dxv6m"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 41,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 0,
+    "reposts": 6,
+    "text": "Ukraine’s Unmanned Systems Forces struck 12 more Russian \"shadow fleet\" vessels during the first week of August. \n\nThe joint campaign with the SBU has effectively blocked Kerch Strait navigation for over a month.\n\nwww.kyivpost.com/post/81960",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3mskqzpxshc2i",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-08T08:55:11.909Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreie74qsl35rijzwj4msogrcvl2qsomjgzrtgm3crr637sxix2ta6am",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreie74qsl35rijzwj4msogrcvl2qsomjgzrtgm3crr637sxix2ta6am"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 24,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 5,
+    "reposts": 5,
+    "text": "Vladimir Putin is preferring trips to Siberia and the Far East where the threat of Ukrainian drone strikes is significantly lower. \n\nAhead of an expected visit to Novosibirsk, the Kremlin chief is steering clear of western regions.\n\nwww.kyivpost.com/post/81947",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3mskp5qci6c2i",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-08T08:22:39.910Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreidwoog7bqfwv7ancxgiiy2atu54h5zhbeth3pfipy66utic4vvlzy",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreidwoog7bqfwv7ancxgiiy2atu54h5zhbeth3pfipy66utic4vvlzy"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 26,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 0,
+    "reposts": 9,
+    "text": "A Russian drone struck a hospital in central Kherson on Friday evening, injuring four healthcare workers and a police officer. \n\nRegional prosecutors launched a war crimes investigation into the attack, citing a direct violation of international law.\n\nwww.kyivpost.com/post/81952",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3mskndkq75k2i",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-08T07:52:17.954Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreid3ix22we5lacsaj3d5pqbxzfdhmi3aygy535l342rfz7x5v6hr3m",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreid3ix22we5lacsaj3d5pqbxzfdhmi3aygy535l342rfz7x5v6hr3m"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 24,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 1,
+    "reposts": 5,
+    "text": "A Russian drone strike on Pukhivka in the Kyiv region killed three people from one family, including a 3-year-old boy, and injured four others. \n\nSimultaneous ballistic missile attacks on Kyiv killed one person.  \n\nPhoto: DSNS/Telegram",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3msklnb6jak2i",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-08T07:31:54.675Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreih2b4imhfyfjncdjg3nyc2lpv2b55hg6gguitbjg2igrxohbtx2ga",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreih2b4imhfyfjncdjg3nyc2lpv2b55hg6gguitbjg2igrxohbtx2ga"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 40,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 0,
+    "reposts": 4,
+    "text": "Ukrainian drones struck two major Russian oil refineries early Saturday, triggering large fires at the Syzran and Ilsky processing plants.\n\nThe dual strikes were part of a widespread barrage targeting industrial infrastructure across Russian regions.\n\nwww.kyivpost.com/post/81954",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3mskkiskxuk2i",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-08T07:01:27.695Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreibl7zzb7hlmnrsx42ubh7cswruymhu7fadagvrmyzwxkhc72asmza",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreibl7zzb7hlmnrsx42ubh7cswruymhu7fadagvrmyzwxkhc72asmza"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 59,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 1,
+    "reposts": 9,
+    "text": "Ukraine’s Unmanned Systems Forces struck 102 Russian targets over two days, including six \"shadow fleet\" vessels and 10 energy facilities across occupied regions.\n\nwww.kyivpost.com/post/81943",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3mskise7xpk2i",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-08T06:32:04.289Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreicqxaexnbywvtb3ogxrtdchrn64b3u7fexmwo5kcligkqd4cspbza",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreicqxaexnbywvtb3ogxrtdchrn64b3u7fexmwo5kcligkqd4cspbza"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 26,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 0,
+    "reposts": 10,
+    "text": "At least four people were injured in Kyiv after Russian forces launched waves of attack drones and ballistic missiles. \n\nFalling debris ignited large fires across enterprise facilities and warehouses in the Holosiivskyi and Obolonskyi districts.\n\nwww.kyivpost.com/post/81946",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3mskh5sj4jc2i",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  },
+  {
+    "author": "kyivpost.com",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreig4fa7ksicw3rzd4czv76nt4hqhd7dretdpvuekiyjtvsjlrxxh2u",
+    "created_at": "2026-08-08T06:04:49.887Z",
+    "display_name": "Kyiv Post",
+    "has_media": true,
+    "has_video": false,
+    "images": [
+      {
+        "alt": "",
+        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreicxzwn3rekfigk27lsytnqt7crsspxhoweoqqpy7pxvajztd67ht4",
+        "url": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:gzqhucwylp2oah35ra76oyju/bafkreicxzwn3rekfigk27lsytnqt7crsspxhoweoqqpy7pxvajztd67ht4"
+      }
+    ],
+    "is_from_target_user": true,
+    "is_reply": false,
+    "is_repost": false,
+    "likes": 32,
+    "media_count": 1,
+    "original_author": null,
+    "replies": 1,
+    "reposts": 6,
+    "text": "President Volodymyr Zelensky arrived in Belgrade for his first official visit to Serbia. \n\nThe talks with Serbian leaders focus on expanding economic cooperation, EU integration, and security issues.\n\nwww.kyivpost.com/post/81931",
+    "uri": "at://did:plc:gzqhucwylp2oah35ra76oyju/app.bsky.feed.post/3mskfn3t4ss2i",
+    "video": null,
+    "source_handler": "kyivpost.com"
+  }
+]

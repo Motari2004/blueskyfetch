@@ -1,0 +1,2404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bluesky Multi-Handler Gallery</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-1: #08081e;
+            --bg-2: #150a30;
+            --bg-3: #0a1630;
+            --surface: rgba(255, 255, 255, 0.045);
+            --surface-strong: rgba(255, 255, 255, 0.075);
+            --surface-hover: rgba(255, 255, 255, 0.08);
+            --border: rgba(255, 255, 255, 0.09);
+            --border-soft: rgba(255, 255, 255, 0.06);
+            --border-strong: rgba(255, 255, 255, 0.16);
+            --text-1: #f4f4fa;
+            --text-2: #b4b4d6;
+            --text-3: #7d7da3;
+            --text-4: #55557a;
+            --accent: #4f9fff;
+            --accent-soft: rgba(79, 159, 255, 0.14);
+            --accent-border: rgba(79, 159, 255, 0.28);
+            --purple: #8b7cf6;
+            --pink: #f06595;
+            --green: #45c96b;
+            --red: #f4574a;
+            --yellow: #ffc542;
+            --orange: #ff8c42;
+            --sp-1: 4px;
+            --sp-2: 8px;
+            --sp-3: 12px;
+            --sp-4: 16px;
+            --sp-5: 20px;
+            --sp-6: 24px;
+            --sp-7: 28px;
+            --sp-8: 32px;
+            --r-sm: 9px;
+            --r-md: 12px;
+            --r-lg: 16px;
+            --r-xl: 22px;
+            --r-pill: 999px;
+            --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.22);
+            --shadow-md: 0 10px 32px rgba(0, 0, 0, 0.32);
+            --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.45);
+            --glow-accent: 0 6px 20px rgba(79, 159, 255, 0.28);
+            --glow-instagram: 0 6px 20px rgba(225, 48, 108, 0.35);
+            --ease: cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { -webkit-text-size-adjust: 100%; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+            -webkit-font-smoothing: antialiased;
+            background: radial-gradient(ellipse 1200px 800px at 15% -10%, rgba(79, 159, 255, 0.10), transparent 60%),
+                        radial-gradient(ellipse 1000px 700px at 100% 10%, rgba(240, 101, 149, 0.08), transparent 55%),
+                        linear-gradient(160deg, var(--bg-1) 0%, var(--bg-2) 55%, var(--bg-3) 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            padding: 28px;
+            color: var(--text-2);
+            line-height: 1.5;
+        }
+
+        ::selection { background: rgba(79, 159, 255, 0.35); }
+        :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+
+        .container { max-width: 1440px; margin: 0 auto; position: relative; z-index: 1; }
+
+        /* Header styles */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+            padding: 18px 28px;
+            background: var(--surface);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-radius: var(--r-xl);
+            border: 1px solid var(--border-soft);
+            box-shadow: var(--shadow-md);
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .header-left { display: flex; align-items: center; gap: 16px; }
+        .header-logo {
+            width: 46px; height: 46px;
+            background: linear-gradient(135deg, var(--accent), var(--purple));
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: var(--glow-accent);
+            flex-shrink: 0;
+        }
+        .header h1 { color: #fff; font-size: 21px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.2; }
+        .header h1 .grad { background: linear-gradient(135deg, var(--accent), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .header h1 small { display: block; font-size: 12px; font-weight: 500; color: var(--text-3); letter-spacing: 0.01em; margin-top: 2px; }
+
+        .login-status {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 9px 20px;
+            border-radius: var(--r-pill);
+            font-size: 13px;
+            border: 1px solid var(--border-soft);
+        }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; animation: pulse-dot 2s infinite; flex-shrink: 0; }
+        .status-dot.online { background: var(--green); box-shadow: 0 0 12px rgba(69, 201, 107, 0.5); }
+        .status-dot.offline { background: var(--red); box-shadow: 0 0 12px rgba(244, 87, 74, 0.5); }
+        @keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.45; } }
+        .user-name { color: #fff; font-weight: 600; font-size: 13px; }
+
+        .btn {
+            padding: 10px 22px;
+            border: none;
+            border-radius: var(--r-sm);
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.01em;
+            cursor: pointer;
+            transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease), background 0.2s var(--ease), opacity 0.2s var(--ease);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            white-space: nowrap;
+            position: relative;
+            min-height: 40px;
+        }
+        .btn:active:not(:disabled) { transform: translateY(0) scale(0.98); }
+        .btn-primary { background: linear-gradient(135deg, var(--accent), var(--purple)); color: white; box-shadow: 0 4px 16px rgba(79, 159, 255, 0.28); }
+        .btn-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(79, 159, 255, 0.4); }
+        .btn-success { background: linear-gradient(135deg, var(--green), #2e9e4f); color: white; box-shadow: 0 4px 16px rgba(69, 201, 107, 0.28); }
+        .btn-success:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(69, 201, 107, 0.38); }
+        .btn-danger { background: linear-gradient(135deg, var(--red), #c62828); color: white; box-shadow: 0 4px 16px rgba(244, 87, 74, 0.28); }
+        .btn-danger:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(244, 87, 74, 0.38); }
+        .btn-secondary { background: var(--surface-strong); color: var(--text-1); border: 1px solid var(--border); }
+        .btn-secondary:hover:not(:disabled) { background: rgba(255, 255, 255, 0.13); border-color: var(--border-strong); transform: translateY(-1px); }
+        .btn-active { background: var(--accent-soft); color: var(--accent); border: 1px solid var(--accent-border); }
+        .btn-active:hover:not(:disabled) { background: rgba(79, 159, 255, 0.22); }
+        .btn-instagram { background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); color: white; box-shadow: var(--glow-instagram); }
+        .btn-instagram:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(225, 48, 108, 0.45); }
+        .btn-sm { padding: 7px 16px; font-size: 12px; min-height: 34px; }
+        .btn-xs { padding: 6px 13px; font-size: 11px; min-height: 28px; }
+        .btn:disabled { opacity: 0.38; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+
+        .login-section {
+            background: var(--surface);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-radius: var(--r-lg);
+            padding: 22px 26px;
+            margin-bottom: 26px;
+            border: 1px solid var(--border-soft);
+            box-shadow: var(--shadow-sm);
+            transition: opacity 0.3s var(--ease);
+        }
+        .login-section .login-row { display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap; }
+        .login-section .form-group { flex: 1; min-width: 220px; }
+        .field-label { display: block; font-size: 11px; color: var(--text-3); margin-bottom: 7px; text-transform: uppercase; letter-spacing: 0.07em; font-weight: 700; }
+        .field-input {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(0, 0, 0, 0.28);
+            border: 1.5px solid var(--border);
+            border-radius: var(--r-sm);
+            color: var(--text-1);
+            font-family: inherit;
+            font-size: 14px;
+            min-height: 44px;
+            transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease), background 0.2s var(--ease);
+        }
+        .field-input:hover { border-color: var(--border-strong); }
+        .field-input:focus { outline: none; border-color: var(--accent); background: rgba(0, 0, 0, 0.4); box-shadow: 0 0 0 4px rgba(79, 159, 255, 0.12); }
+        .field-input::placeholder { color: var(--text-4); }
+        .login-section .btn-primary { height: 44px; }
+        .login-hint { font-size: 11.5px; color: var(--text-4); margin-top: 12px; display: flex; align-items: center; gap: 6px; }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 18px;
+            margin-bottom: 26px;
+            align-items: stretch;
+        }
+        .control-card {
+            background: var(--surface);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-radius: var(--r-lg);
+            padding: 20px 22px;
+            border: 1px solid var(--border-soft);
+            box-shadow: var(--shadow-sm);
+            transition: border-color 0.25s var(--ease), box-shadow 0.25s var(--ease);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .control-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent), var(--purple), var(--pink)); opacity: 0.85; }
+        .control-card:hover { border-color: var(--border); box-shadow: var(--shadow-md); }
+        .control-card h3 { color: var(--text-1); margin-bottom: 16px; font-size: 13px; display: flex; align-items: center; gap: 8px; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase; padding-bottom: 12px; border-bottom: 1px solid var(--border-soft); }
+        .control-card .form-group { margin-bottom: 14px; }
+        .control-card .form-group:last-of-type { margin-bottom: 0; }
+        .control-card label.field-label { margin-bottom: 6px; }
+        .control-card input, .control-card select {
+            width: 100%;
+            padding: 10px 14px;
+            background: rgba(0, 0, 0, 0.28);
+            border: 1.5px solid var(--border);
+            border-radius: var(--r-sm);
+            color: var(--text-1);
+            font-family: inherit;
+            font-size: 13.5px;
+            min-height: 40px;
+            transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease);
+        }
+        .control-card input:hover, .control-card select:hover { border-color: var(--border-strong); }
+        .control-card input:focus, .control-card select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 4px rgba(79, 159, 255, 0.12); }
+        .control-card > .btn { width: 100%; justify-content: center; margin-top: auto; }
+
+        .action-buttons { display: flex; flex-direction: column; gap: 10px; flex: 1; }
+        .action-buttons .btn-row { display: flex; gap: 10px; }
+        .action-buttons .btn-row .btn { flex: 1; justify-content: center; }
+        .action-buttons #clearBtn { margin-top: auto; }
+
+        .segmented { display: flex; background: rgba(0, 0, 0, 0.28); border: 1.5px solid var(--border); border-radius: var(--r-sm); padding: 4px; gap: 4px; }
+        .segmented-option { position: relative; flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 9px 8px; border-radius: 8px; font-size: 12.5px; font-weight: 600; color: var(--text-3); cursor: pointer; transition: background 0.2s var(--ease), color 0.2s var(--ease), box-shadow 0.2s var(--ease); text-align: center; }
+        .segmented-option input { position: absolute; opacity: 0; pointer-events: none; }
+        .segmented-option:hover { color: var(--text-1); }
+        .segmented-option:has(input:checked) { background: linear-gradient(135deg, var(--accent), var(--purple)); color: #fff; box-shadow: var(--glow-accent); }
+
+        .chip-row { display: flex; flex-wrap: wrap; gap: 8px; }
+        .chip-toggle { position: relative; display: flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: var(--r-pill); border: 1.5px solid var(--border); background: rgba(255, 255, 255, 0.03); font-size: 12px; font-weight: 600; color: var(--text-3); cursor: pointer; transition: background 0.2s var(--ease), border-color 0.2s var(--ease), color 0.2s var(--ease); }
+        .chip-toggle input { position: absolute; opacity: 0; pointer-events: none; }
+        .chip-toggle:hover { border-color: var(--border-strong); color: var(--text-1); }
+        .chip-toggle:has(input:checked) { background: var(--accent-soft); border-color: var(--accent-border); color: var(--accent); }
+
+        .handlers-list { flex: 1; min-height: 110px; max-height: 260px; overflow-y: auto; margin-bottom: 12px; padding-right: 2px; }
+        .handlers-list::-webkit-scrollbar, .posts-container::-webkit-scrollbar { width: 6px; }
+        .handlers-list::-webkit-scrollbar-track, .posts-container::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.02); border-radius: 10px; }
+        .handlers-list::-webkit-scrollbar-thumb, .posts-container::-webkit-scrollbar-thumb { background: linear-gradient(135deg, var(--accent), var(--purple)); border-radius: 10px; }
+
+        .handler-item {
+            background: rgba(255, 255, 255, 0.035);
+            border-radius: var(--r-sm);
+            padding: 9px 12px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            border: 1px solid var(--border-soft);
+            transition: background 0.2s var(--ease), border-color 0.2s var(--ease);
+        }
+        .handler-item:hover { background: rgba(255, 255, 255, 0.065); border-color: var(--accent-border); }
+        .handler-item .handler-info { flex: 1; min-width: 0; }
+        .handler-item .handler-name { font-size: 13px; font-weight: 600; color: var(--text-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .handler-item .handler-handle { font-size: 11px; color: var(--text-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .handler-item .handler-avatar { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; flex-shrink: 0; border: 1.5px solid var(--border); }
+        .handler-item .handler-checkbox { flex-shrink: 0; display: flex; }
+        .handler-item .handler-checkbox input[type="checkbox"] { width: 17px; height: 17px; accent-color: var(--accent); cursor: pointer; }
+        .handler-item .handler-actions { display: flex; gap: 4px; flex-shrink: 0; }
+        .handler-item .handler-actions .btn { padding: 4px 10px; font-size: 11px; min-height: 28px; }
+
+        .add-handler-row { display: flex; flex-direction: column; gap: 8px; }
+        .add-handler-row input { width: 100%; min-width: 0; padding: 12px 16px; background: rgba(0, 0, 0, 0.28); border: 1.5px solid var(--border); border-radius: var(--r-sm); color: var(--text-1); font-family: inherit; font-size: 14px; min-height: 44px; transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease); }
+        .add-handler-row input:hover { border-color: var(--border-strong); }
+        .add-handler-row input::placeholder { color: var(--text-4); }
+        .add-handler-row input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 4px rgba(79, 159, 255, 0.12); }
+        .add-handler-row .btn { width: 100%; padding: 0 16px; min-height: 40px; }
+        .handler-quick-actions { margin-top: 10px; display: flex; gap: 8px; }
+        .handler-quick-actions .btn { flex: 1; min-height: 34px; }
+
+        .stats-bar {
+            display: flex;
+            gap: 28px;
+            padding: 14px 22px;
+            background: var(--surface);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-radius: var(--r-md);
+            margin-bottom: 18px;
+            border: 1px solid var(--border-soft);
+            flex-wrap: wrap;
+            font-size: 13px;
+            align-items: center;
+        }
+        .stats-bar .stat-item { display: flex; align-items: center; gap: 7px; color: var(--text-3); }
+        .stats-bar .stat-item .value { color: var(--accent); font-weight: 700; font-size: 16px; font-family: 'JetBrains Mono', monospace; }
+        .stats-bar .stat-item .icon { font-size: 16px; }
+        .filter-badge { display: inline-block; font-size: 11px; padding: 4px 14px; border-radius: var(--r-pill); background: var(--accent-soft); color: var(--accent); border: 1px solid var(--accent-border); font-weight: 600; }
+
+        .sort-controls { display: flex; gap: 8px; margin-left: auto; align-items: center; }
+        .sort-controls .sort-label { font-size: 10.5px; color: var(--text-4); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; margin-right: 2px; }
+
+        .posts-container {
+            background: rgba(0, 0, 0, 0.18);
+            border-radius: var(--r-lg);
+            padding: 18px;
+            max-height: 640px;
+            overflow-y: auto;
+            border: 1px solid var(--border-soft);
+        }
+        .post-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+            gap: 16px;
+        }
+
+        .post-card {
+            background: var(--surface);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: var(--r-lg);
+            padding: 16px 18px;
+            border: 1px solid var(--border-soft);
+            transition: transform 0.35s var(--ease), border-color 0.3s var(--ease), box-shadow 0.35s var(--ease), background 0.3s var(--ease);
+            display: flex;
+            flex-direction: column;
+            height: fit-content;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        .post-card:hover { transform: translateY(-3px); border-color: var(--accent-border); box-shadow: var(--shadow-lg); background: rgba(255, 255, 255, 0.065); }
+        .post-card.has-media { border-left: 3px solid var(--pink); }
+        .post-card.has-video { border-left: 3px solid var(--yellow); }
+
+        .post-card.selected {
+            border: 2px solid var(--accent);
+            background: var(--accent-soft);
+            box-shadow: var(--glow-accent);
+        }
+        .post-card.selected::after {
+            content: '✓';
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: var(--accent);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            z-index: 10;
+        }
+
+        .post-card .post-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .post-card .post-avatar { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border); flex-shrink: 0; transition: border-color 0.3s var(--ease); }
+        .post-card:hover .post-avatar { border-color: var(--accent-border); }
+        .post-card .post-author-wrap { flex: 1; min-width: 0; }
+        .post-card .post-author { font-weight: 700; color: #fff; font-size: 13.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+        .post-card .post-handle { color: var(--text-3); font-size: 11.5px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .post-card .post-time { color: var(--text-4); font-size: 10.5px; flex-shrink: 0; }
+        .post-card .post-text { color: var(--text-2); line-height: 1.55; margin: 6px 0 10px 0; word-wrap: break-word; font-size: 13.5px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; }
+        .post-card .post-text:empty { display: none; }
+
+        .repost-badge { display: inline-block; font-size: 10px; background: var(--accent-soft); color: var(--accent); padding: 3px 11px; border-radius: var(--r-pill); font-weight: 700; margin-bottom: 6px; border: 1px solid var(--accent-border); }
+
+        .post-card .post-gallery { display: grid; gap: 5px; margin: 8px 0 6px 0; max-width: 100%; }
+        .post-card .post-gallery.single { grid-template-columns: 1fr; max-width: 210px; }
+        .post-card .post-gallery.double { grid-template-columns: 1fr 1fr; max-width: 210px; }
+        .post-card .post-gallery.triple { grid-template-columns: 1fr 1fr 1fr; max-width: 230px; }
+        .post-card .post-gallery.quad { grid-template-columns: 1fr 1fr 1fr 1fr; max-width: 230px; }
+
+        .post-card .gallery-item { position: relative; overflow: hidden; border-radius: 9px; background: rgba(0, 0, 0, 0.3); cursor: pointer; aspect-ratio: 1 / 1; }
+        .post-card .gallery-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s var(--ease); display: block; }
+        .post-card .gallery-item:hover img { transform: scale(1.08); }
+        .post-card .gallery-item .image-count-badge { position: absolute; bottom: 5px; right: 5px; background: rgba(0, 0, 0, 0.72); backdrop-filter: blur(4px); color: white; padding: 2px 8px; border-radius: var(--r-pill); font-size: 9px; font-weight: 700; z-index: 2; }
+
+        .post-card .video-placeholder {
+            margin: 8px 0;
+            border-radius: 9px;
+            overflow: hidden;
+            background: linear-gradient(135deg, #1a1a3a, #0a0a2a);
+            border: 1px solid var(--yellow);
+            padding: 16px;
+            text-align: center;
+            cursor: default;
+            position: relative;
+        }
+        .post-card .video-placeholder .video-icon {
+            font-size: 32px;
+            display: block;
+            margin-bottom: 6px;
+        }
+        .post-card .video-placeholder .video-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--yellow);
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+        .post-card .video-placeholder .video-details {
+            font-size: 10px;
+            color: var(--text-4);
+            margin-top: 4px;
+        }
+        .post-card .video-placeholder .video-cid {
+            font-size: 9px;
+            color: var(--text-4);
+            font-family: 'JetBrains Mono', monospace;
+            margin-top: 4px;
+            word-break: break-all;
+        }
+
+        .post-card .post-stats {
+            display: flex;
+            gap: 16px;
+            margin-top: 10px;
+            color: var(--text-3);
+            font-size: 11.5px;
+            flex-wrap: wrap;
+            border-top: 1px solid var(--border-soft);
+            padding-top: 10px;
+            align-items: center;
+        }
+        .post-card .post-stats span { display: flex; align-items: center; gap: 5px; font-family: 'JetBrains Mono', monospace; }
+        .post-card .post-actions { display: flex; gap: 6px; margin-left: auto; pointer-events: none; }
+        .post-card .post-actions .btn { pointer-events: all; }
+
+        .empty-state { text-align: center; padding: 60px 20px; color: var(--text-4); grid-column: 1 / -1; }
+        .empty-state .icon { font-size: 52px; margin-bottom: 14px; opacity: 0.5; }
+        .empty-state p { font-size: 15px; color: var(--text-2); font-weight: 600; }
+        .empty-state .sub { font-size: 12.5px; color: var(--text-4); margin-top: 6px; }
+
+        /* ============================================================
+           VAULT VIEW WITH ZERNIO POSTING
+        ============================================================ */
+        .vault-view {
+            display: none;
+            background: rgba(0, 0, 0, 0.18);
+            border-radius: var(--r-lg);
+            padding: 18px;
+            max-height: 680px;
+            overflow-y: auto;
+            border: 1px solid var(--border-soft);
+        }
+        .vault-view.active { display: block; }
+
+        .vault-actions-bar {
+            display: flex;
+            gap: 10px;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: var(--r-md);
+            margin-bottom: 16px;
+            border: 1px solid var(--border-soft);
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .vault-actions-bar .vault-count { color: var(--text-3); font-size: 13px; margin-right: auto; }
+        .vault-actions-bar .vault-count span { color: var(--accent); font-weight: 700; }
+
+        .vault-item {
+            background: var(--surface);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: var(--r-lg);
+            padding: 16px 18px;
+            border: 1px solid var(--border-soft);
+            margin-bottom: 12px;
+            transition: transform 0.35s var(--ease), border-color 0.3s var(--ease), box-shadow 0.35s var(--ease);
+        }
+        .vault-item:hover { transform: translateY(-3px); border-color: var(--accent-border); box-shadow: var(--shadow-lg); }
+        .vault-item .vault-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .vault-item .vault-avatar { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border); }
+        .vault-item .vault-author { font-weight: 700; color: #fff; font-size: 13.5px; }
+        .vault-item .vault-handle { color: var(--text-3); font-size: 11.5px; }
+        .vault-item .vault-time { color: var(--text-4); font-size: 10.5px; margin-left: auto; }
+        .vault-item .vault-text { color: var(--text-2); line-height: 1.55; margin: 6px 0 10px 0; font-size: 13.5px; }
+        .vault-item .vault-gallery { display: grid; gap: 5px; margin: 8px 0 6px 0; max-width: 210px; grid-template-columns: 1fr 1fr; }
+        .vault-item .vault-gallery img { width: 100%; height: 100px; object-fit: cover; border-radius: 9px; cursor: pointer; }
+        .vault-item .vault-gallery.single { grid-template-columns: 1fr; max-width: 210px; }
+        .vault-item .vault-notes { background: rgba(255,255,255,0.03); border-radius: var(--r-sm); padding: 8px 12px; margin-top: 8px; font-size: 12px; color: var(--text-3); border: 1px dashed var(--border-soft); }
+        
+        .vault-item .vault-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid var(--border-soft);
+            flex-wrap: wrap;
+        }
+        .vault-item .vault-actions .btn { font-size: 11px; padding: 6px 14px; min-height: 30px; }
+
+        /* Zernio Posting Modal */
+        .zernio-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(20px);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            padding: 32px;
+        }
+        .zernio-modal.active { display: flex; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .zernio-modal-content {
+            background: var(--bg-2);
+            border-radius: var(--r-xl);
+            padding: 32px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid var(--border-strong);
+            box-shadow: var(--shadow-lg);
+        }
+        .zernio-modal-content h2 {
+            color: #fff;
+            font-size: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .zernio-modal-content h2 .instagram-icon {
+            background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+            padding: 6px 12px;
+            border-radius: var(--r-pill);
+            font-size: 14px;
+            color: white;
+        }
+        .zernio-modal-content .form-group { margin-bottom: 16px; }
+        .zernio-modal-content .form-group label {
+            display: block;
+            font-size: 12px;
+            color: var(--text-3);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 6px;
+        }
+        .zernio-modal-content .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1.5px solid var(--border);
+            border-radius: var(--r-sm);
+            color: var(--text-1);
+            font-family: inherit;
+            font-size: 14px;
+            min-height: 80px;
+            resize: vertical;
+            transition: border-color 0.2s var(--ease);
+        }
+        .zernio-modal-content .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        .zernio-modal-content .form-group .platform-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .zernio-modal-content .form-group .platform-chip {
+            padding: 8px 16px;
+            border-radius: var(--r-pill);
+            border: 2px solid var(--border);
+            background: transparent;
+            color: var(--text-3);
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s var(--ease);
+        }
+        .zernio-modal-content .form-group .platform-chip:hover {
+            border-color: var(--border-strong);
+            color: var(--text-1);
+        }
+        .zernio-modal-content .form-group .platform-chip.selected {
+            border-color: var(--accent);
+            background: var(--accent-soft);
+            color: var(--accent);
+        }
+        .zernio-modal-content .form-group .platform-chip.instagram {
+            background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+            color: white;
+            border-color: transparent;
+        }
+        .zernio-modal-content .form-group .platform-chip.instagram.selected {
+            box-shadow: var(--glow-instagram);
+        }
+        .zernio-modal-content .form-row {
+            display: flex;
+            gap: 12px;
+        }
+        .zernio-modal-content .form-row .form-group { flex: 1; }
+        .zernio-modal-content .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        .zernio-modal-content .modal-actions .btn { flex: 1; }
+
+        .posted-badge {
+            display: inline-block;
+            font-size: 9px;
+            background: var(--green);
+            color: white;
+            padding: 2px 10px;
+            border-radius: var(--r-pill);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+        .posted-badge.instagram {
+            background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+        }
+
+        .view-toggle { display: flex; gap: 4px; background: rgba(0,0,0,0.2); border-radius: var(--r-pill); padding: 4px; }
+        .view-toggle .btn { border-radius: var(--r-pill); min-height: 30px; padding: 6px 16px; font-size: 12px; background: transparent; color: var(--text-3); }
+        .view-toggle .btn.active { background: var(--accent-soft); color: var(--accent); border: 1px solid var(--accent-border); }
+        .view-toggle .btn:hover:not(.active) { color: var(--text-1); }
+
+        .selection-bar {
+            display: none;
+            background: var(--surface-strong);
+            backdrop-filter: blur(14px);
+            border-radius: var(--r-md);
+            padding: 12px 20px;
+            margin-bottom: 16px;
+            border: 1px solid var(--accent-border);
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .selection-bar.active { display: flex; }
+        .selection-bar .count { color: var(--text-1); font-weight: 700; font-size: 14px; }
+        .selection-bar .count span { color: var(--accent); }
+
+        .download-progress { margin-top: 4px; padding: 10px 14px; background: rgba(0, 0, 0, 0.28); border-radius: var(--r-sm); display: none; font-size: 12px; border: 1px solid var(--border-soft); }
+        .download-progress .progress-bar { width: 100%; height: 5px; background: rgba(255, 255, 255, 0.06); border-radius: var(--r-pill); overflow: hidden; margin-top: 6px; }
+        .download-progress .progress-bar .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--purple)); border-radius: var(--r-pill); transition: width 0.4s var(--ease); width: 0%; }
+
+        .status-bar { display: flex; justify-content: space-between; align-items: center; padding: 14px 4px 4px; color: var(--text-3); font-size: 12.5px; margin-top: 18px; flex-wrap: wrap; gap: 8px; }
+
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: rgba(16, 16, 42, 0.97);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            padding: 14px 24px;
+            border-radius: var(--r-md);
+            border-left: 3px solid var(--accent);
+            box-shadow: var(--shadow-lg);
+            transform: translateY(120px);
+            opacity: 0;
+            transition: all 0.4s var(--ease);
+            z-index: 1000;
+            max-width: 360px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-1);
+            border: 1px solid var(--border-soft);
+        }
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .toast.error { border-left-color: var(--red); }
+        .toast.success { border-left-color: var(--green); }
+
+        .lightbox {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(4, 4, 14, 0.94);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            z-index: 9998;
+            justify-content: center;
+            align-items: center;
+            padding: 32px;
+        }
+        .lightbox.active { display: flex; animation: fadeIn 0.3s ease; }
+        .lightbox img { max-width: 90%; max-height: 85vh; object-fit: contain; border-radius: var(--r-lg); box-shadow: 0 24px 70px rgba(0, 0, 0, 0.85); animation: scaleIn 0.35s var(--ease); }
+        @keyframes scaleIn { from { transform: scale(0.96); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .lightbox-close { position: absolute; top: 24px; right: 32px; color: white; font-size: 22px; cursor: pointer; background: rgba(255, 255, 255, 0.06); border: 1px solid var(--border); width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.3s var(--ease); }
+        .lightbox-close:hover { background: rgba(255, 255, 255, 0.14); transform: rotate(90deg); }
+        .lightbox .lightbox-info { position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%); background: rgba(0, 0, 0, 0.55); backdrop-filter: blur(10px); padding: 8px 22px; border-radius: var(--r-pill); font-size: 12.5px; color: var(--text-2); border: 1px solid var(--border-soft); max-width: 80vw; text-align: center; }
+
+        .filter-group-title { font-size: 11px; color: var(--text-3); margin-bottom: 8px; font-weight: 700; letter-spacing: 0.02em; display: flex; align-items: center; gap: 6px; }
+        .filter-group-title .badge { font-size: 9px; background: var(--accent-soft); color: var(--accent); padding: 2px 9px; border-radius: var(--r-pill); font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; }
+        .filter-divider { border: none; border-top: 1px solid var(--border-soft); margin: 14px 0; }
+
+        @media (max-width: 1180px) { .post-grid { grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); } }
+        @media (max-width: 1024px) { .controls-grid { grid-template-columns: 1fr 1fr; } }
+        @media (max-width: 768px) {
+            body { padding: 16px; }
+            .post-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+            .header { padding: 16px 20px; }
+            .header h1 { font-size: 18px; }
+            .controls-grid { grid-template-columns: 1fr; gap: 14px; }
+            .sort-controls { margin-left: 0; width: 100%; justify-content: flex-start; }
+            .selection-bar { flex-direction: column; align-items: stretch; text-align: center; }
+            .vault-actions-bar { flex-direction: column; align-items: stretch; }
+            .zernio-modal-content { padding: 20px; }
+            .zernio-modal-content .form-row { flex-direction: column; }
+        }
+        @media (max-width: 600px) {
+            body { padding: 12px; }
+            .login-section .login-row { flex-direction: column; align-items: stretch; }
+            .login-section .form-group { min-width: unset; }
+            .post-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+            .stats-bar { font-size: 11.5px; gap: 14px; padding: 12px 16px; }
+            .action-buttons .btn-row { flex-direction: column; }
+            .header { flex-direction: column; align-items: stretch; }
+            .login-status { justify-content: center; }
+            .add-handler-row { flex-direction: column; }
+        }
+        @media (max-width: 420px) {
+            .post-grid { grid-template-columns: 1fr; }
+            .post-card .post-gallery.single { max-width: 150px; }
+            .post-card .post-gallery.double,
+            .post-card .post-gallery.triple,
+            .post-card .post-gallery.quad { grid-template-columns: 1fr 1fr; max-width: 170px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Lightbox -->
+    <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+        <button class="lightbox-close" onclick="closeLightbox()" aria-label="Close">✕</button>
+        <img id="lightboxImage" src="" alt="Full size image">
+        <div class="lightbox-info" id="lightboxInfo">Click to close</div>
+    </div>
+
+    <!-- Zernio Post Modal -->
+    <div class="zernio-modal" id="zernioModal">
+        <div class="zernio-modal-content">
+            <h2>
+                📤 Post to Social Media
+                <span class="instagram-icon">📸</span>
+            </h2>
+            
+            <div class="form-group">
+                <label>📝 Caption</label>
+                <textarea id="zernioCaption" placeholder="Write your caption here..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>📱 Platforms</label>
+                <div class="platform-chips" id="platformChips">
+                    <button class="platform-chip instagram selected" data-platform="instagram" onclick="togglePlatform(this)">📸 Instagram</button>
+                    <button class="platform-chip" data-platform="facebook" onclick="togglePlatform(this)">📘 Facebook</button>
+                    <button class="platform-chip" data-platform="twitter" onclick="togglePlatform(this)">🐦 Twitter/X</button>
+                    <button class="platform-chip" data-platform="linkedin" onclick="togglePlatform(this)">💼 LinkedIn</button>
+                    <button class="platform-chip" data-platform="threads" onclick="togglePlatform(this)">🧵 Threads</button>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label>⏰ Schedule (optional)</label>
+                    <input type="datetime-local" id="zernioSchedule">
+                </div>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeZernioModal()">Cancel</button>
+                <button class="btn btn-instagram" id="zernioPostBtn" onclick="submitZernioPost()">🚀 Post Now</button>
+            </div>
+            <div id="zernioStatus" style="margin-top:12px; font-size:13px; color:var(--text-3);"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <div class="header-logo">🦋</div>
+                <h1>
+                    <span class="grad">Bluesky Gallery</span>
+                    <small>Multi-Handler Viewer</small>
+                </h1>
+            </div>
+            <div class="login-status">
+                <span class="status-dot offline" id="statusDot"></span>
+                <span id="statusText">Offline</span>
+                <span class="user-name" id="userDisplay" style="display:none;"></span>
+                <button class="btn btn-danger btn-sm" id="logoutBtn" style="display:none;">Logout</button>
+            </div>
+        </header>
+
+        <!-- Login Section -->
+        <div class="login-section" id="loginSection">
+            <div class="login-row">
+                <div class="form-group">
+                    <label class="field-label" for="username">Your Handle</label>
+                    <input class="field-input" type="text" id="username" placeholder="user.bsky.social" autocomplete="username" value="dailymotivator.bsky.social">
+                </div>
+                <div class="form-group">
+                    <label class="field-label" for="password">App Password</label>
+                    <input class="field-input" type="password" id="password" placeholder="xxxx-xxxx-xxxx-xxxx" autocomplete="current-password" value="jnyu-ax57-veye-po6b">
+                </div>
+                <button class="btn btn-primary" id="loginBtn">🔐 Login</button>
+            </div>
+            <div class="login-hint">🔒 Use a Bluesky <strong>app password</strong> (Settings → App Passwords), not your main account password.</div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls-grid">
+            <!-- Handlers Card -->
+            <div class="control-card">
+                <h3>👥 Handlers</h3>
+                <div class="handlers-list" id="handlersList"></div>
+                <div class="add-handler-row">
+                    <input type="text" id="newHandlerInput" placeholder="Add Bluesky handle... e.g., user.bsky.social">
+                    <button class="btn btn-secondary btn-sm" id="addHandlerBtn">➕ Add</button>
+                </div>
+                <div class="handler-quick-actions">
+                    <button class="btn btn-secondary btn-sm" id="selectAllBtn">✅ All</button>
+                    <button class="btn btn-secondary btn-sm" id="selectNoneBtn">❌ None</button>
+                </div>
+            </div>
+
+            <!-- Settings Card -->
+            <div class="control-card">
+                <h3>⚙️ Filters</h3>
+                <div class="form-group">
+                    <div class="filter-group-title">📋 Post Type</div>
+                    <div class="segmented">
+                        <label class="segmented-option">
+                            <input type="radio" name="postType" value="user_posts" checked>
+                            <span>📝 Own Posts</span>
+                        </label>
+                        <label class="segmented-option">
+                            <input type="radio" name="postType" value="all_posts">
+                            <span>📰 All Posts</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="filter-group-title">🎛️ Include</div>
+                    <div class="chip-row">
+                        <label class="chip-toggle">
+                            <input type="checkbox" id="filterMedia">
+                            <span>📸 Media only</span>
+                        </label>
+                        <label class="chip-toggle">
+                            <input type="checkbox" id="includeReposts" checked>
+                            <span>🔄 Reposts</span>
+                        </label>
+                        <label class="chip-toggle">
+                            <input type="checkbox" id="includeReplies" checked>
+                            <span>💬 Replies</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="field-label" for="limit">Posts per Handler</label>
+                    <input type="number" id="limit" value="20" min="1" max="100">
+                </div>
+                <button class="btn btn-success" id="fetchBtn" disabled>🚀 Fetch Selected</button>
+            </div>
+
+            <!-- Actions Card -->
+            <div class="control-card">
+                <h3>🎯 Actions</h3>
+                <div class="action-buttons">
+                    <div class="view-toggle">
+                        <button class="btn active" id="viewPostsBtn" onclick="switchView('posts')">📰 Posts</button>
+                        <button class="btn" id="viewVaultBtn" onclick="switchView('vault')">🏦 Vault</button>
+                    </div>
+                    <div class="btn-row">
+                        <button class="btn btn-secondary btn-sm" id="downloadImagesBtn" disabled>📥 Images</button>
+                        <button class="btn btn-secondary btn-sm" id="saveJsonBtn" disabled>💾 JSON</button>
+                    </div>
+                    <button class="btn btn-secondary btn-sm" id="clearBtn">🗑️ Clear All</button>
+                    <div class="download-progress" id="downloadProgress">
+                        <span id="progressText">Downloading...</span>
+                        <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats & Sort -->
+        <div class="stats-bar">
+            <div class="stat-item"><span class="icon">📊</span> <span class="value" id="postCount">0</span> posts</div>
+            <div class="stat-item"><span class="icon">📸</span> <span class="value" id="imageCount">0</span> images</div>
+            <div class="stat-item"><span class="icon">🎬</span> <span class="value" id="videoCount">0</span> videos</div>
+            <div class="stat-item"><span class="icon">❤️</span> <span class="value" id="likeCount">0</span> likes</div>
+            <div class="stat-item"><span class="icon">👥</span> <span class="value" id="handlerCount">0</span> handlers</div>
+            <div class="stat-item"><span class="filter-badge" id="filterBadge">📝 User's Posts</span></div>
+            <div class="sort-controls">
+                <span class="sort-label">Sort:</span>
+                <button class="btn btn-active btn-xs" id="sortNewest" onclick="sortPosts('newest')">⬇ Newest</button>
+                <button class="btn btn-secondary btn-xs" id="sortOldest" onclick="sortPosts('oldest')">⬆ Oldest</button>
+            </div>
+        </div>
+
+        <!-- Selection Bar -->
+        <div class="selection-bar" id="selectionBar">
+            <div class="count">📋 <span id="selectedCount">0</span> posts selected</div>
+            <button class="btn btn-sm btn-success" onclick="saveSelectedPosts()">⭐ Save Selected</button>
+            <button class="btn btn-sm btn-secondary" onclick="clearSelection()">✕ Clear</button>
+            <button class="btn btn-sm btn-secondary" onclick="selectAllVisible()">✅ Select All</button>
+        </div>
+
+        <!-- Posts -->
+        <div class="posts-container" id="postsContainer">
+            <div class="post-grid" id="postGrid">
+                <div class="empty-state">
+                    <div class="icon">🦋</div>
+                    <p>Add handlers & fetch posts</p>
+                    <div class="sub">Click on posts to select them, then save multiple at once</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vault View -->
+        <div class="vault-view" id="vaultView">
+            <div class="vault-actions-bar">
+                <div class="vault-count">🏦 Vault: <span id="vaultItemCount">0</span> items</div>
+                <button class="btn btn-sm btn-success" id="restoreAllBtn">🔄 Restore All</button>
+                <button class="btn btn-sm btn-danger" id="deleteAllBtn">🗑️ Delete All</button>
+                <button class="btn btn-sm btn-instagram" onclick="refreshVault()">🔄 Refresh</button>
+            </div>
+            <div class="post-grid" id="vaultGrid">
+                <div class="empty-state">
+                    <div class="icon">🏦</div>
+                    <p>Vault is empty</p>
+                    <div class="sub">Save posts you like to the vault</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status -->
+        <div class="status-bar">
+            <span id="statusMessage">✨ Ready</span>
+            <span id="sessionInfo">Not logged in</span>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"><span id="toastMessage">Notification</span></div>
+
+    <script>
+        // ============================================================
+        // CONFIGURATION
+        // ============================================================
+        const API_BASE = '';
+
+        // ============================================================
+        // STATE
+        // ============================================================
+        let sessionId = null;
+        let allPosts = [];
+        let vaultItems = [];
+        let removedUris = new Set();
+        let selectedUris = new Set();
+        let isFetching = false;
+        let isDownloading = false;
+        let currentSort = 'newest';
+        let handlers = [];
+        let handlerIdCounter = 0;
+        let currentView = 'posts';
+        let currentPostingItem = null;
+        let zernioAccounts = [];
+
+        const defaultHandlers = [
+            { id: 1, handle: 'economist.bsky.social', displayName: '', avatar: '', selected: true },
+            { id: 2, handle: 'newyorker.com', displayName: '', avatar: '', selected: false }
+        ];
+
+        // ============================================================
+        // DOM ELEMENTS
+        // ============================================================
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const loginBtn = document.getElementById('loginBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const statusDot = document.getElementById('statusDot');
+        const statusText = document.getElementById('statusText');
+        const userDisplay = document.getElementById('userDisplay');
+        const fetchBtn = document.getElementById('fetchBtn');
+        const downloadImagesBtn = document.getElementById('downloadImagesBtn');
+        const saveJsonBtn = document.getElementById('saveJsonBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const postGrid = document.getElementById('postGrid');
+        const vaultGrid = document.getElementById('vaultGrid');
+        const postsContainer = document.getElementById('postsContainer');
+        const vaultView = document.getElementById('vaultView');
+        const postCount = document.getElementById('postCount');
+        const imageCount = document.getElementById('imageCount');
+        const videoCount = document.getElementById('videoCount');
+        const likeCount = document.getElementById('likeCount');
+        const handlerCount = document.getElementById('handlerCount');
+        const statusMessage = document.getElementById('statusMessage');
+        const sessionInfo = document.getElementById('sessionInfo');
+        const limitInput = document.getElementById('limit');
+        const includeReposts = document.getElementById('includeReposts');
+        const includeReplies = document.getElementById('includeReplies');
+        const filterMedia = document.getElementById('filterMedia');
+        const handlersList = document.getElementById('handlersList');
+        const newHandlerInput = document.getElementById('newHandlerInput');
+        const addHandlerBtn = document.getElementById('addHandlerBtn');
+        const selectAllBtn = document.getElementById('selectAllBtn');
+        const selectNoneBtn = document.getElementById('selectNoneBtn');
+        const downloadProgress = document.getElementById('downloadProgress');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const sortNewestBtn = document.getElementById('sortNewest');
+        const sortOldestBtn = document.getElementById('sortOldest');
+        const filterBadge = document.getElementById('filterBadge');
+        const viewPostsBtn = document.getElementById('viewPostsBtn');
+        const viewVaultBtn = document.getElementById('viewVaultBtn');
+        const selectionBar = document.getElementById('selectionBar');
+        const selectedCount = document.getElementById('selectedCount');
+        const vaultItemCount = document.getElementById('vaultItemCount');
+        const restoreAllBtn = document.getElementById('restoreAllBtn');
+        const deleteAllBtn = document.getElementById('deleteAllBtn');
+
+        // Zernio Modal Elements
+        const zernioModal = document.getElementById('zernioModal');
+        const zernioCaption = document.getElementById('zernioCaption');
+        const zernioSchedule = document.getElementById('zernioSchedule');
+        const zernioStatus = document.getElementById('zernioStatus');
+        const zernioPostBtn = document.getElementById('zernioPostBtn');
+
+        // ============================================================
+        // PERSISTENCE
+        // ============================================================
+        function saveToStorage(key, value) {
+            try {
+                localStorage.setItem(`bluesky_${key}`, JSON.stringify(value));
+            } catch (e) { console.log('Storage save error:', e); }
+        }
+
+        function getFromStorage(key) {
+            try {
+                const item = localStorage.getItem(`bluesky_${key}`);
+                return item ? JSON.parse(item) : null;
+            } catch (e) { console.log('Storage load error:', e); return null; }
+        }
+
+        function saveRemovedUris() {
+            saveToStorage('removed_uris', Array.from(removedUris));
+        }
+
+        function loadRemovedUris() {
+            const saved = getFromStorage('removed_uris');
+            if (saved && Array.isArray(saved)) {
+                removedUris = new Set(saved);
+            }
+        }
+
+        // ============================================================
+        // UTILITY FUNCTIONS
+        // ============================================================
+        function getPostType() {
+            const selected = document.querySelector('input[name="postType"]:checked');
+            return selected ? selected.value : 'user_posts';
+        }
+
+        function updateFilterBadge() {
+            const postType = getPostType();
+            const typeLabel = postType === 'user_posts' ? '📝 User\'s Posts' : '📰 All Posts';
+            const mediaFilter = filterMedia.checked ? ' 📸+Images' : '';
+            const repostFilter = includeReposts.checked ? '' : ' 🚫NoReposts';
+            const replyFilter = includeReplies.checked ? '' : ' 🚫NoReplies';
+            filterBadge.textContent = typeLabel + mediaFilter + repostFilter + replyFilter;
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            toastMessage.textContent = message;
+            toast.className = `toast ${type} show`;
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(() => toast.classList.remove('show'), 4000);
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function openLightbox(imageUrl, alt = '') {
+            const lightbox = document.getElementById('lightbox');
+            const lightboxImage = document.getElementById('lightboxImage');
+            const lightboxInfo = document.getElementById('lightboxInfo');
+            lightboxImage.src = imageUrl;
+            lightboxImage.alt = alt;
+            lightboxInfo.textContent = alt || 'Click to close';
+            lightbox.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLightbox(); });
+
+        // ============================================================
+        // SELECTION FUNCTIONS
+        // ============================================================
+        function toggleSelection(uri) {
+            if (selectedUris.has(uri)) {
+                selectedUris.delete(uri);
+            } else {
+                selectedUris.add(uri);
+            }
+            updateSelectionUI();
+            renderPosts(allPosts);
+        }
+
+        function clearSelection() {
+            selectedUris.clear();
+            updateSelectionUI();
+            renderPosts(allPosts);
+        }
+
+        function selectAllVisible() {
+            const visiblePosts = allPosts.filter(post => {
+                const inVault = vaultItems.some(v => v.uri === post.uri);
+                const isRemoved = removedUris.has(post.uri);
+                return !inVault && !isRemoved;
+            });
+            visiblePosts.forEach(post => selectedUris.add(post.uri));
+            updateSelectionUI();
+            renderPosts(allPosts);
+        }
+
+        function updateSelectionUI() {
+            const count = selectedUris.size;
+            selectedCount.textContent = count;
+            if (count > 0) {
+                selectionBar.classList.add('active');
+            } else {
+                selectionBar.classList.remove('active');
+            }
+        }
+
+        // ============================================================
+        // VIEW SWITCHING
+        // ============================================================
+        function switchView(view) {
+            currentView = view;
+            saveToStorage('view', view);
+            if (view === 'posts') {
+                postsContainer.style.display = 'block';
+                vaultView.classList.remove('active');
+                viewPostsBtn.className = 'btn active';
+                viewVaultBtn.className = 'btn';
+                clearSelection();
+            } else {
+                postsContainer.style.display = 'none';
+                vaultView.classList.add('active');
+                viewVaultBtn.className = 'btn active';
+                viewPostsBtn.className = 'btn';
+                loadVaultItems();
+            }
+        }
+
+        // ============================================================
+        // SORT
+        // ============================================================
+        function sortPosts(order) {
+            if (allPosts.length === 0) { showToast('No posts to sort', 'error'); return; }
+            currentSort = order;
+            if (order === 'newest') {
+                sortNewestBtn.className = 'btn btn-active btn-xs';
+                sortOldestBtn.className = 'btn btn-secondary btn-xs';
+            } else {
+                sortNewestBtn.className = 'btn btn-secondary btn-xs';
+                sortOldestBtn.className = 'btn btn-active btn-xs';
+            }
+            const sorted = [...allPosts].sort((a, b) => {
+                const dateA = new Date(a.created_at);
+                const dateB = new Date(b.created_at);
+                return order === 'newest' ? dateB - dateA : dateA - dateB;
+            });
+            renderPosts(sorted);
+            allPosts = sorted;
+            statusMessage.textContent = `📋 Sorted: ${order === 'newest' ? 'Newest first' : 'Oldest first'}`;
+            showToast(`📋 ${order === 'newest' ? 'Newest' : 'Oldest'} first`, 'success');
+        }
+
+        // ============================================================
+        // LOGIN UI
+        // ============================================================
+        function updateLoginUI(loggedIn, userData = null) {
+            if (loggedIn && userData) {
+                statusDot.className = 'status-dot online';
+                statusText.textContent = 'Online';
+                userDisplay.style.display = 'inline';
+                userDisplay.textContent = `👤 ${userData.display_name || userData.handle}`;
+                logoutBtn.style.display = 'inline-block';
+                loginBtn.disabled = true;
+                document.getElementById('loginSection').style.opacity = '0.6';
+                sessionInfo.textContent = `Logged in as ${userData.handle}`;
+                saveToStorage('session_id', sessionId);
+                saveToStorage('username', usernameInput.value.trim());
+                saveToStorage('user_data', userData);
+            } else {
+                statusDot.className = 'status-dot offline';
+                statusText.textContent = 'Offline';
+                userDisplay.style.display = 'none';
+                logoutBtn.style.display = 'none';
+                loginBtn.disabled = false;
+                document.getElementById('loginSection').style.opacity = '1';
+                sessionInfo.textContent = 'Not logged in';
+                localStorage.removeItem('bluesky_session_id');
+                localStorage.removeItem('bluesky_user_data');
+            }
+            updateFetchButton();
+        }
+
+        // ============================================================
+        // HANDLER MANAGEMENT
+        // ============================================================
+        function renderHandlers() {
+            handlersList.innerHTML = '';
+            handlers.forEach(handler => {
+                const div = document.createElement('div');
+                div.className = 'handler-item';
+                div.innerHTML = `
+                    <img class="handler-avatar" src="${handler.avatar || `https://ui-avatars.com/api/?name=${handler.handle}&background=4f9fff&color=fff&size=30`}" alt="${handler.handle}">
+                    <div class="handler-info">
+                        <div class="handler-name">${handler.displayName || handler.handle}</div>
+                        <div class="handler-handle">@${handler.handle}</div>
+                    </div>
+                    <div class="handler-checkbox">
+                        <input type="checkbox" ${handler.selected ? 'checked' : ''} onchange="toggleHandler(${handler.id})">
+                    </div>
+                    <div class="handler-actions">
+                        <button class="btn btn-danger btn-sm" onclick="removeHandler(${handler.id})">✕</button>
+                    </div>
+                `;
+                handlersList.appendChild(div);
+            });
+            handlerCount.textContent = handlers.length;
+            updateFetchButton();
+            saveToStorage('handlers', handlers.map(h => ({
+                id: h.id,
+                handle: h.handle,
+                displayName: h.displayName,
+                avatar: h.avatar,
+                selected: h.selected
+            })));
+            saveToStorage('handler_counter', handlerIdCounter);
+        }
+
+        function toggleHandler(id) {
+            const handler = handlers.find(h => h.id === id);
+            if (handler) { handler.selected = !handler.selected; renderHandlers(); }
+        }
+
+        async function removeHandler(id) {
+            const handler = handlers.find(h => h.id === id);
+            if (!handler) return;
+            
+            if (handlers.length <= 1) {
+                showToast('Keep at least one handler', 'error');
+                return;
+            }
+            
+            if (!sessionId) {
+                showToast('Please login first', 'error');
+                return;
+            }
+            
+            if (!confirm(`Remove @${handler.handle} from handlers?`)) return;
+            
+            try {
+                const res = await fetch(`${API_BASE}/api/handlers/remove`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        session_id: sessionId,
+                        handle: handler.handle
+                    })
+                });
+                const data = await res.json();
+                
+                if (data.success) {
+                    handlers = handlers.filter(h => h.id !== id);
+                    renderHandlers();
+                    showToast(`@${handler.handle} removed`, 'success');
+                } else {
+                    showToast(`Error: ${data.error}`, 'error');
+                }
+            } catch (e) {
+                showToast(`Error: ${e.message}`, 'error');
+            }
+        }
+
+        function addHandler(handle) {
+            handle = handle.trim();
+            if (!handle) { showToast('Please enter a handle', 'error'); return; }
+            if (handlers.some(h => h.handle.toLowerCase() === handle.toLowerCase())) {
+                showToast('Handler already exists', 'error');
+                return;
+            }
+            handlerIdCounter++;
+            handlers.push({ id: handlerIdCounter, handle, displayName: '', avatar: '', selected: true });
+            resolveHandlerInfo(handle, handlerIdCounter);
+            renderHandlers();
+            newHandlerInput.value = '';
+            showToast(`Added @${handle}`, 'success');
+        }
+
+        async function resolveHandlerInfo(handle, id) {
+            if (!sessionId) return;
+            try {
+                const res = await fetch(`${API_BASE}/api/resolve-handle`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ session_id: sessionId, handle })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    const handler = handlers.find(h => h.id === id);
+                    if (handler) {
+                        handler.displayName = data.profile.display_name || handle;
+                        handler.avatar = data.profile.avatar;
+                        renderHandlers();
+                    }
+                }
+            } catch (e) { console.log('Could not resolve handler info:', e); }
+        }
+
+        async function loadSavedHandlers() {
+            if (!sessionId) return;
+            try {
+                const res = await fetch(`${API_BASE}/api/handlers/list`, { method: 'POST', headers: { 'Content-Type': 'application/json' } });
+                const data = await res.json();
+                if (data.success && data.handlers.length > 0) {
+                    handlers = data.handlers.map((h, i) => ({
+                        id: ++handlerIdCounter,
+                        handle: h.handle,
+                        displayName: h.display_name || h.handle,
+                        avatar: h.avatar,
+                        selected: i === 0 ? true : false
+                    }));
+                    renderHandlers();
+                }
+            } catch (e) { console.log('Could not load handlers:', e); }
+        }
+
+        function updateFetchButton() {
+            const hasSelected = handlers.some(h => h.selected);
+            fetchBtn.disabled = !sessionId || !hasSelected;
+        }
+
+        // ============================================================
+        // SELECT ALL / NONE
+        // ============================================================
+        selectAllBtn.addEventListener('click', () => {
+            handlers.forEach(h => h.selected = true);
+            renderHandlers();
+        });
+        selectNoneBtn.addEventListener('click', () => {
+            if (handlers.length === 1) { showToast('Cannot deselect the last handler', 'error'); return; }
+            handlers.forEach(h => h.selected = false);
+            if (handlers.every(h => !h.selected)) { handlers[0].selected = true; }
+            renderHandlers();
+        });
+
+        // ============================================================
+        // ADD HANDLER
+        // ============================================================
+        addHandlerBtn.addEventListener('click', () => { addHandler(newHandlerInput.value); });
+        newHandlerInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') addHandler(newHandlerInput.value); });
+
+        // ============================================================
+        // RENDER POSTS
+        // ============================================================
+        function renderPosts(posts) {
+            postGrid.innerHTML = '';
+
+            const visiblePosts = posts.filter(post => {
+                const inVault = vaultItems.some(v => v.uri === post.uri);
+                const isRemoved = removedUris.has(post.uri);
+                return !inVault && !isRemoved;
+            });
+
+            if (visiblePosts.length === 0) {
+                postGrid.innerHTML = `<div class="empty-state"><div class="icon">📭</div><p>No posts found</p><div class="sub">Try different handlers or filters</div></div>`;
+                return;
+            }
+
+            let totalImages = 0;
+            let totalVideos = 0;
+            let totalLikes = 0;
+
+            visiblePosts.forEach(post => {
+                const card = document.createElement('div');
+                card.className = 'post-card';
+
+                if (post.has_media) {
+                    card.classList.add('has-media');
+                }
+                if (post.has_video) {
+                    card.classList.add('has-video');
+                }
+
+                if (selectedUris.has(post.uri)) {
+                    card.classList.add('selected');
+                }
+
+                card.addEventListener('click', (e) => {
+                    if (e.target.closest('.btn') || e.target.closest('.gallery-item') || e.target.closest('.video-placeholder')) {
+                        return;
+                    }
+                    toggleSelection(post.uri);
+                });
+
+                const time = new Date(post.created_at).toLocaleString();
+                const avatar = post.avatar || `https://ui-avatars.com/api/?name=${post.author}&background=4f9fff&color=fff&size=32`;
+
+                let galleryHTML = '';
+                if (post.images && post.images.length > 0) {
+                    totalImages += post.images.length;
+                    const gridClass = post.images.length === 1 ? 'single' :
+                                    post.images.length === 2 ? 'double' :
+                                    post.images.length === 3 ? 'triple' : 'quad';
+                    galleryHTML = `<div class="post-gallery ${gridClass}">`;
+                    post.images.forEach((img, idx) => {
+                        const imgUrl = img.thumb || img.url;
+                        galleryHTML += `
+                            <div class="gallery-item" onclick="event.stopPropagation(); openLightbox('${img.url}', '${img.alt || ''}')">
+                                <img src="${imgUrl}" alt="${img.alt || 'Post image'}" loading="lazy">
+                                ${post.images.length > 1 ? `<div class="image-count-badge">${idx + 1}</div>` : ''}
+                            </div>
+                        `;
+                    });
+                    galleryHTML += '</div>';
+                }
+
+                let videoHTML = '';
+                if (post.video && post.video.cid) {
+                    totalVideos++;
+                    const videoCid = post.video.cid;
+                    const playlistCount = post.video.playlist ? '📋 Playlist' : '🎬 Video';
+                    
+                    videoHTML = `
+                        <div class="video-placeholder">
+                            <span class="video-icon">🎬</span>
+                            <div class="video-label">📹 VIDEO POST</div>
+                            <div class="video-details">${playlistCount} · CID: ${videoCid.substring(0, 12)}...</div>
+                            <div class="video-cid">${videoCid}</div>
+                            <div style="margin-top: 8px; font-size: 10px; color: var(--text-4);">
+                                ⏳ Video will be handled later
+                            </div>
+                        </div>
+                    `;
+                }
+
+                totalLikes += post.likes || 0;
+
+                let repostBadge = '';
+                if (post.is_repost && post.original_author) {
+                    repostBadge = `<div class="repost-badge">🔁 Reposted from @${post.original_author}</div>`;
+                }
+
+                let sourceBadge = '';
+                if (post.source_handler) {
+                    sourceBadge = `<div class="repost-badge" style="background:rgba(79,159,255,0.12); color:#4f9fff; border-color:rgba(79,159,255,0.22);">📌 From @${post.source_handler}</div>`;
+                }
+
+                let replyBadge = '';
+                if (post.is_reply) {
+                    replyBadge = `<div class="repost-badge" style="background:rgba(255,197,66,0.15); color:#ffc542; border-color:rgba(255,197,66,0.25);">💬 Reply</div>`;
+                }
+
+                card.innerHTML = `
+                    <div class="post-header">
+                        <img src="${avatar}" class="post-avatar" alt="${post.author}">
+                        <div class="post-author-wrap">
+                            <span class="post-author" title="${escapeHtml(post.display_name || post.author)}">${escapeHtml(post.display_name || post.author)}</span>
+                            <span class="post-handle" title="@${escapeHtml(post.author)}">@${escapeHtml(post.author)}</span>
+                        </div>
+                        <span class="post-time">${time}</span>
+                    </div>
+                    ${repostBadge}${replyBadge}${sourceBadge}
+                    ${post.text ? `<div class="post-text">${escapeHtml(post.text)}</div>` : ''}
+                    ${galleryHTML}
+                    ${videoHTML}
+                    <div class="post-stats">
+                        <span>❤️ ${post.likes || 0}</span>
+                        <span>🔄 ${post.reposts || 0}</span>
+                        <span>💬 ${post.replies || 0}</span>
+                        ${post.has_media ? `<span>📸 ${post.images ? post.images.length : 0}</span>` : ''}
+                        ${post.has_video ? `<span>🎬 Video</span>` : ''}
+                        <div class="post-actions">
+                            <button class="btn btn-sm btn-secondary" onclick="event.stopPropagation(); toggleSelection('${post.uri}')">
+                                ${selectedUris.has(post.uri) ? '✓ Selected' : '☐ Select'}
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                postGrid.appendChild(card);
+            });
+
+            postCount.textContent = visiblePosts.length;
+            imageCount.textContent = totalImages;
+            videoCount.textContent = totalVideos;
+            likeCount.textContent = totalLikes;
+
+            updateSelectionUI();
+        }
+
+        // ============================================================
+        // SAVE SELECTED POSTS
+        // ============================================================
+        async function saveSelectedPosts() {
+            if (selectedUris.size === 0) {
+                showToast('No posts selected', 'error');
+                return;
+            }
+
+            if (!sessionId) {
+                showToast('Please login first', 'error');
+                return;
+            }
+
+            const selectedPosts = allPosts.filter(p => selectedUris.has(p.uri));
+            let savedCount = 0;
+            let failedCount = 0;
+
+            showToast(`Saving ${selectedPosts.length} posts to vault...`, 'success');
+
+            for (const post of selectedPosts) {
+                try {
+                    const res = await fetch(`${API_BASE}/api/vault/add`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            post: post,
+                            handler_handle: post.source_handler || post.author
+                        })
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        vaultItems.push(post);
+                        removedUris.add(post.uri);
+                        savedCount++;
+                    } else {
+                        failedCount++;
+                    }
+                } catch (e) {
+                    failedCount++;
+                    console.error('Error saving post:', e);
+                }
+            }
+
+            saveRemovedUris();
+            
+            allPosts = allPosts.filter(p => !selectedUris.has(p.uri));
+            selectedUris.clear();
+            renderPosts(allPosts);
+            updateSelectionUI();
+
+            showToast(`✅ Saved ${savedCount} posts to vault${failedCount > 0 ? `, ${failedCount} failed` : ''}`, 'success');
+            statusMessage.textContent = `Saved ${savedCount} posts to vault`;
+        }
+
+        // ============================================================
+        // VAULT FUNCTIONS WITH ZERNIO POSTING
+        // ============================================================
+        async function loadVaultItems() {
+            if (!sessionId) { return; }
+            try {
+                const res = await fetch(`${API_BASE}/api/vault/list`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({})
+                });
+                const data = await res.json();
+                if (data.success) {
+                    vaultItems = data.vault;
+                    data.vault.forEach(item => {
+                        removedUris.add(item.uri);
+                    });
+                    saveRemovedUris();
+                    renderVaultItems(vaultItems);
+                    if (currentView === 'posts') {
+                        renderPosts(allPosts);
+                    }
+                }
+            } catch (e) { console.log('Error loading vault:', e); }
+        }
+
+        function renderVaultItems(items) {
+            vaultGrid.innerHTML = '';
+            const count = items.length;
+            vaultItemCount.textContent = count;
+            
+            if (count === 0) {
+                vaultGrid.innerHTML = `<div class="empty-state"><div class="icon">🏦</div><p>Vault is empty</p><div class="sub">Save posts you like to the vault</div></div>`;
+                return;
+            }
+            
+            items.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'vault-item';
+                const time = new Date(item.created_at).toLocaleString();
+                const avatar = `https://ui-avatars.com/api/?name=${item.author}&background=4f9fff&color=fff&size=34`;
+
+                let galleryHTML = '';
+                if (item.images && item.images.length > 0) {
+                    const gridClass = item.images.length === 1 ? 'single' : '';
+                    galleryHTML = `<div class="vault-gallery ${gridClass}">`;
+                    item.images.forEach(img => {
+                        const imgUrl = img.thumb || img.url;
+                        galleryHTML += `<img src="${imgUrl}" onclick="event.stopPropagation(); openLightbox('${img.url}', '${img.alt || ''}')" loading="lazy">`;
+                    });
+                    galleryHTML += '</div>';
+                }
+
+                let videoHTML = '';
+                if (item.video && item.video.cid) {
+                    videoHTML = `
+                        <div class="video-placeholder" style="max-width: 210px; padding: 12px; margin: 4px 0;">
+                            <span class="video-icon" style="font-size: 24px;">🎬</span>
+                            <div class="video-label" style="font-size: 10px;">VIDEO POST</div>
+                            <div class="video-details" style="font-size: 9px;">CID: ${item.video.cid.substring(0, 12)}...</div>
+                        </div>
+                    `;
+                }
+
+                // Check if already posted
+                const hasImage = item.images && item.images.length > 0;
+                const imageUrl = hasImage ? item.images[0].url : null;
+
+                div.innerHTML = `
+                    <div class="vault-header">
+                        <img src="${avatar}" class="vault-avatar" alt="${item.author}">
+                        <span class="vault-author">${escapeHtml(item.display_name || item.author)}</span>
+                        <span class="vault-handle">@${escapeHtml(item.author)}</span>
+                        <span class="vault-time">${time}</span>
+                        ${item.notes && item.notes.includes('Posted to') ? `<span class="posted-badge instagram">📤 Posted</span>` : ''}
+                    </div>
+                    ${item.text ? `<div class="vault-text">${escapeHtml(item.text)}</div>` : ''}
+                    ${galleryHTML}
+                    ${videoHTML}
+                    ${item.notes ? `<div class="vault-notes">📝 ${escapeHtml(item.notes)}</div>` : ''}
+                    <div class="vault-actions">
+                        <button class="btn btn-sm btn-secondary" onclick="restoreFromVault('${item.uri}')">🔄 Restore</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteFromVault('${item.uri}')">🗑️ Delete</button>
+                        <button class="btn btn-sm btn-secondary" onclick="addNote('${item.uri}')">📝 Note</button>
+                        ${hasImage ? `<button class="btn btn-sm btn-instagram" onclick="openZernioModal('${item.uri}')">📸 Post to Instagram</button>` : ''}
+                    </div>
+                `;
+                vaultGrid.appendChild(div);
+            });
+        }
+
+        // ============================================================
+        // ZERNIO POSTING MODAL
+        // ============================================================
+        function openZernioModal(uri) {
+            const item = vaultItems.find(v => v.uri === uri);
+            if (!item) {
+                showToast('Item not found in vault', 'error');
+                return;
+            }
+
+            if (!item.images || item.images.length === 0) {
+                showToast('No image found in this post', 'error');
+                return;
+            }
+
+            currentPostingItem = item;
+            
+            // Pre-fill caption
+            let caption = item.text || '';
+            if (caption.length > 500) {
+                caption = caption.substring(0, 497) + '...';
+            }
+            zernioCaption.value = caption;
+            zernioSchedule.value = '';
+            zernioStatus.textContent = '';
+            zernioPostBtn.disabled = false;
+            zernioPostBtn.textContent = '🚀 Post Now';
+            
+            // Reset platform selection (only Instagram selected by default)
+            document.querySelectorAll('.platform-chip').forEach(chip => {
+                chip.classList.remove('selected');
+                if (chip.dataset.platform === 'instagram') {
+                    chip.classList.add('selected');
+                }
+            });
+            
+            zernioModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeZernioModal() {
+            zernioModal.classList.remove('active');
+            document.body.style.overflow = '';
+            currentPostingItem = null;
+        }
+
+        function togglePlatform(element) {
+            element.classList.toggle('selected');
+        }
+
+        function getSelectedPlatforms() {
+            const chips = document.querySelectorAll('.platform-chip.selected');
+            return Array.from(chips).map(chip => chip.dataset.platform);
+        }
+
+        async function submitZernioPost() {
+            if (!currentPostingItem) {
+                showToast('No item selected', 'error');
+                return;
+            }
+
+            const platforms = getSelectedPlatforms();
+            if (platforms.length === 0) {
+                showToast('Please select at least one platform', 'error');
+                return;
+            }
+
+            const caption = zernioCaption.value.trim();
+            const scheduleTime = zernioSchedule.value;
+
+            zernioPostBtn.disabled = true;
+            zernioPostBtn.textContent = '⏳ Posting...';
+            zernioStatus.textContent = '📤 Posting to social media...';
+
+            try {
+                const payload = {
+                    uri: currentPostingItem.uri,
+                    platforms: platforms,
+                    caption: caption,
+                    post_type: currentPostingItem.has_video ? 'video' : 'image'
+                };
+
+                if (scheduleTime) {
+                    payload.schedule_time = scheduleTime;
+                }
+
+                const res = await fetch(`${API_BASE}/api/zernio/post`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    zernioStatus.textContent = `✅ ${data.message || 'Posted successfully!'}`;
+                    showToast(`✅ Posted to ${platforms.join(', ')}`, 'success');
+                    closeZernioModal();
+                    await loadVaultItems();
+                } else if (data.already_posted) {
+                    zernioStatus.textContent = `⚠️ ${data.error}`;
+                    showToast(`⚠️ ${data.error}`, 'error');
+                } else {
+                    zernioStatus.textContent = `❌ Error: ${data.error}`;
+                    showToast(`❌ Error: ${data.error}`, 'error');
+                }
+            } catch (e) {
+                console.error('Error posting:', e);
+                zernioStatus.textContent = `❌ Error: ${e.message}`;
+                showToast(`❌ Error: ${e.message}`, 'error');
+            } finally {
+                zernioPostBtn.disabled = false;
+                zernioPostBtn.textContent = '🚀 Post Now';
+            }
+        }
+
+        // Close modal on Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && zernioModal.classList.contains('active')) {
+                closeZernioModal();
+            }
+        });
+
+        // Close modal on click outside
+        zernioModal.addEventListener('click', (e) => {
+            if (e.target === zernioModal) {
+                closeZernioModal();
+            }
+        });
+
+        // ============================================================
+        // VAULT RESTORE/DELETE/NOTE
+        // ============================================================
+        async function restoreFromVault(uri) {
+            if (!confirm('Restore this post to the feed?')) return;
+            try {
+                const res = await fetch(`${API_BASE}/api/vault/remove`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ uri })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    vaultItems = vaultItems.filter(v => v.uri !== uri);
+                    removedUris.delete(uri);
+                    saveRemovedUris();
+                    renderVaultItems(vaultItems);
+                    renderPosts(allPosts);
+                    showToast('Post restored to feed', 'success');
+                }
+            } catch (e) { showToast('Error: ' + e.message, 'error'); }
+        }
+
+        async function deleteFromVault(uri) {
+            if (!confirm('Permanently delete this post from vault?')) return;
+            try {
+                const res = await fetch(`${API_BASE}/api/vault/delete-permanent`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ uri })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    vaultItems = vaultItems.filter(v => v.uri !== uri);
+                    removedUris.delete(uri);
+                    saveRemovedUris();
+                    renderVaultItems(vaultItems);
+                    showToast('Post permanently deleted', 'success');
+                }
+            } catch (e) { showToast('Error: ' + e.message, 'error'); }
+        }
+
+        async function addNote(uri) {
+            const note = prompt('Enter a note for this post:');
+            if (note === null) return;
+            try {
+                const res = await fetch(`${API_BASE}/api/vault/update-notes`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ uri, notes: note })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    loadVaultItems();
+                    showToast('Note added!', 'success');
+                }
+            } catch (e) { showToast('Error: ' + e.message, 'error'); }
+        }
+
+        async function refreshVault() {
+            await loadVaultItems();
+            showToast('🔄 Vault refreshed', 'success');
+        }
+
+        // ============================================================
+        // VAULT BULK ACTIONS
+        // ============================================================
+        async function restoreAllFromVault() {
+            if (vaultItems.length === 0) {
+                showToast('Vault is empty', 'error');
+                return;
+            }
+            
+            if (!confirm(`Restore all ${vaultItems.length} posts from vault back to feed?`)) return;
+            
+            let restoredCount = 0;
+            let failedCount = 0;
+            
+            showToast(`Restoring ${vaultItems.length} posts...`, 'success');
+            
+            for (const item of vaultItems) {
+                try {
+                    const res = await fetch(`${API_BASE}/api/vault/remove`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ uri: item.uri })
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        removedUris.delete(item.uri);
+                        restoredCount++;
+                    } else {
+                        failedCount++;
+                    }
+                } catch (e) {
+                    failedCount++;
+                    console.error('Error restoring:', e);
+                }
+            }
+            
+            vaultItems = [];
+            saveRemovedUris();
+            renderVaultItems(vaultItems);
+            renderPosts(allPosts);
+            
+            showToast(`✅ Restored ${restoredCount} posts${failedCount > 0 ? `, ${failedCount} failed` : ''}`, 'success');
+            statusMessage.textContent = `Restored ${restoredCount} posts from vault`;
+        }
+
+        async function deleteAllFromVault() {
+            if (vaultItems.length === 0) {
+                showToast('Vault is empty', 'error');
+                return;
+            }
+            
+            if (!confirm(`Permanently delete all ${vaultItems.length} posts from vault? This cannot be undone!`)) return;
+            
+            let deletedCount = 0;
+            let failedCount = 0;
+            
+            showToast(`Deleting ${vaultItems.length} posts...`, 'success');
+            
+            for (const item of vaultItems) {
+                try {
+                    const res = await fetch(`${API_BASE}/api/vault/delete-permanent`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ uri: item.uri })
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        removedUris.delete(item.uri);
+                        deletedCount++;
+                    } else {
+                        failedCount++;
+                    }
+                } catch (e) {
+                    failedCount++;
+                    console.error('Error deleting:', e);
+                }
+            }
+            
+            vaultItems = [];
+            saveRemovedUris();
+            renderVaultItems(vaultItems);
+            renderPosts(allPosts);
+            
+            showToast(`✅ Deleted ${deletedCount} posts${failedCount > 0 ? `, ${failedCount} failed` : ''}`, 'success');
+            statusMessage.textContent = `Deleted ${deletedCount} posts from vault`;
+        }
+
+        // ============================================================
+        // FETCH POSTS
+        // ============================================================
+        async function fetchPosts() {
+            if (!sessionId) { showToast('Please login first', 'error'); return; }
+            const selectedHandlers = handlers.filter(h => h.selected);
+            if (selectedHandlers.length === 0) { showToast('Select at least one handler', 'error'); return; }
+            if (isFetching) return;
+
+            isFetching = true;
+            fetchBtn.disabled = true;
+            statusMessage.textContent = `Fetching from ${selectedHandlers.length} handlers...`;
+            await loadVaultItems();
+
+            const limit = parseInt(limitInput.value) || 20;
+            const postType = getPostType();
+            const includeRepostsChecked = includeReposts.checked;
+            const includeRepliesChecked = includeReplies.checked;
+            const filterMediaChecked = filterMedia.checked;
+            const apiFilter = postType === 'user_posts' ? 'posts_no_replies' : 'posts_and_author_threads';
+
+            let allFetchedPosts = [];
+            const progressContainer = document.createElement('div');
+            progressContainer.style.cssText = 'text-align:center; padding:10px; color:#8888bb; font-size:13px; grid-column:1/-1;';
+            postGrid.innerHTML = '';
+            postGrid.appendChild(progressContainer);
+
+            for (let i = 0; i < selectedHandlers.length; i++) {
+                const handler = selectedHandlers[i];
+                progressContainer.textContent = `Fetching ${i+1}/${selectedHandlers.length}: @${handler.handle}...`;
+                try {
+                    const res = await fetch(`${API_BASE}/api/fetch-posts`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            session_id: sessionId,
+                            actor: handler.handle,
+                            limit: limit,
+                            filter: apiFilter,
+                            include_reposts: includeRepostsChecked
+                        })
+                    });
+                    const data = await res.json();
+                    if (data.success && data.posts.length > 0) {
+                        let filteredPosts = data.posts;
+                        if (!includeRepliesChecked) {
+                            filteredPosts = filteredPosts.filter(post => post.is_reply !== true);
+                        }
+                        if (filterMediaChecked) {
+                            filteredPosts = filteredPosts.filter(post => post.has_media === true);
+                        }
+                        filteredPosts = filteredPosts.filter(post => {
+                            const inVault = vaultItems.some(v => v.uri === post.uri);
+                            const isRemoved = removedUris.has(post.uri);
+                            return !inVault && !isRemoved;
+                        });
+                        filteredPosts.forEach(post => { post.source_handler = handler.handle; });
+                        allFetchedPosts = allFetchedPosts.concat(filteredPosts);
+                    }
+                } catch (e) { console.error(`Error fetching @${handler.handle}:`, e); }
+            }
+
+            allPosts = allFetchedPosts;
+            allPosts.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            selectedUris.clear();
+            renderPosts(allPosts);
+            updateFilterBadge();
+            downloadImagesBtn.disabled = false;
+            saveJsonBtn.disabled = false;
+
+            const typeLabel = postType === 'user_posts' ? 'User posts' : 'All posts';
+            statusMessage.textContent = `✨ Fetched ${allPosts.length} ${typeLabel} from ${selectedHandlers.length} handlers`;
+            showToast(`✨ Fetched ${allPosts.length} posts from ${selectedHandlers.length} handlers`, 'success');
+
+            sortNewestBtn.className = 'btn btn-active btn-xs';
+            sortOldestBtn.className = 'btn btn-secondary btn-xs';
+            currentSort = 'newest';
+            isFetching = false;
+            fetchBtn.disabled = false;
+            switchView('posts');
+        }
+
+        // ============================================================
+        // DOWNLOAD IMAGES
+        // ============================================================
+        async function downloadImages() {
+            if (allPosts.length === 0) { showToast('No posts to download', 'error'); return; }
+            if (isDownloading) return;
+            isDownloading = true;
+            downloadImagesBtn.disabled = true;
+            downloadProgress.style.display = 'block';
+            progressFill.style.width = '0%';
+            progressText.textContent = 'Preparing download...';
+
+            try {
+                const res = await fetch(`${API_BASE}/api/download-images`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ posts: allPosts, actor: 'multiple_handlers' })
+                });
+                if (res.ok) {
+                    const cd = res.headers.get('Content-Disposition');
+                    const filename = cd ? cd.split('filename=')[1].replace(/"/g, '') : 'bluesky_images.zip';
+                    const blob = await res.blob();
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    showToast(`📥 Downloaded ${filename}`, 'success');
+                    statusMessage.textContent = `Downloaded ${filename}`;
+                } else {
+                    const err = await res.json();
+                    showToast(`Error: ${err.error}`, 'error');
+                }
+            } catch (e) { showToast(`Error: ${e.message}`, 'error'); }
+            finally {
+                isDownloading = false;
+                downloadImagesBtn.disabled = false;
+                downloadProgress.style.display = 'none';
+                progressFill.style.width = '0%';
+            }
+        }
+
+        // ============================================================
+        // SAVE JSON
+        // ============================================================
+        async function saveJson() {
+            if (allPosts.length === 0) { showToast('No posts to save', 'error'); return; }
+            try {
+                const res = await fetch(`${API_BASE}/api/save-posts`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ posts: allPosts, actor: 'multiple_handlers' })
+                });
+                if (res.ok) {
+                    const blob = await res.blob();
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `multiple_handlers_posts_${new Date().toISOString().slice(0,10)}.json`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    showToast('💾 JSON exported', 'success');
+                    statusMessage.textContent = 'JSON exported';
+                } else {
+                    const err = await res.json();
+                    showToast(`Error: ${err.error}`, 'error');
+                }
+            } catch (e) { showToast(`Error: ${e.message}`, 'error'); }
+        }
+
+        // ============================================================
+        // EVENT LISTENERS
+        // ============================================================
+        loginBtn.addEventListener('click', async () => {
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value.trim();
+            if (!username || !password) { showToast('Enter username and password', 'error'); return; }
+
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'Logging in...';
+            try {
+                const res = await fetch(`${API_BASE}/api/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    sessionId = data.session_id;
+                    updateLoginUI(true, data);
+                    loadRemovedUris();
+                    await loadSavedHandlers();
+                    await loadVaultItems();
+                    const savedView = getFromStorage('view');
+                    if (savedView) {
+                        switchView(savedView);
+                    }
+                    showToast('Login successful!', 'success');
+                } else {
+                    showToast(`Login failed: ${data.error}`, 'error');
+                }
+            } catch (e) { 
+                console.error('Login error:', e);
+                showToast(`Login error: ${e.message}`, 'error'); 
+            }
+            finally {
+                loginBtn.disabled = false;
+                loginBtn.textContent = '🔐 Login';
+            }
+        });
+
+        logoutBtn.addEventListener('click', async () => {
+            if (sessionId) {
+                try { await fetch(`${API_BASE}/api/logout`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ session_id: sessionId }) }); } catch (e) {}
+            }
+            sessionId = null;
+            allPosts = [];
+            vaultItems = [];
+            removedUris.clear();
+            selectedUris.clear();
+            updateLoginUI(false);
+            renderPosts([]);
+            renderVaultItems([]);
+            downloadImagesBtn.disabled = true;
+            saveJsonBtn.disabled = true;
+            statusMessage.textContent = 'Logged out';
+            showToast('Logged out', 'success');
+            localStorage.removeItem('bluesky_session_id');
+        });
+
+        fetchBtn.addEventListener('click', fetchPosts);
+        downloadImagesBtn.addEventListener('click', downloadImages);
+        saveJsonBtn.addEventListener('click', saveJson);
+
+        clearBtn.addEventListener('click', () => {
+            allPosts = [];
+            selectedUris.clear();
+            renderPosts([]);
+            downloadImagesBtn.disabled = true;
+            saveJsonBtn.disabled = true;
+            statusMessage.textContent = 'Cleared';
+            showToast('🗑️ Cleared all posts', 'success');
+        });
+
+        usernameInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') loginBtn.click(); });
+        passwordInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') loginBtn.click(); });
+
+        document.querySelectorAll('input[name="postType"]').forEach(el => {
+            el.addEventListener('change', () => {
+                updateFilterBadge();
+                saveToStorage('filters', {
+                    postType: getPostType(),
+                    filterMedia: filterMedia.checked,
+                    includeReposts: includeReposts.checked,
+                    includeReplies: includeReplies.checked,
+                    limit: limitInput.value
+                });
+            });
+        });
+        filterMedia.addEventListener('change', () => {
+            updateFilterBadge();
+            saveToStorage('filters', {
+                postType: getPostType(),
+                filterMedia: filterMedia.checked,
+                includeReposts: includeReposts.checked,
+                includeReplies: includeReplies.checked,
+                limit: limitInput.value
+            });
+        });
+        includeReposts.addEventListener('change', () => {
+            updateFilterBadge();
+            saveToStorage('filters', {
+                postType: getPostType(),
+                filterMedia: filterMedia.checked,
+                includeReposts: includeReposts.checked,
+                includeReplies: includeReplies.checked,
+                limit: limitInput.value
+            });
+        });
+        includeReplies.addEventListener('change', () => {
+            updateFilterBadge();
+            saveToStorage('filters', {
+                postType: getPostType(),
+                filterMedia: filterMedia.checked,
+                includeReposts: includeReposts.checked,
+                includeReplies: includeReplies.checked,
+                limit: limitInput.value
+            });
+        });
+        limitInput.addEventListener('change', () => {
+            saveToStorage('filters', {
+                postType: getPostType(),
+                filterMedia: filterMedia.checked,
+                includeReposts: includeReposts.checked,
+                includeReplies: includeReplies.checked,
+                limit: limitInput.value
+            });
+        });
+
+        // ============================================================
+        // VAULT BUTTON EVENT LISTENERS
+        // ============================================================
+        restoreAllBtn.addEventListener('click', restoreAllFromVault);
+        deleteAllBtn.addEventListener('click', deleteAllFromVault);
+
+        // ============================================================
+        // INSTANT SESSION RESTORATION
+        // ============================================================
+        function initializeApp() {
+            loadRemovedUris();
+            
+            const savedSessionId = getFromStorage('session_id');
+            const savedUsername = getFromStorage('username');
+            const savedUserData = getFromStorage('user_data');
+            
+            const savedHandlers = getFromStorage('handlers');
+            if (savedHandlers && savedHandlers.length > 0) {
+                handlers = savedHandlers;
+                const savedCounter = getFromStorage('handler_counter');
+                if (savedCounter) { handlerIdCounter = savedCounter; }
+                renderHandlers();
+            } else {
+                handlers = defaultHandlers.map(h => ({ ...h, id: ++handlerIdCounter }));
+                renderHandlers();
+            }
+            
+            const savedFilters = getFromStorage('filters');
+            if (savedFilters) {
+                document.querySelectorAll('input[name="postType"]').forEach(el => {
+                    if (el.value === savedFilters.postType) { el.checked = true; }
+                });
+                filterMedia.checked = savedFilters.filterMedia || false;
+                includeReposts.checked = savedFilters.includeReposts !== undefined ? savedFilters.includeReposts : true;
+                includeReplies.checked = savedFilters.includeReplies !== undefined ? savedFilters.includeReplies : true;
+                if (savedFilters.limit) { limitInput.value = savedFilters.limit; }
+                updateFilterBadge();
+            }
+            
+            const savedView = getFromStorage('view');
+            if (savedView) {
+                currentView = savedView;
+                if (savedView === 'posts') {
+                    postsContainer.style.display = 'block';
+                    vaultView.classList.remove('active');
+                    viewPostsBtn.className = 'btn active';
+                    viewVaultBtn.className = 'btn';
+                } else {
+                    postsContainer.style.display = 'none';
+                    vaultView.classList.add('active');
+                    viewVaultBtn.className = 'btn active';
+                    viewPostsBtn.className = 'btn';
+                }
+            }
+            
+            if (savedSessionId && savedUsername) {
+                sessionId = savedSessionId;
+                usernameInput.value = savedUsername;
+                
+                if (savedUserData) {
+                    statusDot.className = 'status-dot online';
+                    statusText.textContent = 'Online';
+                    userDisplay.style.display = 'inline';
+                    userDisplay.textContent = `👤 ${savedUserData.display_name || savedUserData.handle}`;
+                    logoutBtn.style.display = 'inline-block';
+                    loginBtn.disabled = true;
+                    document.getElementById('loginSection').style.opacity = '0.6';
+                    sessionInfo.textContent = `Logged in as ${savedUserData.handle}`;
+                    fetchBtn.disabled = false;
+                } else {
+                    statusDot.className = 'status-dot online';
+                    statusText.textContent = 'Connecting...';
+                    sessionInfo.textContent = 'Restoring session...';
+                }
+                
+                fetch(`${API_BASE}/api/handlers/list`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ session_id: savedSessionId })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        loadSavedHandlers();
+                        loadVaultItems();
+                        statusText.textContent = 'Online';
+                        statusMessage.textContent = '✨ Session restored';
+                        showToast('Welcome back!', 'success');
+                    } else {
+                        sessionId = null;
+                        localStorage.removeItem('bluesky_session_id');
+                        localStorage.removeItem('bluesky_user_data');
+                        updateLoginUI(false);
+                        showToast('Session expired, please login again', 'error');
+                    }
+                })
+                .catch(() => {
+                    statusText.textContent = 'Connecting...';
+                    statusMessage.textContent = '⏳ Reconnecting...';
+                    setTimeout(() => {
+                        if (sessionId) {
+                            fetch(`${API_BASE}/api/handlers/list`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ session_id: sessionId })
+                            })
+                            .then(res => res.json())
+                            .then(data => {
+                                if (data.success) {
+                                    statusText.textContent = 'Online';
+                                    statusMessage.textContent = '✨ Connected';
+                                    showToast('Reconnected!', 'success');
+                                    loadSavedHandlers();
+                                    loadVaultItems();
+                                }
+                            })
+                            .catch(() => {});
+                        }
+                    }, 3000);
+                });
+            } else {
+                updateLoginUI(false);
+            }
+            
+            if (sessionId) {
+                loadVaultItems();
+            }
+            
+            console.log('🦋 Bluesky Gallery loaded with Zernio posting support');
+        }
+
+        // Global functions for onclick
+        window.toggleSelection = toggleSelection;
+        window.saveSelectedPosts = saveSelectedPosts;
+        window.clearSelection = clearSelection;
+        window.selectAllVisible = selectAllVisible;
+        window.switchView = switchView;
+        window.sortPosts = sortPosts;
+        window.openLightbox = openLightbox;
+        window.closeLightbox = closeLightbox;
+        window.restoreFromVault = restoreFromVault;
+        window.deleteFromVault = deleteFromVault;
+        window.addNote = addNote;
+        window.removeHandler = removeHandler;
+        window.restoreAllFromVault = restoreAllFromVault;
+        window.deleteAllFromVault = deleteAllFromVault;
+        window.refreshVault = refreshVault;
+        window.openZernioModal = openZernioModal;
+        window.closeZernioModal = closeZernioModal;
+        window.togglePlatform = togglePlatform;
+        window.submitZernioPost = submitZernioPost;
+
+        // Initialize
+        initializeApp();
+    </script>
+</body>
+</html>

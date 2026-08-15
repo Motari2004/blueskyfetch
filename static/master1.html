@@ -1,0 +1,1641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bluesky Vault · Scheduler</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg: #0a0a0a;
+            --card: #141414;
+            --card-2: #191919;
+            --border: #2a2a2a;
+            --border-strong: #3a3a3a;
+            --text: #ffffff;
+            --text-secondary: #888888;
+            --text-muted: #555555;
+            --accent: #4f9fff;
+            --accent-hover: #3a7fd9;
+            --accent-soft: rgba(79, 159, 255, 0.14);
+            --purple: #8b7cf6;
+            --success: #22c55e;
+            --error: #ef4444;
+            --warning: #f59e0b;
+            --radius: 16px;
+            --radius-sm: 10px;
+            --shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 24px;
+        }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .app {
+            max-width: 1520px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 260px 1fr 340px;
+            gap: 24px;
+            align-items: start;
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+        .sidebar {
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 24px 20px;
+            border: 1px solid var(--border);
+            position: sticky;
+            top: 24px;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 24px;
+        }
+        .logo i { font-size: 28px; color: var(--accent); }
+        .logo h1 { font-size: 18px; font-weight: 700; }
+        .logo .badge {
+            font-size: 9px;
+            background: var(--accent);
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-left: auto;
+        }
+        .nav { display: flex; flex-direction: column; gap: 4px; }
+        .nav a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+        .nav a i { width: 20px; text-align: center; font-size: 15px; }
+        .nav a:hover { background: rgba(255,255,255,0.05); color: var(--text); }
+        .nav a.active { background: var(--accent); color: white; }
+        .nav a .count {
+            margin-left: auto;
+            background: rgba(255,255,255,0.1);
+            padding: 0 10px;
+            border-radius: 20px;
+            font-size: 11px;
+        }
+        .nav a.active .count { background: rgba(255,255,255,0.2); color: white; }
+        .sidebar-footer { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); }
+        .account-box { display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--bg); border-radius: var(--radius-sm); }
+        .account-box .avatar { width: 38px; height: 38px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; flex-shrink: 0; object-fit: cover; }
+        .account-box .info { flex: 1; min-width: 0; }
+        .account-box .info .name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .account-box .info .status { font-size: 11px; color: var(--text-secondary); display: flex; align-items: center; gap: 6px; }
+        .account-box .info .status .dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+        .dot.online { background: var(--success); }
+        .dot.offline { background: var(--error); }
+        .main { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
+        .stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+        .stat { background: var(--card); border-radius: var(--radius-sm); padding: 16px 20px; border: 1px solid var(--border); text-align: center; }
+        .stat .number { font-size: 26px; font-weight: 700; color: var(--accent); }
+        .stat .label { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+        .card { background: var(--card); border-radius: var(--radius); padding: 28px 32px; border: 1px solid var(--border); }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+        .card-header h2 { font-size: 18px; font-weight: 600; }
+        .card-header h2 i { color: var(--accent); margin-right: 10px; }
+        .card-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        .schedule-list { display: flex; flex-direction: column; gap: 10px; max-height: 600px; overflow-y: auto; padding-right: 4px; }
+        .schedule-item {
+            background: var(--bg); border-radius: var(--radius-sm); padding: 16px 20px; border-left: 4px solid var(--warning);
+            display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;
+            transition: var(--transition); border: 1px solid var(--border);
+        }
+        .schedule-item:hover { border-color: var(--accent); }
+        .schedule-item.published { border-left-color: var(--success); opacity: 0.75; }
+        .schedule-item .info { flex: 2; min-width: 200px; }
+        .schedule-item .info .handle { font-weight: 600; color: var(--text); font-size: 14px; }
+        .schedule-item .info .text { font-size: 13px; color: var(--text-secondary); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .schedule-item .info .meta { font-size: 11px; color: var(--text-muted); margin-top: 4px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+        .schedule-item .time { font-family: 'JetBrains Mono', monospace; font-weight: 600; color: var(--warning); font-size: 14px; white-space: nowrap; }
+        .schedule-item.published .time { color: var(--success); }
+        .schedule-item .badge { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; padding: 4px 14px; border-radius: 40px; background: rgba(245, 158, 11, 0.15); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.2); white-space: nowrap; }
+        .schedule-item.published .badge { background: rgba(34, 197, 94, 0.15); color: var(--success); border-color: rgba(34, 197, 94, 0.2); }
+        .countdown { font-family: 'JetBrains Mono', monospace; font-size: 16px; font-weight: 700; color: var(--warning); min-width: 90px; text-align: right; }
+        .schedule-item.published .countdown { color: var(--success); }
+        .platform-tag { font-size: 10px; padding: 2px 10px; border-radius: 20px; background: rgba(79, 159, 255, 0.15); color: var(--accent); border: 1px solid rgba(79, 159, 255, 0.2); font-weight: 500; text-transform: capitalize; }
+
+        /* ---- Vault items ---- */
+        .vault-item {
+            background: var(--bg); border-radius: var(--radius-sm); padding: 16px 18px; border: 1px solid var(--border);
+            margin-bottom: 10px; transition: var(--transition); cursor: pointer; position: relative;
+        }
+        .vault-item:hover { border-color: var(--accent); }
+        .vault-item.selected { border-color: var(--accent); background: rgba(79, 159, 255, 0.08); border-width: 2px; }
+        .vault-item.posted { border-left: 4px solid var(--success); }
+        .vault-item.selected::after {
+            content: '✓'; position: absolute; top: 10px; right: 10px; background: var(--accent); color: #fff;
+            width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: 700;
+        }
+        .vault-item .vh { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+        .vault-item .vh img { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border); }
+        .vault-item .vh .handle { font-weight: 600; color: var(--text); font-size: 14px; }
+        .vault-item .vh .sub { font-size: 11px; color: var(--text-muted); }
+        .vault-item .vh .vtime { margin-left: auto; font-size: 11px; color: var(--text-muted); }
+        .vault-item .text { font-size: 13px; color: var(--text-secondary); margin-bottom: 8px; }
+        .vault-item .gallery { display: grid; grid-template-columns: repeat(auto-fill, 72px); gap: 6px; margin-bottom: 8px; }
+        .vault-item .gallery img { width: 72px; height: 72px; object-fit: cover; border-radius: 8px; cursor: zoom-in; border: 1px solid var(--border); }
+        .vault-item .video-chip { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: var(--warning); background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.25); padding: 4px 10px; border-radius: 20px; margin-bottom: 8px; }
+        .vault-item .notes { background: rgba(255,255,255,0.03); border: 1px dashed var(--border); border-radius: 8px; padding: 6px 10px; font-size: 11.5px; color: var(--text-secondary); margin-bottom: 8px; }
+        .vault-item .posted-badges { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+        .vault-item .posted-badges span { font-size: 10px; padding: 3px 10px; border-radius: 20px; background: rgba(34,197,94,0.15); color: var(--success); border: 1px solid rgba(34,197,94,0.25); font-weight: 600; text-transform: capitalize; }
+        .vault-item .vactions { display: flex; gap: 8px; flex-wrap: wrap; padding-top: 8px; border-top: 1px solid var(--border); }
+
+        .btn {
+            display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border: none; border-radius: var(--radius-sm);
+            font-weight: 600; font-size: 14px; font-family: 'Inter', sans-serif; cursor: pointer; transition: var(--transition);
+        }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+        .btn-primary { background: var(--accent); color: white; }
+        .btn-primary:hover:not(:disabled) { background: var(--accent-hover); transform: translateY(-2px); box-shadow: 0 4px 20px rgba(79, 159, 255, 0.3); }
+        .btn-success { background: var(--success); color: white; }
+        .btn-success:hover:not(:disabled) { opacity: 0.9; transform: translateY(-2px); }
+        .btn-danger { background: var(--error); color: white; }
+        .btn-danger:hover:not(:disabled) { opacity: 0.9; transform: translateY(-2px); }
+        .btn-secondary { background: var(--bg); color: var(--text-secondary); border: 1px solid var(--border); }
+        .btn-secondary:hover:not(:disabled) { background: var(--border); color: var(--text); }
+        .btn-instagram { background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); color: white; }
+        .btn-instagram:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(225, 48, 108, 0.35); }
+        .btn-sm { padding: 6px 14px; font-size: 12px; }
+        .btn-xs { padding: 4px 10px; font-size: 11px; }
+        .btn .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.6s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 500; color: var(--text-secondary); margin-bottom: 6px; }
+        .form-group label i { color: var(--accent); margin-right: 8px; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 10px 14px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm);
+            color: var(--text); font-size: 14px; font-family: 'Inter', sans-serif; transition: var(--transition);
+        }
+        .form-group textarea { min-height: 80px; resize: vertical; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--accent); }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .form-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 4px; }
+        .hint { font-size: 11px; color: var(--text-muted); margin-top: 6px; }
+
+        .quick-schedule { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
+        .quick-btn { padding: 12px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text-secondary); font-weight: 600; font-size: 14px; cursor: pointer; transition: var(--transition); text-align: center; font-family: 'Inter', sans-serif; }
+        .quick-btn:hover { background: var(--border); color: var(--text); border-color: var(--accent); }
+        .quick-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+        .quick-btn .sub { display: block; font-size: 10px; font-weight: 400; opacity: 0.7; margin-top: 2px; }
+
+        /* segmented + chips (from gallery script) */
+        .segmented { display: flex; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 4px; gap: 4px; }
+        .segmented-option { position: relative; flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 9px 8px; border-radius: 8px; font-size: 12.5px; font-weight: 600; color: var(--text-secondary); cursor: pointer; transition: var(--transition); text-align: center; }
+        .segmented-option input { position: absolute; opacity: 0; pointer-events: none; }
+        .segmented-option:hover { color: var(--text); }
+        .segmented-option:has(input:checked) { background: var(--accent); color: #fff; }
+        .chip-row { display: flex; flex-wrap: wrap; gap: 8px; }
+        .chip-toggle { position: relative; display: flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 40px; border: 1.5px solid var(--border); background: rgba(255,255,255,0.02); font-size: 12px; font-weight: 600; color: var(--text-secondary); cursor: pointer; transition: var(--transition); }
+        .chip-toggle input { position: absolute; opacity: 0; pointer-events: none; }
+        .chip-toggle:hover { border-color: var(--border-strong); color: var(--text); }
+        .chip-toggle:has(input:checked) { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+        .platform-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+        .platform-chip { padding: 6px 14px; border-radius: 40px; border: 2px solid var(--border); background: transparent; color: var(--text-muted); cursor: pointer; font-size: 12px; font-weight: 600; transition: var(--transition); }
+        .platform-chip:hover { border-color: var(--text-secondary); color: var(--text); }
+        .platform-chip.selected { border-color: var(--accent); background: rgba(79,159,255,0.15); color: var(--accent); }
+        .platform-chip.instagram { background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); color: white; border-color: transparent; }
+        .platform-chip.instagram.selected { box-shadow: 0 4px 20px rgba(225,48,108,0.35); }
+
+        /* ---- Handlers panel (Fetch Posts page) ---- */
+        .fetch-grid { display: grid; grid-template-columns: 300px 1fr; gap: 24px; align-items: start; }
+        .handlers-panel { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 18px; }
+        .handlers-panel h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-secondary); margin-bottom: 12px; }
+        .handlers-list { max-height: 220px; overflow-y: auto; margin-bottom: 12px; padding-right: 2px; }
+        .handler-item { background: var(--card-2); border-radius: var(--radius-sm); padding: 8px 10px; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; border: 1px solid var(--border); }
+        .handler-item img { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; flex-shrink: 0; border: 1px solid var(--border); }
+        .handler-item .hi { flex: 1; min-width: 0; }
+        .handler-item .hi .n { font-size: 12.5px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .handler-item .hi .h { font-size: 10.5px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .handler-item input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; flex-shrink: 0; }
+        .add-handler-row { display: flex; gap: 6px; margin-bottom: 10px; }
+        .add-handler-row input { flex: 1; padding: 9px 12px; min-height: 38px; }
+        .handler-quick-actions { display: flex; gap: 8px; }
+        .handler-quick-actions .btn { flex: 1; justify-content: center; }
+
+        .filters-panel { display: flex; flex-direction: column; gap: 14px; }
+        .filter-badge { display: inline-block; font-size: 11px; padding: 4px 14px; border-radius: 40px; background: var(--accent-soft); color: var(--accent); border: 1px solid rgba(79,159,255,0.25); font-weight: 600; }
+
+        .post-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; margin-top: 16px; }
+        .post-card { background: var(--bg); border-radius: var(--radius-sm); padding: 14px 16px; border: 1px solid var(--border); cursor: pointer; transition: var(--transition); position: relative; }
+        .post-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+        .post-card.selected { border: 2px solid var(--accent); background: rgba(79,159,255,0.08); }
+        .post-card.selected::after { content: '✓'; position: absolute; top: 8px; right: 8px; background: var(--accent); color: #fff; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
+        .post-card .ph { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+        .post-card .ph img { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border); }
+        .post-card .ph .an { font-size: 12.5px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .post-card .ph .ah { font-size: 10.5px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .post-card .pt { font-size: 12.5px; color: var(--text-secondary); margin-bottom: 8px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        .post-card .pgal { display: grid; grid-template-columns: repeat(auto-fill, 60px); gap: 5px; margin-bottom: 8px; }
+        .post-card .pgal img { width: 60px; height: 60px; object-fit: cover; border-radius: 6px; }
+        .post-card .pstats { display: flex; gap: 12px; font-size: 11px; color: var(--text-muted); border-top: 1px solid var(--border); padding-top: 8px; font-family: 'JetBrains Mono', monospace; }
+        .badge-tag { display: inline-block; font-size: 9.5px; padding: 2px 9px; border-radius: 20px; font-weight: 700; margin-bottom: 6px; margin-right: 4px; }
+        .badge-repost { background: rgba(79,159,255,0.14); color: var(--accent); border: 1px solid rgba(79,159,255,0.25); }
+        .badge-reply { background: rgba(245,158,11,0.14); color: var(--warning); border: 1px solid rgba(245,158,11,0.25); }
+        .badge-video { background: rgba(139,124,246,0.16); color: var(--purple); border: 1px solid rgba(139,124,246,0.3); }
+
+        .selection-bar { display: none; align-items: center; gap: 14px; background: var(--bg); border: 1px solid var(--accent); border-radius: var(--radius-sm); padding: 12px 18px; margin-top: 14px; flex-wrap: wrap; }
+        .selection-bar.active { display: flex; }
+        .selection-bar .count { font-weight: 700; color: var(--text); font-size: 13px; }
+        .selection-bar .count span { color: var(--accent); }
+
+        .right { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
+        .right .card { padding: 20px 24px; }
+        .right .card-header { margin-bottom: 14px; }
+        .right .card-header h3 { font-size: 15px; font-weight: 600; }
+        .right .card-header h3 i { color: var(--accent); margin-right: 8px; }
+        .empty { text-align: center; padding: 32px 16px; color: var(--text-muted); }
+        .empty i { font-size: 36px; opacity: 0.3; margin-bottom: 10px; }
+        .empty p { font-size: 14px; }
+        .current-time { display: flex; align-items: center; gap: 8px; padding: 8px 14px; background: var(--bg); border-radius: var(--radius-sm); border: 1px solid var(--border); font-size: 13px; color: var(--text-secondary); margin-bottom: 12px; }
+        .current-time .time { color: var(--text); font-weight: 600; font-size: 15px; font-family: 'JetBrains Mono', monospace; }
+        .current-time .tz { font-size: 11px; color: var(--text-muted); }
+        .current-time i { color: var(--accent); }
+        .toast { position: fixed; top: 24px; right: 24px; padding: 14px 24px; border-radius: var(--radius-sm); font-weight: 500; font-size: 14px; z-index: 9999; animation: slideIn 0.3s ease; max-width: 420px; box-shadow: var(--shadow); }
+        .toast.success { background: var(--success); color: white; }
+        .toast.error { background: var(--error); color: white; }
+        .toast.info { background: var(--accent); color: white; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
+
+        /* Modals */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(20px); z-index: 9999; justify-content: center; align-items: center; padding: 32px; }
+        .modal-overlay.active { display: flex; }
+        .modal-content { background: var(--card); border-radius: var(--radius); padding: 32px; max-width: 620px; width: 100%; max-height: 90vh; overflow-y: auto; border: 1px solid var(--border); box-shadow: var(--shadow); }
+        .modal-content h2 { color: var(--text); font-size: 20px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+        .modal-actions { display: flex; gap: 12px; margin-top: 20px; }
+        .modal-actions .btn { flex: 1; }
+        .modal-close { position: absolute; }
+
+        /* Lightbox */
+        .lightbox { display: none; position: fixed; inset: 0; background: rgba(4,4,14,0.94); backdrop-filter: blur(20px); z-index: 10001; justify-content: center; align-items: center; padding: 32px; }
+        .lightbox.active { display: flex; }
+        .lightbox img { max-width: 90%; max-height: 85vh; object-fit: contain; border-radius: var(--radius); box-shadow: 0 24px 70px rgba(0,0,0,0.85); }
+        .lightbox-close { position: absolute; top: 24px; right: 32px; color: white; font-size: 22px; cursor: pointer; background: rgba(255,255,255,0.06); border: 1px solid var(--border); width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .lightbox-close:hover { background: rgba(255,255,255,0.14); }
+
+        .schedule-preview-times { font-size: 12px; color: var(--text-secondary); max-height: 160px; overflow-y: auto; margin-top: 10px; }
+        .schedule-preview-times .time-item { padding: 5px 8px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; gap: 8px; }
+        .schedule-preview-times .time-item .time { color: var(--accent); font-weight: 600; }
+
+        @media (max-width: 1300px) {
+            .app { grid-template-columns: 1fr; max-width: 800px; }
+            .sidebar { position: static; display: none; }
+            .right { display: grid; grid-template-columns: 1fr 1fr; }
+            .fetch-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 768px) {
+            body { padding: 12px; }
+            .stats { grid-template-columns: 1fr 1fr; }
+            .form-row { grid-template-columns: 1fr; }
+            .right { grid-template-columns: 1fr; }
+            .card { padding: 20px; }
+            .quick-schedule { grid-template-columns: 1fr 1fr; }
+            .schedule-item { flex-direction: column; align-items: stretch; }
+            .schedule-item .countdown { text-align: left; }
+            .schedule-item .time { text-align: left; }
+        }
+        @media (max-width: 480px) {
+            .stats { grid-template-columns: 1fr 1fr; gap: 8px; }
+            .stat { padding: 12px; }
+            .stat .number { font-size: 20px; }
+            .card-header { flex-direction: column; align-items: stretch; gap: 10px; }
+            .card-actions { flex-wrap: wrap; }
+            .quick-schedule { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app">
+
+    <aside class="sidebar">
+        <div class="logo">
+            <i class="fas fa-feather"></i>
+            <h1>Vault</h1>
+            <span class="badge">v4</span>
+        </div>
+        <nav class="nav">
+            <a href="#" class="active" data-page="scheduled">
+                <i class="fas fa-calendar-check"></i> Scheduled
+                <span class="count" id="navSchedCount">0</span>
+            </a>
+            <a href="#" data-page="fetch">
+                <i class="fas fa-satellite-dish"></i> Fetch Posts
+                <span class="count" id="navHandlerCount">0</span>
+            </a>
+            <a href="#" data-page="vault">
+                <i class="fas fa-archive"></i> Vault
+                <span class="count" id="navVaultCount">0</span>
+            </a>
+            <a href="#" data-page="schedule">
+                <i class="fas fa-calendar-plus"></i> Auto Schedule
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="account-box">
+                <div class="avatar" id="avatarBox">V</div>
+                <div class="info">
+                    <div class="name" id="accountName">Bluesky Vault</div>
+                    <div class="status">
+                        <span class="dot offline" id="statusDot"></span>
+                        <span id="accountStatus">Offline</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <main class="main">
+        <div class="stats">
+            <div class="stat"><div class="number" id="statScheduled">0</div><div class="label">Scheduled</div></div>
+            <div class="stat"><div class="number" id="statPublished">0</div><div class="label">Published</div></div>
+            <div class="stat"><div class="number" id="statVault">0</div><div class="label">In Vault</div></div>
+            <div class="stat"><div class="number" id="statFetched">0</div><div class="label">Fetched</div></div>
+            <div class="stat"><div class="number" id="statHandlers">0</div><div class="label">Handlers</div></div>
+        </div>
+
+        <!-- LOGIN -->
+        <div class="card" style="padding:20px 24px;">
+            <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:end;">
+                <div class="form-group" style="flex:1; min-width:180px; margin-bottom:0;">
+                    <label style="font-size:11px; color:var(--text-muted); text-transform:uppercase;">Handle</label>
+                    <input type="text" id="username" value="dailymotivator.bsky.social" style="padding:8px 12px; min-height:38px;"/>
+                </div>
+                <div class="form-group" style="flex:1; min-width:180px; margin-bottom:0;">
+                    <label style="font-size:11px; color:var(--text-muted); text-transform:uppercase;">App Password</label>
+                    <input type="password" id="password" value="jnyu-ax57-veye-po6b" style="padding:8px 12px; min-height:38px;"/>
+                </div>
+                <button class="btn btn-primary" id="loginBtn">🔐 Login</button>
+                <button class="btn btn-secondary" id="logoutBtn" style="display:none;">Logout</button>
+            </div>
+            <div style="font-size:11px; color:var(--text-muted); margin-top:8px;">🔒 Use a Bluesky app password (Settings → App Passwords)</div>
+        </div>
+
+        <!-- SCHEDULED -->
+        <section id="page-scheduled" class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-calendar-check"></i> Scheduled Posts</h2>
+                <div class="card-actions">
+                    <button class="btn btn-secondary btn-sm" onclick="refreshScheduled()"><i class="fas fa-rotate"></i> Refresh</button>
+                </div>
+            </div>
+            <div class="current-time">
+                <i class="fas fa-clock"></i>
+                <span>Current Time (GMT+3):</span>
+                <span class="time" id="currentTime">--:--:--</span>
+                <span class="tz">(Africa/Nairobi)</span>
+            </div>
+            <div class="schedule-list" id="scheduleList">
+                <div class="empty"><i class="fas fa-calendar-day"></i><p>No scheduled posts</p></div>
+            </div>
+        </section>
+
+        <!-- FETCH POSTS (new page, merged from Gallery script) -->
+        <section id="page-fetch" style="display:none;" class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-satellite-dish"></i> Fetch Posts</h2>
+                <span class="filter-badge" id="filterBadge">📝 User's Posts</span>
+            </div>
+
+            <div class="fetch-grid">
+                <div class="handlers-panel">
+                    <h3><i class="fas fa-users"></i> Handlers</h3>
+                    <div class="handlers-list" id="handlersList"></div>
+                    <div class="add-handler-row">
+                        <input type="text" id="newHandlerInput" placeholder="user.bsky.social">
+                        <button class="btn btn-secondary btn-sm" id="addHandlerBtn">➕</button>
+                    </div>
+                    <div class="handler-quick-actions">
+                        <button class="btn btn-secondary btn-sm" id="selectAllBtn">✅ All</button>
+                        <button class="btn btn-secondary btn-sm" id="selectNoneBtn">❌ None</button>
+                    </div>
+                </div>
+
+                <div class="filters-panel">
+                    <div class="form-row">
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label><i class="fas fa-list"></i> Post Type</label>
+                            <div class="segmented">
+                                <label class="segmented-option">
+                                    <input type="radio" name="postType" value="user_posts" checked>
+                                    <span>📝 Own Posts</span>
+                                </label>
+                                <label class="segmented-option">
+                                    <input type="radio" name="postType" value="all_posts">
+                                    <span>📰 All Posts</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label><i class="fas fa-hashtag"></i> Posts per Handler</label>
+                            <input type="number" id="limit" value="20" min="1" max="100">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-sliders"></i> Include</label>
+                        <div class="chip-row">
+                            <label class="chip-toggle"><input type="checkbox" id="filterMedia"><span>📸 Media only</span></label>
+                            <label class="chip-toggle"><input type="checkbox" id="includeReposts" checked><span>🔄 Reposts</span></label>
+                            <label class="chip-toggle"><input type="checkbox" id="includeReplies" checked><span>💬 Replies</span></label>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button class="btn btn-success" id="fetchBtn" disabled><i class="fas fa-download"></i> Fetch Selected Handlers</button>
+                        <button class="btn btn-secondary btn-sm" id="downloadImagesBtn" disabled><i class="fas fa-images"></i> Download Images</button>
+                        <button class="btn btn-secondary btn-sm" id="saveJsonBtn" disabled><i class="fas fa-file-export"></i> Export JSON</button>
+                        <button class="btn btn-secondary btn-sm" id="clearFetchBtn">🗑️ Clear</button>
+                    </div>
+                    <div id="downloadProgress" style="display:none; font-size:12px; color:var(--text-secondary);">Downloading…</div>
+                </div>
+            </div>
+
+            <div class="selection-bar" id="selectionBar">
+                <div class="count">📋 <span id="selectedCount">0</span> posts selected</div>
+                <button class="btn btn-sm btn-success" onclick="saveSelectedPosts()"> Save to Vault</button>
+                <button class="btn btn-sm btn-secondary" onclick="selectAllVisible()">✅ Select All</button>
+                <button class="btn btn-sm btn-secondary" onclick="clearFetchSelection()">✕ Clear</button>
+            </div>
+
+            <div class="post-grid" id="postGrid">
+                <div class="empty" style="grid-column:1/-1;"><i class="fas fa-satellite-dish"></i><p>Add handlers and fetch posts</p></div>
+            </div>
+        </section>
+
+        <!-- VAULT -->
+        <section id="page-vault" style="display:none;" class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-archive"></i> Vault</h2>
+                <div class="card-actions">
+                    <button class="btn btn-secondary btn-sm" onclick="selectAllVaultItems()">✅ Select All</button>
+                    <button class="btn btn-secondary btn-sm" onclick="deselectAllVaultItems()">❌ Deselect</button>
+                    <button class="btn btn-secondary btn-sm" onclick="refreshVault()"><i class="fas fa-rotate"></i> Refresh</button>
+                    <button class="btn btn-instagram btn-sm" onclick="openScheduleModal()"><i class="fas fa-calendar-plus"></i> Auto-Schedule</button>
+                </div>
+            </div>
+            <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px;">
+                💡 Click on posts to select them, then use "Auto-Schedule", or hit "Post Now" on a single item.
+            </div>
+            <div class="schedule-list" id="vaultList">
+                <div class="empty"><i class="fas fa-archive"></i><p>Vault is empty</p></div>
+            </div>
+        </section>
+
+        <!-- AUTO SCHEDULE -->
+        <section id="page-schedule" style="display:none;" class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-calendar-plus"></i> Auto Schedule</h2>
+                <span style="font-size:12px;color:var(--text-muted);">GMT+3</span>
+            </div>
+            <div class="current-time">
+                <i class="fas fa-clock"></i>
+                <span>Current Time:</span>
+                <span class="time" id="currentTime2">--:--:--</span>
+                <span class="tz">(GMT+3)</span>
+            </div>
+            <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;">
+                💡 This schedules the posts currently <strong>selected in the Vault</strong> (<span id="schedSelCount">0</span> selected).
+            </div>
+            <div class="quick-schedule">
+                <button class="quick-btn active" data-period="24h" onclick="setQuickSchedule(this)"><i class="fas fa-sun"></i> 24 Hours<span class="sub">Next 24 hours</span></button>
+                <button class="quick-btn" data-period="week" onclick="setQuickSchedule(this)"><i class="fas fa-calendar-week"></i> Week<span class="sub">Next 7 days</span></button>
+                <button class="quick-btn" data-period="month" onclick="setQuickSchedule(this)"><i class="fas fa-calendar-alt"></i> Month<span class="sub">Next 30 days</span></button>
+                <button class="quick-btn" data-period="year" onclick="setQuickSchedule(this)"><i class="fas fa-calendar"></i> Year<span class="sub">Next 365 days</span></button>
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-share-nodes"></i> Platforms</label>
+                <div class="platform-chips" id="schedPlatformChips">
+                    <button class="platform-chip instagram selected" data-platform="instagram" onclick="toggleSchedulePlatform(this)">📸 Instagram</button>
+                    <button class="platform-chip" data-platform="facebook" onclick="toggleSchedulePlatform(this)">📘 Facebook</button>
+                    <button class="platform-chip" data-platform="twitter" onclick="toggleSchedulePlatform(this)">🐦 Twitter/X</button>
+                    <button class="platform-chip" data-platform="linkedin" onclick="toggleSchedulePlatform(this)">💼 LinkedIn</button>
+                    <button class="platform-chip" data-platform="threads" onclick="toggleSchedulePlatform(this)">🧵 Threads</button>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label><i class="fas fa-calendar-start"></i> Start Date & Time</label>
+                    <input type="datetime-local" id="schedStart" />
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-calendar-end"></i> End Date & Time</label>
+                    <input type="datetime-local" id="schedEnd" />
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label><i class="fas fa-hashtag"></i> Total Posts</label>
+                    <input type="number" id="schedTotal" value="10" min="1" max="100" />
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-clock"></i> Min Hours Between</label>
+                    <input type="number" id="schedGap" value="2" min="1" max="24" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-image"></i> Post Type</label>
+                <div class="segmented">
+                    <label class="segmented-option"><input type="radio" name="schedContentType" value="feed" checked><span>📱 Feed Post</span></label>
+                    <label class="segmented-option"><input type="radio" name="schedContentType" value="story"><span>📸 Story</span></label>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-primary" id="createSchedBtn"><i class="fas fa-play"></i> Create Schedule</button>
+                <button class="btn btn-secondary" id="previewSchedBtn"><i class="fas fa-eye"></i> Preview</button>
+                <button class="btn btn-secondary" id="processSchedBtn"><i class="fas fa-arrow-rotate-right"></i> Process Now</button>
+            </div>
+            <div id="schedResult" style="margin-top:16px;"></div>
+        </section>
+    </main>
+
+    <aside class="right">
+        <div class="card">
+            <div class="card-header"><h3><i class="fas fa-clock"></i> Recent Activity</h3></div>
+            <div id="recentList"><div class="empty"><i class="fas fa-inbox"></i><p>No activity</p></div></div>
+        </div>
+        <div class="card">
+            <div class="card-header"><h3><i class="fas fa-chart-simple"></i> Quick Stats</h3></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                <div class="stat" style="padding:12px;"><div class="number" style="font-size:20px;" id="qScheduled">0</div><div class="label">Scheduled</div></div>
+                <div class="stat" style="padding:12px;"><div class="number" style="font-size:20px;" id="qPublished">0</div><div class="label">Published</div></div>
+                <div class="stat" style="padding:12px;"><div class="number" style="font-size:20px;" id="qVault">0</div><div class="label">Vault</div></div>
+                <div class="stat" style="padding:12px;"><div class="number" style="font-size:20px;" id="qHandlers">0</div><div class="label">Handlers</div></div>
+            </div>
+        </div>
+    </aside>
+</div>
+
+<!-- ZERNIO MODAL (post single vault item now) -->
+<div class="modal-overlay" id="zernioModal">
+    <div class="modal-content">
+        <h2>📤 Post to Social Media</h2>
+        <div class="form-group">
+            <label>📝 Caption</label>
+            <textarea id="zernioCaption" placeholder="Write your caption here..."></textarea>
+        </div>
+        <div class="form-group">
+            <label>📱 Platforms</label>
+            <div class="platform-chips" id="platformChips">
+                <button class="platform-chip instagram selected" data-platform="instagram" onclick="togglePlatform(this)">📸 Instagram</button>
+                <button class="platform-chip" data-platform="facebook" onclick="togglePlatform(this)">📘 Facebook</button>
+                <button class="platform-chip" data-platform="twitter" onclick="togglePlatform(this)">🐦 Twitter/X</button>
+                <button class="platform-chip" data-platform="linkedin" onclick="togglePlatform(this)">💼 LinkedIn</button>
+                <button class="platform-chip" data-platform="threads" onclick="togglePlatform(this)">🧵 Threads</button>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>📱 Post Type</label>
+            <div class="segmented">
+                <label class="segmented-option"><input type="radio" name="contentType" value="feed" checked><span>📱 Feed Post</span></label>
+                <label class="segmented-option"><input type="radio" name="contentType" value="story"><span>📸 Story</span></label>
+            </div>
+            <div class="hint">💡 Feed: 1:1 or 4:5 · Story: 9:16</div>
+        </div>
+        <div class="form-group">
+            <label>⏰ Schedule (optional)</label>
+            <input type="datetime-local" id="zernioSchedule">
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-secondary" onclick="closeZernioModal()">Cancel</button>
+            <button class="btn btn-instagram" id="zernioPostBtn" onclick="submitZernioPost()">🚀 Post Now</button>
+        </div>
+        <div id="zernioStatus" style="margin-top:12px; font-size:13px; color:var(--text-muted);"></div>
+    </div>
+</div>
+
+<!-- SCHEDULE PREVIEW MODAL -->
+<div class="modal-overlay" id="previewModal">
+    <div class="modal-content">
+        <h2>👁️ Schedule Preview</h2>
+        <div class="schedule-preview-times" id="previewTimes"></div>
+        <div class="modal-actions">
+            <button class="btn btn-secondary" onclick="closePreviewModal()">Close</button>
+        </div>
+    </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+    <button class="lightbox-close" onclick="closeLightbox()" aria-label="Close">✕</button>
+    <img id="lightboxImage" src="" alt="Full size image">
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast" style="display:none;"><span id="toastMessage">Notification</span></div>
+
+<script>
+    // ==============================
+    // STATE
+    // ==============================
+    let sessionId = null;
+    let scheduledPosts = [];
+    let vaultItems = [];
+    let allPosts = [];
+    let removedUris = new Set();
+    let selectedUris = new Set();
+    let postedUris = new Set();
+    let postedPlatformsMap = {};
+    let handlers = [];
+    let handlerIdCounter = 0;
+    let currentPostingItem = null;
+    let selectedPeriod = '24h';
+    let countdownInterval = null;
+    let clockInterval = null;
+    let isFetching = false;
+    const API_BASE = '';
+
+    const defaultHandlers = [
+        { id: 1, handle: 'economist.bsky.social', displayName: '', avatar: '', selected: true }
+    ];
+
+    // ==============================
+    // DOM REFS
+    // ==============================
+    const $ = id => document.getElementById(id);
+    const scheduleList = $('scheduleList');
+    const vaultList = $('vaultList');
+    const postGrid = $('postGrid');
+    const handlersList = $('handlersList');
+    const schedResult = $('schedResult');
+    const schedStart = $('schedStart');
+    const schedEnd = $('schedEnd');
+    const schedTotal = $('schedTotal');
+    const schedGap = $('schedGap');
+
+    // ==============================
+    // TOAST
+    // ==============================
+    function toast(msg, type = 'info') {
+        const el = $('toast');
+        const msgEl = $('toastMessage');
+        if (!el) return;
+        msgEl.textContent = msg;
+        el.className = 'toast ' + type;
+        el.style.display = 'block';
+        clearTimeout(el._hide);
+        el._hide = setTimeout(() => { el.style.display = 'none'; }, 4000);
+    }
+
+    // ==============================
+    // STORAGE HELPERS
+    // ==============================
+    function saveToStorage(key, value) { try { localStorage.setItem('bvault_' + key, JSON.stringify(value)); } catch (e) {} }
+    function getFromStorage(key) { try { const v = localStorage.getItem('bvault_' + key); return v ? JSON.parse(v) : null; } catch (e) { return null; } }
+
+    // ==============================
+    // NAVIGATION
+    // ==============================
+    document.querySelectorAll('.nav a').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            document.querySelectorAll('.nav a').forEach(l => l.classList.remove('active'));
+            this.classList.add('active');
+            const page = this.dataset.page;
+            document.querySelectorAll('.main > section').forEach(s => s.style.display = 'none');
+            const target = $('page-' + page);
+            if (target) target.style.display = 'block';
+            if (page === 'scheduled') loadScheduled();
+            if (page === 'vault') loadVault();
+            if (page === 'fetch') { renderHandlers(); }
+            if (page === 'schedule') { setScheduleDefaults(); updateSchedSelCount(); }
+            if (!clockInterval) startClock();
+        });
+    });
+    document.querySelector('.nav a.active')?.click();
+
+    // ==============================
+    // CLOCK (GMT+3)
+    // ==============================
+    function startClock() {
+        if (clockInterval) clearInterval(clockInterval);
+        clockInterval = setInterval(() => {
+            const now = new Date();
+            const gmt3 = new Date(now.getTime() + (3 * 60 * 60 * 1000));
+            const h = String(gmt3.getUTCHours()).padStart(2, '0');
+            const m = String(gmt3.getUTCMinutes()).padStart(2, '0');
+            const s = String(gmt3.getUTCSeconds()).padStart(2, '0');
+            const timeStr = `${h}:${m}:${s}`;
+            const el = $('currentTime'); const el2 = $('currentTime2');
+            if (el) el.textContent = timeStr;
+            if (el2) el2.textContent = timeStr;
+        }, 1000);
+    }
+    startClock();
+
+    // ==============================
+    // LOGIN
+    // ==============================
+    $('loginBtn').addEventListener('click', async function() {
+        const username = $('username').value.trim();
+        const password = $('password').value.trim();
+        if (!username || !password) { toast('Enter username and password', 'error'); return; }
+        this.disabled = true;
+        this.textContent = '⏳ Logging in...';
+        try {
+            const res = await fetch(`${API_BASE}/api/login`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+            const data = await res.json();
+            if (data.success) {
+                sessionId = data.session_id;
+                setOnline(data);
+                loadRemovedUris();
+                await loadSavedHandlers();
+                loadVault();
+                loadScheduled();
+                toast('✅ Login successful!', 'success');
+            } else {
+                toast('❌ Login failed: ' + data.error, 'error');
+            }
+        } catch(e) { toast('❌ Login error: ' + e.message, 'error'); }
+        finally { this.disabled = false; this.textContent = '🔐 Login'; }
+    });
+
+    $('logoutBtn').addEventListener('click', async function() {
+        if (sessionId) {
+            try { await fetch(`${API_BASE}/api/logout`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ session_id: sessionId }) }); } catch(e) {}
+        }
+        sessionId = null;
+        setOffline();
+        allPosts = []; vaultItems = []; scheduledPosts = []; removedUris.clear(); selectedUris.clear();
+        renderPosts(); renderVault([]); renderScheduled([]);
+        localStorage.removeItem('bvault_session_id');
+        localStorage.removeItem('bvault_user_data');
+        toast('Logged out', 'info');
+    });
+
+    function setOnline(userData) {
+        $('statusDot').className = 'dot online';
+        $('accountStatus').textContent = 'Online';
+        $('accountName').textContent = userData.display_name || userData.handle || 'Bluesky Vault';
+        if (userData.avatar) {
+            const box = $('avatarBox');
+            box.innerHTML = `<img src="${userData.avatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+        }
+        $('loginBtn').style.display = 'none';
+        $('logoutBtn').style.display = 'inline-block';
+        $('fetchBtn').disabled = !handlers.some(h => h.selected);
+        saveToStorage('session_id', sessionId);
+        saveToStorage('username', $('username').value.trim());
+        saveToStorage('user_data', userData);
+    }
+
+    function setOffline() {
+        $('statusDot').className = 'dot offline';
+        $('accountStatus').textContent = 'Offline';
+        $('accountName').textContent = 'Bluesky Vault';
+        $('avatarBox').textContent = 'V';
+        $('loginBtn').style.display = 'inline-block';
+        $('logoutBtn').style.display = 'none';
+        $('fetchBtn').disabled = true;
+    }
+
+    async function verifySession(sid) {
+        try {
+            const res = await fetch(`${API_BASE}/api/verify-session`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ session_id: sid }) });
+            return await res.json();
+        } catch(e) { return { success: false, valid: false }; }
+    }
+
+    // ==============================
+    // HANDLERS
+    // ==============================
+    function renderHandlers() {
+        handlersList.innerHTML = '';
+        handlers.forEach(h => {
+            const div = document.createElement('div');
+            div.className = 'handler-item';
+            div.innerHTML = `
+                <img src="${h.avatar || `https://ui-avatars.com/api/?name=${h.handle}&background=4f9fff&color=fff&size=28`}" alt="${h.handle}">
+                <div class="hi">
+                    <div class="n">${h.displayName || h.handle}</div>
+                    <div class="h">@${h.handle}</div>
+                </div>
+                <input type="checkbox" ${h.selected ? 'checked' : ''} onchange="toggleHandler(${h.id})">
+                <button class="btn btn-danger btn-xs" onclick="removeHandler(${h.id})">✕</button>
+            `;
+            handlersList.appendChild(div);
+        });
+        $('navHandlerCount').textContent = handlers.length;
+        $('statHandlers').textContent = handlers.length;
+        $('qHandlers').textContent = handlers.length;
+        $('fetchBtn').disabled = !sessionId || !handlers.some(h => h.selected);
+        saveToStorage('handlers', handlers.map(h => ({ id: h.id, handle: h.handle, displayName: h.displayName, avatar: h.avatar, selected: h.selected })));
+        saveToStorage('handler_counter', handlerIdCounter);
+    }
+    window.toggleHandler = function(id) {
+        const h = handlers.find(x => x.id === id);
+        if (h) { h.selected = !h.selected; renderHandlers(); }
+    };
+    window.removeHandler = async function(id) {
+        const h = handlers.find(x => x.id === id);
+        if (!h) return;
+        if (handlers.length <= 1) { toast('Keep at least one handler', 'error'); return; }
+        if (!confirm(`Remove @${h.handle}?`)) return;
+        try {
+            if (sessionId) {
+                await fetch(`${API_BASE}/api/handlers/remove`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ session_id: sessionId, handle: h.handle }) });
+            }
+        } catch(e) {}
+        handlers = handlers.filter(x => x.id !== id);
+        renderHandlers();
+        toast(`@${h.handle} removed`, 'success');
+    };
+
+    function addHandler(handle) {
+        handle = handle.trim();
+        if (!handle) { toast('Enter a handle', 'error'); return; }
+        if (handlers.some(h => h.handle.toLowerCase() === handle.toLowerCase())) { toast('Handler already exists', 'error'); return; }
+        handlerIdCounter++;
+        handlers.push({ id: handlerIdCounter, handle, displayName: '', avatar: '', selected: true });
+        resolveHandlerInfo(handle, handlerIdCounter);
+        renderHandlers();
+        $('newHandlerInput').value = '';
+        toast(`Added @${handle}`, 'success');
+    }
+    $('addHandlerBtn').addEventListener('click', () => addHandler($('newHandlerInput').value));
+    $('newHandlerInput').addEventListener('keypress', e => { if (e.key === 'Enter') addHandler($('newHandlerInput').value); });
+    $('selectAllBtn').addEventListener('click', () => { handlers.forEach(h => h.selected = true); renderHandlers(); });
+    $('selectNoneBtn').addEventListener('click', () => {
+        if (handlers.length === 1) { toast('Cannot deselect the last handler', 'error'); return; }
+        handlers.forEach(h => h.selected = false);
+        if (handlers.every(h => !h.selected)) handlers[0].selected = true;
+        renderHandlers();
+    });
+
+    async function resolveHandlerInfo(handle, id) {
+        if (!sessionId) return;
+        try {
+            const res = await fetch(`${API_BASE}/api/resolve-handle`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ session_id: sessionId, handle }) });
+            const data = await res.json();
+            if (data.success) {
+                const h = handlers.find(x => x.id === id);
+                if (h) { h.displayName = data.profile.display_name || handle; h.avatar = data.profile.avatar; renderHandlers(); }
+            }
+        } catch(e) {}
+    }
+
+    async function loadSavedHandlers() {
+        if (!sessionId) return;
+        try {
+            const res = await fetch(`${API_BASE}/api/handlers/list`, { method: 'POST', headers: { 'Content-Type': 'application/json' } });
+            const data = await res.json();
+            if (data.success && data.handlers && data.handlers.length > 0) {
+                handlers = data.handlers.map((h, i) => ({
+                    id: ++handlerIdCounter, handle: h.handle, displayName: h.display_name || h.handle,
+                    avatar: h.avatar, selected: i === 0
+                }));
+                renderHandlers();
+            }
+        } catch(e) {}
+    }
+
+    // ==============================
+    // FILTER BADGE
+    // ==============================
+    function getPostType() { const s = document.querySelector('input[name="postType"]:checked'); return s ? s.value : 'user_posts'; }
+    function updateFilterBadge() {
+        const postType = getPostType();
+        let label = postType === 'user_posts' ? '📝 User\'s Posts' : '📰 All Posts';
+        if ($('filterMedia').checked) label += ' 📸+Images';
+        if (!$('includeReposts').checked) label += ' 🚫NoReposts';
+        if (!$('includeReplies').checked) label += ' 🚫NoReplies';
+        $('filterBadge').textContent = label;
+    }
+    document.querySelectorAll('input[name="postType"]').forEach(el => el.addEventListener('change', updateFilterBadge));
+    $('filterMedia').addEventListener('change', updateFilterBadge);
+    $('includeReposts').addEventListener('change', updateFilterBadge);
+    $('includeReplies').addEventListener('change', updateFilterBadge);
+
+    // ==============================
+    // FETCH POSTS
+    // ==============================
+    $('fetchBtn').addEventListener('click', fetchPosts);
+    async function fetchPosts() {
+        if (!sessionId) { toast('Please login first', 'error'); return; }
+        const selectedHandlers = handlers.filter(h => h.selected);
+        if (selectedHandlers.length === 0) { toast('Select at least one handler', 'error'); return; }
+        if (isFetching) return;
+        isFetching = true;
+        $('fetchBtn').disabled = true;
+        await loadVault();
+
+        const limit = parseInt($('limit').value) || 20;
+        const postType = getPostType();
+        const includeRepostsChecked = $('includeReposts').checked;
+        const includeRepliesChecked = $('includeReplies').checked;
+        const filterMediaChecked = $('filterMedia').checked;
+        const apiFilter = postType === 'user_posts' ? 'posts_no_replies' : 'posts_and_author_threads';
+
+        let fetched = [];
+        postGrid.innerHTML = `<div class="empty" style="grid-column:1/-1;"><p>⏳ Fetching...</p></div>`;
+
+        for (let i = 0; i < selectedHandlers.length; i++) {
+            const handler = selectedHandlers[i];
+            postGrid.innerHTML = `<div class="empty" style="grid-column:1/-1;"><p>⏳ Fetching ${i+1}/${selectedHandlers.length}: @${handler.handle}...</p></div>`;
+            try {
+                const res = await fetch(`${API_BASE}/api/fetch-posts`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ session_id: sessionId, actor: handler.handle, limit, filter: apiFilter, include_reposts: includeRepostsChecked })
+                });
+                const data = await res.json();
+                if (data.success && data.posts.length > 0) {
+                    let posts = data.posts;
+                    if (!includeRepliesChecked) posts = posts.filter(p => p.is_reply !== true);
+                    if (filterMediaChecked) posts = posts.filter(p => p.has_media === true);
+                    posts = posts.filter(p => !vaultItems.some(v => v.uri === p.uri) && !removedUris.has(p.uri));
+                    posts.forEach(p => p.source_handler = handler.handle);
+                    fetched = fetched.concat(posts);
+                }
+            } catch(e) { console.error(`Error fetching @${handler.handle}:`, e); }
+        }
+
+        allPosts = fetched.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        selectedUris.clear();
+        renderPosts();
+        updateFilterBadge();
+        $('downloadImagesBtn').disabled = allPosts.length === 0;
+        $('saveJsonBtn').disabled = allPosts.length === 0;
+        $('statFetched').textContent = allPosts.length;
+
+        toast(`✨ Fetched ${allPosts.length} posts from ${selectedHandlers.length} handlers`, 'success');
+        isFetching = false;
+        $('fetchBtn').disabled = false;
+    }
+
+    function renderPosts() {
+        postGrid.innerHTML = '';
+        const visible = allPosts.filter(p => !vaultItems.some(v => v.uri === p.uri) && !removedUris.has(p.uri));
+        if (visible.length === 0) {
+            postGrid.innerHTML = `<div class="empty" style="grid-column:1/-1;"><i class="fas fa-satellite-dish"></i><p>No posts found</p></div>`;
+            updateSelectionUI();
+            return;
+        }
+        visible.forEach(post => {
+            const card = document.createElement('div');
+            card.className = 'post-card' + (selectedUris.has(post.uri) ? ' selected' : '');
+            const avatar = post.avatar || `https://ui-avatars.com/api/?name=${post.author}&background=4f9fff&color=fff&size=28`;
+            const time = new Date(post.created_at).toLocaleString();
+
+            let badges = '';
+            if (post.is_repost) badges += `<span class="badge-tag badge-repost">🔁 Repost</span>`;
+            if (post.is_reply) badges += `<span class="badge-tag badge-reply">💬 Reply</span>`;
+            if (post.has_video) badges += `<span class="badge-tag badge-video">🎬 Video</span>`;
+
+            let gallery = '';
+            if (post.images && post.images.length > 0) {
+                gallery = '<div class="pgal">' + post.images.slice(0,4).map(img => `<img src="${img.thumb || img.url}" loading="lazy" onclick="event.stopPropagation(); openLightbox('${img.url}')">`).join('') + '</div>';
+            }
+
+            card.innerHTML = `
+                <div class="ph">
+                    <img src="${avatar}" alt="${post.author}">
+                    <div style="min-width:0;">
+                        <div class="an">${escapeHtml(post.display_name || post.author)}</div>
+                        <div class="ah">@${escapeHtml(post.author)} · ${time}</div>
+                    </div>
+                </div>
+                ${badges}
+                ${post.text ? `<div class="pt">${escapeHtml(post.text)}</div>` : ''}
+                ${gallery}
+                <div class="pstats">
+                    <span>❤️ ${post.likes || 0}</span>
+                    <span>🔄 ${post.reposts || 0}</span>
+                    <span>💬 ${post.replies || 0}</span>
+                </div>
+            `;
+            card.addEventListener('click', (e) => {
+                if (e.target.closest('img')) return;
+                toggleSelection(post.uri);
+            });
+            postGrid.appendChild(card);
+        });
+        updateSelectionUI();
+    }
+
+    function toggleSelection(uri) {
+        if (selectedUris.has(uri)) selectedUris.delete(uri); else selectedUris.add(uri);
+        renderPosts();
+    }
+    window.selectAllVisible = function() {
+        allPosts.filter(p => !vaultItems.some(v => v.uri === p.uri) && !removedUris.has(p.uri)).forEach(p => selectedUris.add(p.uri));
+        renderPosts();
+    };
+    window.clearFetchSelection = function() { selectedUris.clear(); renderPosts(); };
+    function updateSelectionUI() {
+        const count = selectedUris.size;
+        $('selectedCount').textContent = count;
+        $('selectionBar').classList.toggle('active', count > 0);
+    }
+
+    window.saveSelectedPosts = async function() {
+        if (selectedUris.size === 0) { toast('No posts selected', 'error'); return; }
+        if (!sessionId) { toast('Please login first', 'error'); return; }
+        const posts = allPosts.filter(p => selectedUris.has(p.uri));
+        let saved = 0, failed = 0;
+        toast(`Saving ${posts.length} posts to vault...`, 'info');
+        for (const post of posts) {
+            try {
+                const res = await fetch(`${API_BASE}/api/vault/add`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ post, handler_handle: post.source_handler || post.author })
+                });
+                const data = await res.json();
+                if (data.success) { vaultItems.push(post); removedUris.add(post.uri); saved++; } else failed++;
+            } catch(e) { failed++; }
+        }
+        saveRemovedUris();
+        selectedUris.clear();
+        renderPosts();
+        updateStats();
+        toast(`✅ Saved ${saved} posts${failed ? `, ${failed} failed` : ''}`, 'success');
+    };
+
+    $('clearFetchBtn').addEventListener('click', () => { allPosts = []; selectedUris.clear(); renderPosts(); $('downloadImagesBtn').disabled = true; $('saveJsonBtn').disabled = true; toast('🗑️ Cleared', 'success'); });
+
+    $('downloadImagesBtn').addEventListener('click', async function() {
+        if (allPosts.length === 0) { toast('No posts to download', 'error'); return; }
+        this.disabled = true;
+        $('downloadProgress').style.display = 'block';
+        $('downloadProgress').textContent = 'Preparing download...';
+        try {
+            const res = await fetch(`${API_BASE}/api/download-images`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ posts: allPosts, actor: 'multiple_handlers' }) });
+            if (res.ok) {
+                const cd = res.headers.get('Content-Disposition');
+                const filename = cd ? cd.split('filename=')[1].replace(/"/g, '') : 'bluesky_images.zip';
+                const blob = await res.blob();
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a'); a.href = url; a.download = filename;
+                document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+                toast(`📥 Downloaded ${filename}`, 'success');
+            } else { const err = await res.json(); toast(`Error: ${err.error}`, 'error'); }
+        } catch(e) { toast(`Error: ${e.message}`, 'error'); }
+        finally { this.disabled = false; $('downloadProgress').style.display = 'none'; }
+    });
+
+    $('saveJsonBtn').addEventListener('click', async function() {
+        if (allPosts.length === 0) { toast('No posts to save', 'error'); return; }
+        try {
+            const res = await fetch(`${API_BASE}/api/save-posts`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ posts: allPosts, actor: 'multiple_handlers' }) });
+            if (res.ok) {
+                const blob = await res.blob();
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a'); a.href = url; a.download = `posts_${new Date().toISOString().slice(0,10)}.json`;
+                document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+                toast('💾 JSON exported', 'success');
+            } else { const err = await res.json(); toast(`Error: ${err.error}`, 'error'); }
+        } catch(e) { toast(`Error: ${e.message}`, 'error'); }
+    });
+
+    // ==============================
+    // REMOVED URIS PERSISTENCE
+    // ==============================
+    function saveRemovedUris() { saveToStorage('removed_uris', Array.from(removedUris)); }
+    function loadRemovedUris() { const s = getFromStorage('removed_uris'); if (s && Array.isArray(s)) removedUris = new Set(s); }
+
+    // ==============================
+    // LOAD SCHEDULED POSTS
+    // ==============================
+    async function loadScheduled() {
+        try {
+            const res = await fetch(`${API_BASE}/api/vault/scheduled`, { method: 'GET', headers: { 'Content-Type': 'application/json' } });
+            const data = await res.json();
+            if (data.success && data.scheduled_posts) {
+                scheduledPosts = data.scheduled_posts.map(item => {
+                    let d = item.scheduled_datetime ? new Date(item.scheduled_datetime) : (item.scheduled_time ? new Date(item.scheduled_time) : null);
+                    const valid = d && !isNaN(d.getTime());
+                    return { ...item, scheduledDate: valid ? d : null, isFuture: valid && d > new Date() };
+                }).filter(p => p.scheduledDate !== null);
+                renderScheduled(scheduledPosts);
+                updateStats();
+            } else { await loadScheduledFromVault(); }
+        } catch(e) { await loadScheduledFromVault(); }
+    }
+
+    async function loadScheduledFromVault() {
+        try {
+            const res = await fetch(`${API_BASE}/api/vault/list`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) });
+            const data = await res.json();
+            if (data.success) {
+                const all = data.vault || [];
+                const scheduled = all.filter(item => item.notes && item.notes.includes('Scheduled for'));
+                scheduledPosts = scheduled.map(item => {
+                    let scheduledDate = null;
+                    const match = item.notes.match(/Scheduled for ([\d\-:]+)/);
+                    if (match) {
+                        const timeStr = match[1].trim();
+                        let dt = new Date(timeStr);
+                        if (isNaN(dt.getTime())) {
+                            const parts = timeStr.split(' ');
+                            const dp = parts[0].split('-');
+                            const tp = parts[1] ? parts[1].split(':') : ['03', '00'];
+                            dt = new Date(parseInt(dp[0]), parseInt(dp[1])-1, parseInt(dp[2]), parseInt(tp[0]), parseInt(tp[1]));
+                        }
+                        if (!isNaN(dt.getTime())) scheduledDate = dt;
+                    }
+                    const valid = scheduledDate && !isNaN(scheduledDate.getTime());
+                    return { ...item, scheduledDate: valid ? scheduledDate : null, isFuture: valid && scheduledDate > new Date() };
+                }).filter(p => p.scheduledDate !== null);
+                renderScheduled(scheduledPosts);
+                updateStats();
+            }
+        } catch(e) {}
+    }
+
+    function renderScheduled(items) {
+        scheduleList.innerHTML = '';
+        if (!items || items.length === 0) {
+            scheduleList.innerHTML = `<div class="empty"><i class="fas fa-calendar-day"></i><p>No scheduled posts</p></div>`;
+            $('navSchedCount').textContent = '0';
+            return;
+        }
+        const sorted = [...items].sort((a, b) => {
+            const dA = a.saved_at ? new Date(a.saved_at) : (a.created_at ? new Date(a.created_at) : null);
+            const dB = b.saved_at ? new Date(b.saved_at) : (b.created_at ? new Date(b.created_at) : null);
+            if (dA && dB) return dB - dA;
+            return dA ? -1 : (dB ? 1 : 0);
+        });
+        $('navSchedCount').textContent = sorted.length;
+
+        sorted.forEach((item, index) => {
+            const isFuture = item.isFuture;
+            const div = document.createElement('div');
+            div.className = `schedule-item ${isFuture ? '' : 'published'}`;
+            let timeStr = 'Unknown';
+            if (item.scheduledDate && !isNaN(item.scheduledDate.getTime())) {
+                timeStr = item.scheduledDate.toLocaleString('en-US', { month:'short', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit', hour12:true });
+            }
+            const handle = item.author || 'unknown';
+            const text = item.text || '(no text)';
+            let countdownDisplay = '--:--:--', targetTime = 0;
+            if (isFuture && item.scheduledDate) {
+                targetTime = item.scheduledDate.getTime();
+                const diff = targetTime - Date.now();
+                if (diff > 0) {
+                    const days = Math.floor(diff / 86400000);
+                    const h = String(Math.floor((diff % 86400000) / 3600000)).padStart(2, '0');
+                    const m = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
+                    const s = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
+                    countdownDisplay = days > 0 ? `${days}d ${h}:${m}:${s}` : `${h}:${m}:${s}`;
+                } else countdownDisplay = '00:00:00';
+            } else if (!isFuture && item.scheduledDate) countdownDisplay = '✅ Done';
+
+            let platform = 'Threads';
+            if (item.notes) {
+                if (item.notes.includes('Instagram')) platform = 'Instagram';
+                else if (item.notes.includes('Facebook')) platform = 'Facebook';
+                else if (item.notes.includes('Twitter')) platform = 'Twitter';
+            }
+            let rawTime = '';
+            const match = item.notes && item.notes.match(/Scheduled for ([\d\-:]+)/);
+            if (match) rawTime = match[1];
+
+            const isNewest = index === 0;
+            div.innerHTML = `
+                <div class="info">
+                    <div class="handle">@${handle} ${isNewest ? '🆕' : ''}</div>
+                    <div class="text">${text.slice(0, 80)}${text.length > 80 ? '…' : ''}</div>
+                    <div class="meta">
+                        <span class="platform-tag">${platform}</span>
+                        <span>📅 <strong>${timeStr}</strong></span>
+                        ${rawTime ? `<span>⏰ ${rawTime}</span>` : ''}
+                        ${item.notes ? `<span>📝 ${item.notes.slice(0, 24)}</span>` : ''}
+                    </div>
+                </div>
+                <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                    <span class="time">${timeStr}</span>
+                    <span class="badge">${isFuture ? '⏳ scheduled' : '✅ published'}</span>
+                    <span class="countdown" data-target="${targetTime}" data-published="${!isFuture}">${countdownDisplay}</span>
+                </div>
+            `;
+            scheduleList.appendChild(div);
+        });
+        startCountdowns();
+    }
+
+    function startCountdowns() {
+        if (countdownInterval) clearInterval(countdownInterval);
+        countdownInterval = setInterval(() => {
+            const now = Date.now();
+            document.querySelectorAll('.schedule-item .countdown[data-target]').forEach(el => {
+                const target = parseInt(el.dataset.target);
+                const isPublished = el.dataset.published === 'true';
+                if (isPublished || !target) return;
+                const diff = target - now;
+                if (diff <= 0) {
+                    el.textContent = '00:00:00';
+                    el.style.color = 'var(--success)';
+                    const parent = el.closest('.schedule-item');
+                    if (parent) {
+                        parent.classList.add('published');
+                        const badge = parent.querySelector('.badge');
+                        if (badge) { badge.textContent = '✅ published'; badge.style.background = 'rgba(34,197,94,0.15)'; badge.style.color = '#22c55e'; badge.style.borderColor = 'rgba(34,197,94,0.2)'; }
+                        const timeEl = parent.querySelector('.time'); if (timeEl) timeEl.style.color = 'var(--success)';
+                    }
+                    el.dataset.published = 'true';
+                    return;
+                }
+                const days = Math.floor(diff / 86400000);
+                const h = String(Math.floor((diff % 86400000) / 3600000)).padStart(2, '0');
+                const m = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
+                const s = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
+                el.textContent = days > 0 ? `${days}d ${h}:${m}:${s}` : `${h}:${m}:${s}`;
+            });
+        }, 1000);
+    }
+    window.refreshScheduled = () => loadScheduled();
+
+    // ==============================
+    // LOAD / RENDER VAULT
+    // ==============================
+    async function loadVault() {
+        try {
+            const res = await fetch(`${API_BASE}/api/vault/list`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) });
+            const data = await res.json();
+            if (data.success) {
+                vaultItems = data.vault || [];
+                vaultItems.forEach(item => removedUris.add(item.uri));
+                saveRemovedUris();
+                await loadPostedStatus();
+                renderVault(vaultItems);
+                renderPosts();
+                updateStats();
+            }
+        } catch(e) {}
+    }
+
+    async function loadPostedStatus() {
+        try {
+            const res = await fetch(`${API_BASE}/api/zernio/posts`, { method: 'GET', headers: { 'Content-Type': 'application/json' } });
+            const data = await res.json();
+            if (data.success) {
+                postedUris = new Set(); postedPlatformsMap = {};
+                data.posts.forEach(p => {
+                    postedUris.add(p.uri);
+                    if (!postedPlatformsMap[p.uri]) postedPlatformsMap[p.uri] = [];
+                    if (!postedPlatformsMap[p.uri].includes(p.platform)) postedPlatformsMap[p.uri].push(p.platform);
+                });
+            }
+        } catch(e) {}
+    }
+
+    function renderVault(items) {
+        vaultList.innerHTML = '';
+        if (!items || items.length === 0) {
+            vaultList.innerHTML = `<div class="empty"><i class="fas fa-archive"></i><p>Vault is empty</p></div>`;
+            $('navVaultCount').textContent = '0';
+            return;
+        }
+        $('navVaultCount').textContent = items.length;
+        items.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'vault-item' + (postedUris.has(item.uri) ? ' posted' : '');
+            div.dataset.uri = item.uri;
+            const time = item.created_at ? new Date(item.created_at).toLocaleString() : '';
+            const avatar = `https://ui-avatars.com/api/?name=${item.author}&background=4f9fff&color=fff&size=32`;
+
+            let gallery = '';
+            if (item.images && item.images.length > 0) {
+                gallery = '<div class="gallery">' + item.images.map(img => `<img src="${img.thumb || img.url}" loading="lazy" onclick="event.stopPropagation(); openLightbox('${img.url}')">`).join('') + '</div>';
+            }
+            let videoChip = '';
+            if (item.video && item.video.cid) videoChip = `<div class="video-chip">🎬 Video · ${item.video.cid.substring(0,10)}...</div>`;
+
+            const isPosted = postedUris.has(item.uri);
+            const platforms = postedPlatformsMap[item.uri] || [];
+            let postedBadges = '';
+            if (isPosted && platforms.length > 0) postedBadges = `<div class="posted-badges">${platforms.map(p => `<span>✅ ${p}</span>`).join('')}</div>`;
+
+            const hasImage = item.images && item.images.length > 0;
+
+            div.innerHTML = `
+                <div class="vh">
+                    <img src="${avatar}" alt="${item.author}">
+                    <span class="handle">@${escapeHtml(item.author)}</span>
+                    <span class="vtime">${time}</span>
+                </div>
+                ${item.text ? `<div class="text">${escapeHtml(item.text).slice(0,140)}${(item.text||'').length>140?'…':''}</div>` : ''}
+                ${gallery}
+                ${videoChip}
+                ${postedBadges}
+                ${item.notes ? `<div class="notes">📝 ${escapeHtml(item.notes)}</div>` : ''}
+                <div class="vactions">
+                    <button class="btn btn-secondary btn-xs" onclick="event.stopPropagation(); restoreFromVault('${item.uri}')">🔄 Restore</button>
+                    <button class="btn btn-danger btn-xs" onclick="event.stopPropagation(); deleteFromVault('${item.uri}')">🗑️ Delete</button>
+                    <button class="btn btn-secondary btn-xs" onclick="event.stopPropagation(); addNote('${item.uri}')">📝 Note</button>
+                    ${hasImage ? (isPosted ? `<button class="btn btn-instagram btn-xs" disabled>✅ Posted</button>` : `<button class="btn btn-instagram btn-xs" onclick="event.stopPropagation(); openZernioModal('${item.uri}')">📸 Post Now</button>`) : ''}
+                </div>
+            `;
+            div.addEventListener('click', (e) => {
+                if (e.target.closest('.vactions') || e.target.closest('img')) return;
+                div.classList.toggle('selected');
+                updateSchedSelCount();
+            });
+            vaultList.appendChild(div);
+        });
+    }
+
+    window.refreshVault = async function() { await loadPostedStatus(); await loadVault(); toast('🔄 Vault refreshed', 'success'); };
+    window.selectAllVaultItems = function() { document.querySelectorAll('.vault-item').forEach(el => el.classList.add('selected')); updateSchedSelCount(); toast(`✅ Selected ${document.querySelectorAll('.vault-item.selected').length} posts`, 'success'); };
+    window.deselectAllVaultItems = function() { document.querySelectorAll('.vault-item').forEach(el => el.classList.remove('selected')); updateSchedSelCount(); toast('❌ Deselected all', 'success'); };
+    function updateSchedSelCount() { const n = document.querySelectorAll('.vault-item.selected').length; const el = $('schedSelCount'); if (el) el.textContent = n; }
+
+    window.restoreFromVault = async function(uri) {
+        if (!confirm('Restore this post to the feed?')) return;
+        try {
+            const res = await fetch(`${API_BASE}/api/vault/remove`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ uri }) });
+            const data = await res.json();
+            if (data.success) {
+                vaultItems = vaultItems.filter(v => v.uri !== uri);
+                removedUris.delete(uri);
+                saveRemovedUris();
+                renderVault(vaultItems);
+                renderPosts();
+                updateStats();
+                toast('Post restored to feed', 'success');
+            }
+        } catch(e) { toast('Error: ' + e.message, 'error'); }
+    };
+    window.deleteFromVault = async function(uri) {
+        if (!confirm('Permanently delete this post from vault?')) return;
+        try {
+            const res = await fetch(`${API_BASE}/api/vault/delete-permanent`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ uri }) });
+            const data = await res.json();
+            if (data.success) { vaultItems = vaultItems.filter(v => v.uri !== uri); removedUris.delete(uri); saveRemovedUris(); renderVault(vaultItems); updateStats(); toast('Post permanently deleted', 'success'); }
+        } catch(e) { toast('Error: ' + e.message, 'error'); }
+    };
+    window.addNote = async function(uri) {
+        const note = prompt('Enter a note for this post:');
+        if (note === null) return;
+        try {
+            const res = await fetch(`${API_BASE}/api/vault/update-notes`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ uri, notes: note }) });
+            const data = await res.json();
+            if (data.success) { loadVault(); toast('Note added!', 'success'); }
+        } catch(e) { toast('Error: ' + e.message, 'error'); }
+    };
+
+    // ==============================
+    // STATS
+    // ==============================
+    function updateStats() {
+        const sched = scheduledPosts.filter(p => p.isFuture).length;
+        const published = scheduledPosts.filter(p => !p.isFuture).length;
+        const vault = vaultItems.length;
+        const set = (id, val) => { const el = $(id); if (el) el.textContent = val; };
+        set('statScheduled', sched); set('statPublished', published); set('statVault', vault); set('statHandlers', handlers.length);
+        set('qScheduled', sched); set('qPublished', published); set('qVault', vault); set('qHandlers', handlers.length);
+    }
+
+    // ==============================
+    // ZERNIO POST MODAL
+    // ==============================
+    window.openZernioModal = function(uri) {
+        const item = vaultItems.find(v => v.uri === uri);
+        if (!item) { toast('Item not found in vault', 'error'); return; }
+        if (!item.images || item.images.length === 0) { toast('No image found', 'error'); return; }
+        currentPostingItem = item;
+        let caption = item.text || '';
+        if (caption.length > 500) caption = caption.substring(0, 497) + '...';
+        $('zernioCaption').value = caption;
+        $('zernioSchedule').value = '';
+        $('zernioStatus').textContent = '';
+        $('zernioPostBtn').disabled = false;
+        $('zernioPostBtn').textContent = '🚀 Post Now';
+        document.querySelectorAll('#platformChips .platform-chip').forEach(chip => {
+            chip.classList.remove('selected');
+            if (chip.dataset.platform === 'instagram') chip.classList.add('selected');
+        });
+        $('zernioModal').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    };
+    window.closeZernioModal = function() { $('zernioModal').classList.remove('active'); document.body.style.overflow = ''; currentPostingItem = null; };
+    window.togglePlatform = function(el) { el.classList.toggle('selected'); };
+
+    window.submitZernioPost = async function() {
+        if (!currentPostingItem) { toast('No item selected', 'error'); return; }
+        const platforms = Array.from(document.querySelectorAll('#platformChips .platform-chip.selected')).map(c => c.dataset.platform);
+        if (platforms.length === 0) { toast('Select at least one platform', 'error'); return; }
+        const caption = $('zernioCaption').value.trim();
+        const scheduleTime = $('zernioSchedule').value;
+        const contentType = document.querySelector('input[name="contentType"]:checked')?.value || 'feed';
+        $('zernioPostBtn').disabled = true;
+        $('zernioPostBtn').textContent = '⏳ Posting...';
+        $('zernioStatus').textContent = '📤 Posting to social media...';
+        try {
+            const payload = { uri: currentPostingItem.uri, platforms, caption, post_type: currentPostingItem.has_video ? 'video' : 'image', content_type: contentType };
+            if (scheduleTime) payload.schedule_time = scheduleTime;
+            const res = await fetch(`${API_BASE}/api/zernio/post`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            const data = await res.json();
+            if (data.success) {
+                $('zernioStatus').textContent = `✅ ${data.message || 'Posted successfully!'}`;
+                toast(`✅ Posted to ${platforms.join(', ')}`, 'success');
+                closeZernioModal();
+                await loadPostedStatus();
+                await loadVault();
+                await loadScheduled();
+            } else if (data.already_posted) {
+                $('zernioStatus').textContent = `⚠️ ${data.error}`;
+                toast(`⚠️ ${data.error}`, 'error');
+            } else {
+                $('zernioStatus').textContent = `❌ Error: ${data.error}`;
+                toast(`❌ Error: ${data.error}`, 'error');
+            }
+        } catch(e) { $('zernioStatus').textContent = `❌ Error: ${e.message}`; toast(`❌ Error: ${e.message}`, 'error'); }
+        finally { $('zernioPostBtn').disabled = false; $('zernioPostBtn').textContent = '🚀 Post Now'; }
+    };
+
+    // ==============================
+    // AUTO SCHEDULE (uses posts selected in Vault)
+    // ==============================
+    function setQuickSchedule(btn) {
+        document.querySelectorAll('.quick-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedPeriod = btn.dataset.period;
+        const now = new Date();
+        const gmt3 = new Date(now.getTime() + (3 * 60 * 60 * 1000));
+        const start = new Date(gmt3.getTime() + 10 * 60 * 1000);
+        let end = new Date(start);
+        const periodDays = { '24h': 1, 'week': 7, 'month': 30, 'year': 365 };
+        end.setDate(end.getDate() + (periodDays[selectedPeriod] || 7));
+        const periodPosts = { '24h': 2, 'week': 7, 'month': 30, 'year': 52 };
+        const total = periodPosts[selectedPeriod] || 10;
+        const fmt = d => { const y=d.getUTCFullYear(),mo=String(d.getUTCMonth()+1).padStart(2,'0'),day=String(d.getUTCDate()).padStart(2,'0'),h=String(d.getUTCHours()).padStart(2,'0'),min=String(d.getUTCMinutes()).padStart(2,'0'); return `${y}-${mo}-${day}T${h}:${min}`; };
+        schedStart.value = fmt(start);
+        schedEnd.value = fmt(end);
+        schedTotal.value = total;
+        const periodNames = { '24h': '24 hours', 'week': '1 week', 'month': '1 month', 'year': '1 year' };
+        toast(`📅 ${periodNames[selectedPeriod]} schedule: ${total} posts`, 'info');
+    }
+    window.setQuickSchedule = setQuickSchedule;
+
+    function setScheduleDefaults() {
+        const now = new Date();
+        const gmt3 = new Date(now.getTime() + (3 * 60 * 60 * 1000));
+        const start = new Date(gmt3.getTime() + 10 * 60 * 1000);
+        const end = new Date(start); end.setDate(end.getDate() + 1);
+        const fmt = d => { const y=d.getUTCFullYear(),mo=String(d.getUTCMonth()+1).padStart(2,'0'),day=String(d.getUTCDate()).padStart(2,'0'),h=String(d.getUTCHours()).padStart(2,'0'),min=String(d.getUTCMinutes()).padStart(2,'0'); return `${y}-${mo}-${day}T${h}:${min}`; };
+        if (!schedStart.value) schedStart.value = fmt(start);
+        if (!schedEnd.value) schedEnd.value = fmt(end);
+    }
+
+    window.toggleSchedulePlatform = function(el) { el.classList.toggle('selected'); };
+    function getSchedulePlatforms() { return Array.from(document.querySelectorAll('#schedPlatformChips .platform-chip.selected')).map(c => c.dataset.platform); }
+
+    $('createSchedBtn').addEventListener('click', async function() {
+        const start = schedStart.value, end = schedEnd.value;
+        const total = parseInt(schedTotal.value) || 10;
+        const gap = parseInt(schedGap.value) || 2;
+        const contentType = document.querySelector('input[name="schedContentType"]:checked')?.value || 'feed';
+        const platforms = getSchedulePlatforms();
+        if (!start || !end) { toast('Select start and end dates', 'error'); return; }
+        if (end <= start) { toast('End date must be after start date', 'error'); return; }
+        if (platforms.length === 0) { toast('Select at least one platform', 'error'); return; }
+        const uris = Array.from(document.querySelectorAll('.vault-item.selected')).map(el => el.dataset.uri).filter(Boolean);
+        if (uris.length === 0) { toast('Select vault items first (go to Vault page and click on them)', 'error'); return; }
+
+        this.disabled = true; this.innerHTML = '<span class="spinner"></span>';
+        schedResult.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);">⏳ Creating schedule...</div>';
+        const periodNames = { '24h': '24 hours', 'week': '1 week', 'month': '1 month', 'year': '1 year' };
+        try {
+            const res = await fetch(`${API_BASE}/api/vault/schedule-bulk`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ uris: uris.slice(0, total), platforms, period: selectedPeriod, start_date: start, min_hours_between: gap, content_type: contentType, timezone: 'Africa/Nairobi' })
+            });
+            const data = await res.json();
+            if (data.success) {
+                schedResult.innerHTML = `
+                    <div style="background:var(--bg);border-radius:var(--radius-sm);padding:16px;border:1px solid var(--border);">
+                        <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+                            <span style="color:var(--success);font-size:20px;">✅</span>
+                            <div><div style="font-weight:600;">${data.message}</div>
+                            <div style="font-size:13px;color:var(--text-secondary);">${data.scheduled_count} scheduled over ${periodNames[selectedPeriod]} · ${data.failed_count || 0} failed</div></div>
+                        </div>
+                        ${data.scheduled_posts && data.scheduled_posts.length > 0 ? `<div style="font-size:12px;color:var(--text-secondary);margin-top:8px;max-height:150px;overflow-y:auto;">${data.scheduled_posts.map(p => `<div style="padding:4px 0;border-bottom:1px solid var(--border);">📅 ${p.scheduled_display || p.scheduled_time || 'Unknown'}</div>`).join('')}</div>` : ''}
+                    </div>`;
+                toast(`✅ ${data.scheduled_count} posts scheduled over ${periodNames[selectedPeriod]}!`, 'success');
+                loadScheduled(); loadVault();
+                document.querySelectorAll('.vault-item.selected').forEach(el => el.classList.remove('selected'));
+                updateSchedSelCount();
+            } else {
+                schedResult.innerHTML = `<div style="background:var(--bg);border-radius:var(--radius-sm);padding:16px;border:1px solid var(--error);"><div style="color:var(--error);font-weight:600;">❌ ${data.error}</div></div>`;
+                toast('❌ ' + data.error, 'error');
+            }
+        } catch(e) { toast('❌ ' + e.message, 'error'); }
+        finally { this.disabled = false; this.innerHTML = '<i class="fas fa-play"></i> Create Schedule'; }
+    });
+
+    $('previewSchedBtn').addEventListener('click', async function() {
+        const total = document.querySelectorAll('.vault-item.selected').length || parseInt(schedTotal.value) || 10;
+        const start = schedStart.value;
+        const gap = parseInt(schedGap.value) || 2;
+        if (!start) { toast('Set a start date first', 'error'); return; }
+        try {
+            const res = await fetch(`${API_BASE}/api/vault/schedule-preview`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ total_posts: total, period: selectedPeriod, start_date: start, min_hours_between: gap, timezone: 'Africa/Nairobi' })
+            });
+            const data = await res.json();
+            if (data.success && data.times) {
+                $('previewTimes').innerHTML = data.times.map((t, i) => `<div class="time-item"><span>#${i+1}</span><span>${t.date}</span><span class="time">${t.time}</span><span>${t.day}</span></div>`).join('');
+                $('previewModal').classList.add('active');
+            } else toast('❌ Could not generate preview', 'error');
+        } catch(e) { toast('❌ ' + e.message, 'error'); }
+    });
+    window.closePreviewModal = function() { $('previewModal').classList.remove('active'); };
+
+    $('processSchedBtn').addEventListener('click', async function() {
+        this.disabled = true; this.innerHTML = '<span class="spinner"></span>';
+        try {
+            const res = await fetch(`${API_BASE}/api/vault/schedule-bulk/process`, { method: 'POST', headers: { 'Content-Type': 'application/json' } });
+            const data = await res.json();
+            if (data.success) { toast('✅ ' + data.message, 'success'); loadScheduled(); }
+            else toast('❌ ' + data.error, 'error');
+        } catch(e) { toast('❌ ' + e.message, 'error'); }
+        finally { this.disabled = false; this.innerHTML = '<i class="fas fa-arrow-rotate-right"></i> Process Now'; }
+    });
+
+    // ==============================
+    // LIGHTBOX / UTIL
+    // ==============================
+    window.openLightbox = function(url) { $('lightboxImage').src = url; $('lightbox').classList.add('active'); document.body.style.overflow = 'hidden'; };
+    window.closeLightbox = function() { $('lightbox').classList.remove('active'); document.body.style.overflow = ''; };
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeLightbox(); closeZernioModal(); closePreviewModal(); } });
+
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // ==============================
+    // INIT
+    // ==============================
+    function initializeApp() {
+        loadRemovedUris();
+        const savedHandlers = getFromStorage('handlers');
+        if (savedHandlers && savedHandlers.length > 0) {
+            handlers = savedHandlers;
+            const savedCounter = getFromStorage('handler_counter');
+            if (savedCounter) handlerIdCounter = savedCounter;
+        } else {
+            handlers = defaultHandlers.map(h => ({ ...h, id: ++handlerIdCounter }));
+        }
+        renderHandlers();
+
+        const savedSessionId = getFromStorage('session_id');
+        const savedUsername = getFromStorage('username');
+        if (savedSessionId && savedUsername) {
+            $('username').value = savedUsername;
+            $('accountStatus').textContent = 'Verifying...';
+            verifySession(savedSessionId).then(async data => {
+                if (data.success && data.valid) {
+                    sessionId = savedSessionId;
+                    setOnline({ handle: data.handle, display_name: data.display_name || data.handle, avatar: data.avatar });
+                    await loadSavedHandlers();
+                    await loadVault();
+                    await loadScheduled();
+                    toast('Welcome back!', 'success');
+                } else {
+                    setOffline();
+                    localStorage.removeItem('bvault_session_id');
+                    localStorage.removeItem('bvault_user_data');
+                }
+            }).catch(() => { setOffline(); });
+        }
+        loadScheduled();
+        setScheduleDefaults();
+        console.log('🦋 Bluesky Vault Scheduler (merged) loaded — GMT+3');
+    }
+    initializeApp();
+</script>
+</body>
+</html>
