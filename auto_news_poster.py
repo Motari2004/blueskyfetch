@@ -12,28 +12,8 @@ Or via Flask routes registered by register_auto_news_routes(app).
 Config is stored in Postgres table auto_news_config + auto_news_seen.
 
 ------------------------------------------------------------------------------
-IMPORTANT: this module runs an ALWAYS-ON background heartbeat (default every
-10s) when register_auto_news_routes(app) is called. On each heartbeat tick:
-  1. It checks every ENABLED config against its own `poll_interval_sec`
-     (e.g. set this to 10 in the Auto News page to actually check every
-     10 seconds — the heartbeat itself is always awake and checking whether
-     something is due).
-  2. If a config is due, it ALWAYS runs the fetch/check step, no matter what.
-  3. If it finds new (unseen) posts that match the filters -> posts them.
-  4. If it finds nothing (empty handler, no new posts, etc.) -> logs
-     "checked, nothing new" and just waits for the next cycle. It NEVER
-     stops, disables itself, or exits because a cycle found 0 posts.
-
-Posting failures for one post no longer abort the rest of the batch, and no
-error anywhere in a cycle (including after posting finishes) can kill the
-heartbeat or the CLI loop — every layer catches its own exceptions.
-
-DUPLICATE-POST SAFETY: each cycle is claimed atomically in the database
-(claim_due_config) before it runs, so if more than one process is alive at
-once — e.g. Flask's dev-mode reloader running both a parent watcher process
-and a child server process, or multiple production workers — only ONE of
-them ever wins a given cycle. The others see the claim already taken and
-skip, so the same post is never sent twice.
+IMPORTANT: When enabled, Auto News only fetches posts created AFTER the
+config was enabled. Old posts are skipped automatically.
 ------------------------------------------------------------------------------
 """
 
@@ -99,6 +79,7 @@ def init_auto_tables():
             last_run_at TIMESTAMP,
             last_error TEXT,
             last_result TEXT,
+            enabled_at TIMESTAMP,  -- NEW: tracks when config was enabled
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
         """
@@ -115,14 +96,16 @@ def init_auto_tables():
         )
         """
     )
-    # Migrate: add last_result if this table pre-dates it
+    # Migrate: add missing columns if they don't exist
     try:
         cur.execute("ALTER TABLE auto_news_config ADD COLUMN IF NOT EXISTS last_result TEXT")
+        cur.execute("ALTER TABLE auto_news_config ADD COLUMN IF NOT EXISTS enabled_at TIMESTAMP")
     except Exception as mig_e:
         print(f"auto_news_config migrate: {mig_e}")
     conn.commit()
     cur.close()
     conn.close()
+    print("✅ Auto-news tables initialized")
 
 
 # ---------------------------------------------------------------------------
@@ -152,15 +135,6 @@ def fetch_author_feed(client, actor: str, limit: int = 20):
             is_reply = reply is not None
 
             images = []
-            embed = getattr(record, "embed", None)
-            # images in embed
-            if embed is not None:
-                # app.bsky.embed.images
-                imgs = getattr(embed, "images", None)
-                if imgs:
-                    for im in imgs:
-                        # need full URL from post.embed if available
-                        pass
             # Prefer hydrated embed on post
             post_embed = getattr(post, "embed", None)
             if post_embed is not None:
@@ -213,25 +187,6 @@ def fetch_author_feed(client, actor: str, limit: int = 20):
 def post_image_to_account(image_url: str, caption: str, account_id: str, platform: str = "instagram", content_type: str = "feed"):
     """Try app.post_to_zernio; fallback simple call."""
     try:
-        import backend_app as app_mod  # when run next to app
-        return app_mod.post_to_zernio(
-            image_url=image_url,
-            caption=caption,
-            platforms=[platform],
-            content_type=content_type,
-            account_ids=[account_id],
-        )
-    except Exception:
-        pass
-    try:
-        # If imported from Flask app context
-        from flask import current_app
-        # direct function on module loaded as app
-    except Exception:
-        pass
-
-    # Fallback: try import by filename patterns
-    try:
         import importlib
         for name in ("app", "backend_app"):
             try:
@@ -249,7 +204,77 @@ def post_image_to_account(image_url: str, caption: str, account_id: str, platfor
     except Exception as e:
         return {"success": False, "error": str(e)}
 
-    return {"success": False, "error": "Could not import post_to_zernio from app"}
+    # Fallback: direct Zernio API call
+    try:
+        headers = {
+            'Authorization': f'Bearer {ZERNIO_API_KEY}',
+            'Content-Type': 'application/json'
+        }
+        
+        # Download image
+        img_response = requests.get(image_url, timeout=30)
+        if img_response.status_code != 200:
+            return {"success": False, "error": f"Failed to download image: {img_response.status_code}"}
+        
+        # Upload to Zernio
+        presign_payload = {
+            "filename": "post.jpg",
+            "contentType": "image/jpeg"
+        }
+        presign_response = requests.post(
+            f"{ZERNIO_BASE_URL}/media/presign",
+            headers=headers,
+            json=presign_payload,
+            timeout=30
+        )
+        
+        if presign_response.status_code not in [200, 201]:
+            return {"success": False, "error": f"Presign failed: {presign_response.text}"}
+        
+        data = presign_response.json()
+        upload_url = data.get('uploadUrl')
+        public_url = data.get('publicUrl')
+        
+        if not upload_url or not public_url:
+            return {"success": False, "error": "Missing upload URL"}
+        
+        upload_response = requests.put(
+            upload_url,
+            headers={'Content-Type': 'image/jpeg'},
+            data=img_response.content,
+            timeout=60
+        )
+        
+        if upload_response.status_code not in [200, 201, 204]:
+            return {"success": False, "error": f"Upload failed: {upload_response.text}"}
+        
+        payload = {
+            "mediaItems": [{
+                "type": "image",
+                "url": public_url
+            }],
+            "platforms": [{
+                "platform": platform,
+                "accountId": account_id
+            }],
+            "content": caption[:2200] if len(caption) > 2200 else caption,
+            "publishNow": True
+        }
+        
+        post_response = requests.post(
+            f"{ZERNIO_BASE_URL}/posts",
+            headers=headers,
+            json=payload,
+            timeout=60
+        )
+        
+        if post_response.status_code in [200, 201]:
+            return {"success": True, "post_id": post_response.json().get('post', {}).get('_id')}
+        else:
+            return {"success": False, "error": f"Post failed: {post_response.text}"}
+            
+    except Exception as e:
+        return {"success": False, "error": str(e)}
 
 
 # ---------------------------------------------------------------------------
@@ -269,8 +294,6 @@ def get_config(name: str = "default"):
             return None
         return dict(zip(cols, row))
     except Exception as e:
-        # A DB hiccup here must never propagate and kill a running loop —
-        # treat it as "config unavailable this cycle", not a fatal error.
         print(f"[auto_news] get_config DB error: {e}")
         return None
 
@@ -347,16 +370,24 @@ def claim_due_config(name: str, min_interval_sec: int = 10) -> dict | None:
 def save_config(cfg: dict):
     conn = get_db()
     cur = conn.cursor()
+    
+    # Check if config is being enabled (was disabled and now enabled)
+    existing = get_config(cfg.get('name', 'default'))
+    was_disabled = existing and not existing.get('enabled', False) and bool(cfg.get('enabled', False))
+    
     cur.execute(
         """
         INSERT INTO auto_news_config (
             name, enabled, handler_handle, account_id, platform, content_type,
             poll_interval_sec, media_only, include_reposts, include_replies,
-            caption_template, bluesky_handle, bluesky_app_password, updated_at
+            caption_template, bluesky_handle, bluesky_app_password,
+            enabled_at, updated_at
         ) VALUES (
             %(name)s, %(enabled)s, %(handler_handle)s, %(account_id)s, %(platform)s, %(content_type)s,
             %(poll_interval_sec)s, %(media_only)s, %(include_reposts)s, %(include_replies)s,
-            %(caption_template)s, %(bluesky_handle)s, %(bluesky_app_password)s, CURRENT_TIMESTAMP
+            %(caption_template)s, %(bluesky_handle)s, %(bluesky_app_password)s,
+            CASE WHEN %(enabled)s AND %(was_disabled)s THEN CURRENT_TIMESTAMP ELSE COALESCE(auto_news_config.enabled_at, CURRENT_TIMESTAMP) END,
+            CURRENT_TIMESTAMP
         )
         ON CONFLICT (name) DO UPDATE SET
             enabled = EXCLUDED.enabled,
@@ -371,6 +402,10 @@ def save_config(cfg: dict):
             caption_template = EXCLUDED.caption_template,
             bluesky_handle = COALESCE(EXCLUDED.bluesky_handle, auto_news_config.bluesky_handle),
             bluesky_app_password = COALESCE(EXCLUDED.bluesky_app_password, auto_news_config.bluesky_app_password),
+            enabled_at = CASE 
+                WHEN EXCLUDED.enabled = TRUE AND auto_news_config.enabled = FALSE THEN CURRENT_TIMESTAMP 
+                ELSE COALESCE(auto_news_config.enabled_at, CURRENT_TIMESTAMP)
+            END,
             updated_at = CURRENT_TIMESTAMP
         RETURNING id
         """,
@@ -388,6 +423,7 @@ def save_config(cfg: dict):
             "caption_template": cfg.get("caption_template") or "{text}",
             "bluesky_handle": cfg.get("bluesky_handle"),
             "bluesky_app_password": cfg.get("bluesky_app_password"),
+            "was_disabled": was_disabled,
         },
     )
     rid = cur.fetchone()[0]
@@ -408,9 +444,6 @@ def uri_seen(config_id: int, uri: str) -> bool:
         return found
     except Exception as e:
         print(f"[auto_news] uri_seen DB error (treating as unseen, will retry): {e}")
-        # Fail safe: if we can't check, skip this post THIS cycle rather than
-        # crash the whole run — the caller's per-post try/except already
-        # protects the loop, this is belt-and-suspenders.
         return True
 
 
@@ -430,7 +463,6 @@ def mark_seen(config_id: int, uri: str, posted: bool):
         cur.close()
         conn.close()
     except Exception as e:
-        # Never let a bookkeeping write kill an otherwise-successful cycle.
         print(f"[auto_news] mark_seen DB error (non-fatal): {e}")
 
 
@@ -481,7 +513,6 @@ def _run_once_inner(name: str = "default") -> dict:
     if not cfg:
         return {"success": False, "error": f"Config '{name}' not found. Save config first."}
     if not cfg.get("enabled"):
-        # Not an error — just nothing to do this cycle.
         return {"success": True, "skipped": True, "reason": "Config is disabled"}
 
     handle = cfg["handler_handle"]
@@ -493,21 +524,37 @@ def _run_once_inner(name: str = "default") -> dict:
         set_last_run(name, err, "error")
         return {"success": False, "error": err}
 
+    # ============================================================
+    # GET ENABLED AT TIME - Only fetch posts after this time
+    # ============================================================
+    enabled_at = cfg.get("enabled_at")
+    if enabled_at:
+        if isinstance(enabled_at, str):
+            try:
+                enabled_at = datetime.fromisoformat(enabled_at.replace('Z', '+00:00'))
+            except:
+                enabled_at = datetime.now(timezone.utc)
+    else:
+        enabled_at = datetime.now(timezone.utc)
+    
+    if enabled_at.tzinfo is None:
+        enabled_at = enabled_at.replace(tzinfo=timezone.utc)
+    
+    print(f"📅 Auto-news enabled at: {enabled_at.isoformat()}")
+    print(f"⏳ Only fetching posts created after this time...")
+
     # --- ALWAYS attempt the fetch/check step -----------------------------
     try:
         client = bluesky_login(bsky_user, bsky_pass)
-        posts = fetch_author_feed(client, handle, limit=15)
+        posts = fetch_author_feed(client, handle, limit=30)
     except Exception as e:
         err = f"Fetch failed: {e}"
         set_last_run(name, err, "error")
-        # This cycle failed, but the caller (scheduler) will simply try
-        # again next interval — the config stays enabled and active.
         return {"success": False, "error": err}
 
     config_id = cfg["id"]
 
     if not posts:
-        # No posts came back at all — perfectly normal, just wait for next cycle.
         set_last_run(name, None, "no_posts_found")
         return {
             "success": True,
@@ -526,9 +573,37 @@ def _run_once_inner(name: str = "default") -> dict:
 
     # Process oldest first so news order is chronological when posting immediately
     posts_sorted = sorted(posts, key=lambda p: p.get("created_at") or "")
+    
+    print(f"📊 Found {len(posts_sorted)} posts, checking against enabled_at...")
 
     for p in posts_sorted:
         uri = p["uri"]
+        
+        # ============================================================
+        # SKIP POSTS CREATED BEFORE ENABLED AT TIME
+        # ============================================================
+        created_at = p.get("created_at")
+        if created_at:
+            try:
+                if isinstance(created_at, str):
+                    post_time = datetime.fromisoformat(created_at.replace('Z', '+00:00'))
+                else:
+                    post_time = created_at
+                
+                if post_time.tzinfo is None:
+                    post_time = post_time.replace(tzinfo=timezone.utc)
+                
+                # Skip posts created before the config was enabled
+                if post_time < enabled_at:
+                    print(f"⏭️ Skipping old post from {post_time.isoformat()} (enabled at {enabled_at.isoformat()})")
+                    # Mark as seen so we don't process it later
+                    mark_seen(config_id, uri, False)
+                    skipped.append(uri)
+                    continue
+            except Exception as e:
+                print(f"⚠️ Could not parse date for {uri}: {e}")
+                # If we can't parse the date, process it anyway (fail safe)
+        
         try:
             if uri_seen(config_id, uri):
                 skipped.append(uri)
@@ -569,13 +644,9 @@ def _run_once_inner(name: str = "default") -> dict:
                 posted.append({"uri": uri, "text": text[:80]})
                 time.sleep(2)
             else:
-                # One post failing to publish should NOT stop the rest of
-                # the batch, and should NOT stop future cycles from running.
-                # Leave it unmarked so it's retried next cycle.
                 errors.append({"uri": uri, "error": result.get("error")})
                 continue
         except Exception as e:
-            # Never let a single post's unexpected exception kill the whole run.
             errors.append({"uri": uri, "error": str(e)})
             traceback.print_exc()
             continue
@@ -583,14 +654,19 @@ def _run_once_inner(name: str = "default") -> dict:
     err = errors[0]["error"] if errors else None
     result_label = "posted" if posted else ("errors" if errors else "no_new_posts")
     set_last_run(name, err, result_label)
+    
     return {
-        "success": True,  # the CYCLE ran successfully even if some posts errored
+        "success": True,
         "posted_count": len(posted),
         "posted": posted,
         "skipped": len(skipped),
         "errors": errors,
         "handler": handle,
         "account_id": account_id,
+        "enabled_at": enabled_at.isoformat(),
+        "posts_processed": len(posts_sorted),
+        "old_posts_skipped": len([s for s in skipped if s not in posted]),
+        "message": f"Processed {len(posts_sorted)} posts, skipped old posts created before {enabled_at.strftime('%Y-%m-%d %H:%M')}"
     }
 
 
@@ -615,7 +691,7 @@ def run_all_enabled(log_prefix: str = "") -> dict:
     for cfg in configs:
         name = cfg.get("name", "default")
         try:
-            results[name] = run_once(name)  # run_once() never raises, but stay defensive
+            results[name] = run_once(name)
         except Exception as e:
             traceback.print_exc()
             results[name] = {"success": False, "error": str(e)}
@@ -638,11 +714,9 @@ def run_loop(name: str = "default", interval: int | None = None):
             cfg = get_config(name)
             sec = interval or (cfg.get("poll_interval_sec") if cfg else 300) or 300
             print(f"[{datetime.now().isoformat()}] auto_news run '{name}'")
-            result = run_once(name)  # run_once() itself never raises, but stay defensive
+            result = run_once(name)
             print(json.dumps(result, indent=2, default=str))
         except Exception as e:
-            # Whatever went wrong — even after a successful posting run —
-            # log it and keep the loop alive instead of exiting.
             print(f"[auto_news] run_loop cycle error (continuing, will retry): {e}")
             traceback.print_exc()
         print(f"[{datetime.now().isoformat()}] auto_news sleeping {sec}s before next check…")
@@ -697,10 +771,12 @@ def _heartbeat_tick(heartbeat_sec: int):
             if posted:
                 print(f"[auto_news] '{name}' posted {posted} item(s) this cycle.")
             else:
-                print(f"[auto_news] '{name}' checked, nothing new — will check again in {interval}s.")
+                old_skipped = result.get("old_posts_skipped", 0) if isinstance(result, dict) else 0
+                if old_skipped > 0:
+                    print(f"[auto_news] '{name}' checked, skipped {old_skipped} old posts. Will check again in {interval}s.")
+                else:
+                    print(f"[auto_news] '{name}' checked, nothing new — will check again in {interval}s.")
         except Exception as e:
-            # run_once() already guards itself, but stay defensive here too —
-            # one config's failure must never stop the heartbeat for others.
             print(f"[auto_news] '{name}' heartbeat run error (non-fatal): {e}")
             traceback.print_exc()
 
@@ -730,8 +806,6 @@ def start_background_scheduler(default_interval_sec: int = 10):
                 try:
                     _heartbeat_tick(heartbeat_sec)
                 except Exception as e:
-                    # Absolute last line of defense: the heartbeat thread
-                    # itself must never die.
                     print(f"[auto_news] heartbeat loop error (continuing): {e}")
                     traceback.print_exc()
                 time.sleep(heartbeat_sec)
@@ -760,7 +834,6 @@ def register_auto_news_routes(app, autostart: bool = True, default_interval_sec:
             cfg = get_config(request.args.get("name", "default"))
             if not cfg:
                 return jsonify({"success": True, "config": None})
-            # hide password
             safe = dict(cfg)
             if safe.get("bluesky_app_password"):
                 safe["bluesky_app_password"] = "********"
@@ -772,7 +845,6 @@ def register_auto_news_routes(app, autostart: bool = True, default_interval_sec:
             if not data.get(r):
                 return jsonify({"success": False, "error": f"{r} required"}), 400
         data.setdefault("name", "default")
-        # don't overwrite password with stars
         if data.get("bluesky_app_password") == "********":
             data["bluesky_app_password"] = None
         rid = save_config(data)
@@ -811,19 +883,9 @@ def register_auto_news_routes(app, autostart: bool = True, default_interval_sec:
             "configs": safe_configs,
         })
 
-
-
-
-
-
-
-
-
-
     @app.route("/api/auto-news/start", methods=["POST"])
     def auto_news_start():
         """Start the auto-news scheduler (already running by default)."""
-        # The scheduler is already running - just return status
         return jsonify({
             "success": True,
             "message": "Auto-news scheduler is already running",
@@ -833,21 +895,11 @@ def register_auto_news_routes(app, autostart: bool = True, default_interval_sec:
     @app.route("/api/auto-news/stop", methods=["POST"])
     def auto_news_stop():
         """Stop the auto-news scheduler (cannot be stopped, only disabled via config)."""
-        # The scheduler cannot be stopped - but you can disable the config
         return jsonify({
             "success": True,
             "message": "To stop auto-news, set Enabled = OFF in config and save",
             "running": _scheduler is not None and getattr(_scheduler, "is_alive", lambda: False)()
         })
-
-
-
-
-
-
-
-
-
 
     @app.route("/api/auto-news/seen", methods=["GET"])
     def auto_news_seen():
