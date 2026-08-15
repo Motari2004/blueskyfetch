@@ -48,6 +48,17 @@ def get_db_connection():
         print(f"❌ Database connection error: {e}")
         return None
 
+
+
+
+
+
+
+
+
+
+
+
 def init_db():
     """Initialize database tables"""
     conn = get_db_connection()
@@ -56,6 +67,27 @@ def init_db():
     
     try:
         cur = conn.cursor()
+        
+        # Create sessions table for persistent login (Vercel compatibility)
+        cur.execute('''
+            CREATE TABLE IF NOT EXISTS sessions (
+                id SERIAL PRIMARY KEY,
+                session_id TEXT UNIQUE NOT NULL,
+                username TEXT NOT NULL,
+                handle TEXT NOT NULL,
+                display_name TEXT,
+                avatar TEXT,
+                session_string TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                last_used_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                expires_at TIMESTAMP
+            )
+        ''')
+        
+        # Add indexes for faster lookups
+        cur.execute('CREATE INDEX IF NOT EXISTS idx_sessions_session_id ON sessions(session_id)')
+        cur.execute('CREATE INDEX IF NOT EXISTS idx_sessions_handle ON sessions(handle)')
+        cur.execute('CREATE INDEX IF NOT EXISTS idx_sessions_expires_at ON sessions(expires_at)')
         
         # Create handlers table
         cur.execute('''
@@ -95,6 +127,13 @@ def init_db():
                 notes TEXT
             )
         ''')
+        
+        # Add missing columns to vault if they don't exist
+        try:
+            cur.execute("ALTER TABLE vault ADD COLUMN IF NOT EXISTS video JSONB")
+            cur.execute("ALTER TABLE vault ADD COLUMN IF NOT EXISTS notes TEXT")
+        except Exception as mig_e:
+            print(f"vault column migrate: {mig_e}")
         
         # Create deleted_posts table
         cur.execute('''
@@ -148,12 +187,55 @@ def init_db():
             )
         ''')
         
+        # Create auto_news_config table if it doesn't exist
+        cur.execute('''
+            CREATE TABLE IF NOT EXISTS auto_news_config (
+                id SERIAL PRIMARY KEY,
+                name TEXT UNIQUE NOT NULL DEFAULT 'default',
+                enabled BOOLEAN DEFAULT FALSE,
+                handler_handle TEXT NOT NULL,
+                account_id TEXT NOT NULL,
+                platform TEXT DEFAULT 'instagram',
+                content_type TEXT DEFAULT 'feed',
+                poll_interval_sec INTEGER DEFAULT 300,
+                media_only BOOLEAN DEFAULT TRUE,
+                include_reposts BOOLEAN DEFAULT FALSE,
+                include_replies BOOLEAN DEFAULT FALSE,
+                caption_template TEXT DEFAULT '{text}',
+                bluesky_handle TEXT,
+                bluesky_app_password TEXT,
+                last_run_at TIMESTAMP,
+                last_error TEXT,
+                last_result TEXT,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        
+        # Create auto_news_seen table
+        cur.execute('''
+            CREATE TABLE IF NOT EXISTS auto_news_seen (
+                id SERIAL PRIMARY KEY,
+                config_id INTEGER REFERENCES auto_news_config(id) ON DELETE CASCADE,
+                uri TEXT NOT NULL,
+                posted BOOLEAN DEFAULT FALSE,
+                seen_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE(config_id, uri)
+            )
+        ''')
+        
         conn.commit()
         cur.close()
         conn.close()
-        print("✅ Database initialized successfully")
+        print("✅ Database initialized successfully with sessions table")
     except Exception as e:
         print(f"❌ Database init error: {e}")
+        traceback.print_exc()
+
+
+
+
+
+
 
 # Initialize database on startup
 init_db()
@@ -962,6 +1044,11 @@ def download_video_segments_cdn(cid, did, quality='720p', session_string=None):
 def index():
     return send_from_directory('static', 'index.html')
 
+
+
+
+
+
 @app.route('/api/login', methods=['POST'])
 def login():
     data = request.json
@@ -976,13 +1063,53 @@ def login():
         client.login(username, password)
         profile = client.get_profile(username)
         
+        # Generate a persistent session ID
         session_id = f"{username}_{int(datetime.now().timestamp())}"
+        
+        # Export session string for persistence
+        session_string = client.export_session_string()
+        
+        # Store session in database
+        conn = get_db_connection()
+        if conn:
+            try:
+                cur = conn.cursor()
+                
+                # Calculate expiration (30 days from now)
+                expires_at = datetime.now() + timedelta(days=30)
+                
+                # Delete old sessions for this handle
+                cur.execute('DELETE FROM sessions WHERE handle = %s', (profile.handle,))
+                
+                # Insert new session
+                cur.execute('''
+                    INSERT INTO sessions (session_id, username, handle, display_name, avatar, session_string, created_at, last_used_at, expires_at)
+                    VALUES (%s, %s, %s, %s, %s, %s, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, %s)
+                ''', (
+                    session_id,
+                    username,
+                    profile.handle,
+                    profile.display_name or username,
+                    profile.avatar,
+                    session_string,
+                    expires_at
+                ))
+                conn.commit()
+                cur.close()
+                conn.close()
+                print(f"✅ Session saved to database for {profile.handle}")
+            except Exception as e:
+                print(f"Error saving session to database: {e}")
+                traceback.print_exc()
+        
+        # Also keep in memory for immediate use
         sessions[session_id] = {
             'client': client,
             'username': username,
             'handle': profile.handle,
             'display_name': profile.display_name or username,
-            'avatar': profile.avatar
+            'avatar': profile.avatar,
+            'session_string': session_string
         }
         
         return jsonify({
@@ -990,10 +1117,24 @@ def login():
             'session_id': session_id,
             'handle': profile.handle,
             'display_name': profile.display_name or username,
-            'avatar': profile.avatar
+            'avatar': profile.avatar,
+            'persistent': True
         })
     except Exception as e:
+        print(f"❌ Login error: {e}")
+        traceback.print_exc()
         return jsonify({'success': False, 'error': str(e)}), 401
+
+
+
+
+
+
+
+
+
+
+
 
 @app.route('/api/logout', methods=['POST'])
 def logout():
@@ -1212,6 +1353,130 @@ def fetch_posts():
         print(f"❌ Error in fetch_posts: {e}")
         traceback.print_exc()
         return jsonify({'success': False, 'error': str(e)}), 500
+
+
+
+
+
+
+
+
+
+@app.route('/api/restore-session', methods=['POST'])
+def restore_session():
+    """Restore a session from the database (for Vercel persistence)"""
+    data = request.json
+    handle = data.get('handle')
+    
+    if not handle:
+        return jsonify({'success': False, 'error': 'Handle required'}), 400
+    
+    try:
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({'success': False, 'error': 'Database connection failed'}), 500
+        
+        cur = conn.cursor()
+        cur.execute('''
+            SELECT session_id, username, handle, display_name, avatar, session_string, expires_at
+            FROM sessions 
+            WHERE handle = %s AND expires_at > CURRENT_TIMESTAMP
+            ORDER BY last_used_at DESC
+            LIMIT 1
+        ''', (handle,))
+        
+        row = cur.fetchone()
+        cur.close()
+        conn.close()
+        
+        if not row:
+            return jsonify({
+                'success': False, 
+                'error': 'No valid session found. Please login again.',
+                'valid': False
+            }), 401
+        
+        session_id = row[0]
+        username = row[1]
+        handle = row[2]
+        display_name = row[3]
+        avatar = row[4]
+        session_string = row[5]
+        expires_at = row[6]
+        
+        # Restore the client from session string
+        try:
+            client = Client()
+            client.login(session_string=session_string)
+            
+            # Store in memory for immediate use
+            sessions[session_id] = {
+                'client': client,
+                'username': username,
+                'handle': handle,
+                'display_name': display_name or handle,
+                'avatar': avatar,
+                'session_string': session_string
+            }
+            
+            # Update last_used_at
+            conn = get_db_connection()
+            if conn:
+                cur = conn.cursor()
+                cur.execute('UPDATE sessions SET last_used_at = CURRENT_TIMESTAMP WHERE session_id = %s', (session_id,))
+                conn.commit()
+                cur.close()
+                conn.close()
+            
+            print(f"✅ Session restored for {handle}")
+            return jsonify({
+                'success': True,
+                'valid': True,
+                'session_id': session_id,
+                'handle': handle,
+                'display_name': display_name or handle,
+                'avatar': avatar,
+                'expires_at': expires_at.isoformat() if expires_at else None
+            })
+            
+        except Exception as e:
+            print(f"❌ Failed to restore session: {e}")
+            # Session string might be expired or invalid
+            # Delete it from database
+            conn = get_db_connection()
+            if conn:
+                cur = conn.cursor()
+                cur.execute('DELETE FROM sessions WHERE session_id = %s', (session_id,))
+                conn.commit()
+                cur.close()
+                conn.close()
+            
+            return jsonify({
+                'success': False,
+                'error': f'Session expired or invalid: {str(e)}',
+                'valid': False
+            }), 401
+            
+    except Exception as e:
+        print(f"Error restoring session: {e}")
+        traceback.print_exc()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 @app.route('/api/resolve-handle', methods=['POST'])
 def resolve_handle():
