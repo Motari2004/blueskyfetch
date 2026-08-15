@@ -1757,6 +1757,90 @@ html, body {
 
 
 
+
+
+
+
+
+
+
+
+/* Mobile Sidebar Footer - Account status at bottom */
+.mobile-sidebar-footer {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+}
+
+.mobile-sidebar-footer .account-box {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: var(--bg);
+    border-radius: var(--radius-sm);
+}
+
+.mobile-sidebar-footer .account-box .avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    flex-shrink: 0;
+    object-fit: cover;
+}
+
+.mobile-sidebar-footer .account-box .info {
+    flex: 1;
+    min-width: 0;
+}
+
+.mobile-sidebar-footer .account-box .info .name {
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mobile-sidebar-footer .account-box .info .status {
+    font-size: 11px;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.mobile-sidebar-footer .account-box .info .status .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.mobile-sidebar-footer .account-box .info .status .dot.online {
+    background: var(--success);
+}
+
+.mobile-sidebar-footer .account-box .info .status .dot.offline {
+    background: var(--error);
+}
+
+
+
+
+
+
+
+
+
+
+
     </style>
 </head>
 <body>
@@ -1774,7 +1858,6 @@ html, body {
 
 <!-- Mobile Sidebar Overlay -->
 <div class="mobile-sidebar-overlay" id="mobileOverlay" onclick="closeMobileSidebar()"></div>
-
 
 
 
@@ -1819,9 +1902,21 @@ html, body {
             <span class="count" id="navSchedCountMobile">0</span>
         </a>
     </nav>
+    
+    <!-- Account Status at the bottom -->
+    <div class="mobile-sidebar-footer">
+        <div class="account-box">
+            <div class="avatar" id="avatarBoxMobile">V</div>
+            <div class="info">
+                <div class="name" id="accountNameMobile">Bluesky Vault</div>
+                <div class="status">
+                    <span class="dot offline" id="statusDotMobile"></span>
+                    <span id="accountStatusMobile">Offline</span>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-
-
 
 
 
