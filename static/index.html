@@ -451,11 +451,947 @@
         .engine-banner.running .engine-title { color: var(--success); }
         .engine-banner .engine-meta { display:flex; gap:14px; flex-wrap:wrap; font-size:12px; }
         .engine-banner .engine-meta strong { color: var(--text); }
+
+
+
+
+/* ============================================================
+   MOBILE-FRIENDLY IMPROVEMENTS
+   ============================================================ */
+
+/* Better touch targets for mobile */
+.btn, .nav a, .handler-item, .vault-item, .post-card,
+.quick-btn, .platform-chip, .account-chip, .vault-filter-btn,
+.chip-toggle, .segmented-option {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Mobile Navigation - Bottom Bar */
+.mobile-nav-bar {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--card);
+    border-top: 1px solid var(--border);
+    padding: 8px 0 env(safe-area-inset-bottom, 8px) 0;
+    z-index: 1000;
+    justify-content: space-around;
+    align-items: center;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+.mobile-nav-bar a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 10px;
+    padding: 4px 8px;
+    border-radius: 8px;
+    transition: var(--transition);
+    min-width: 44px;
+    min-height: 44px;
+    justify-content: center;
+}
+
+.mobile-nav-bar a i {
+    font-size: 20px;
+}
+
+.mobile-nav-bar a.active {
+    color: var(--accent);
+}
+
+.mobile-nav-bar a .count {
+    font-size: 9px;
+    background: rgba(255,255,255,0.1);
+    padding: 0 6px;
+    border-radius: 10px;
+}
+
+.mobile-nav-bar a .live-dot {
+    width: 6px;
+    height: 6px;
+    margin-left: 0;
+}
+
+.mobile-menu-toggle {
+    display: none;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 8px 14px;
+    color: var(--text);
+    cursor: pointer;
+    font-size: 18px;
+}
+
+/* Mobile Overlay Sidebar */
+.mobile-sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 999;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.mobile-sidebar-overlay.active {
+    display: block;
+}
+
+.mobile-sidebar {
+    position: fixed;
+    top: 0;
+    left: -300px;
+    width: 280px;
+    height: 100%;
+    background: var(--card);
+    z-index: 1000;
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 20px;
+    overflow-y: auto;
+    border-right: 1px solid var(--border);
+}
+
+.mobile-sidebar.open {
+    left: 0;
+}
+
+.mobile-sidebar .close-btn {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 24px;
+    cursor: pointer;
+    padding: 8px;
+}
+
+.mobile-sidebar .logo {
+    margin-top: 8px;
+}
+
+/* Responsive adjustments for all screen sizes */
+@media (max-width: 1024px) {
+    .app {
+        grid-template-columns: 1fr;
+        max-width: 100%;
+        padding-bottom: 80px;
+    }
+    
+    .sidebar {
+        display: none;
+    }
+    
+    .mobile-nav-bar,
+    .mobile-menu-toggle {
+        display: flex;
+    }
+    
+    .right {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+    
+    .stats {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+    }
+    
+    .fetch-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .main {
+        gap: 16px;
+    }
+    
+    .card {
+        padding: 16px 18px;
+        border-radius: var(--radius-sm);
+    }
+    
+    .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .card-header h2 {
+        font-size: 16px;
+    }
+    
+    .card-actions {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+    
+    .card-actions .btn {
+        flex: 1;
+        min-width: 80px;
+        justify-content: center;
+    }
+    
+    .post-grid {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 10px;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .quick-schedule {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .vault-item {
+        padding: 12px 14px;
+    }
+    
+    .vault-item .gallery {
+        grid-template-columns: repeat(auto-fill, 60px);
+    }
+    
+    .vault-item .gallery img {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .schedule-item {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+    
+    .schedule-item .info {
+        min-width: unset;
+    }
+    
+    .schedule-item .time,
+    .schedule-item .countdown {
+        text-align: left;
+    }
+    
+    .modal-content {
+        padding: 20px;
+        margin: 16px;
+        max-width: 100%;
+    }
+    
+    .modal-content h2 {
+        font-size: 18px;
+    }
+    
+    .modal-actions {
+        flex-direction: column;
+    }
+    
+    .modal-actions .btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    body {
+        padding: 12px;
+        padding-bottom: 80px;
+    }
+    
+    .stats {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+    }
+    
+    .stat {
+        padding: 10px 12px;
+    }
+    
+    .stat .number {
+        font-size: 20px;
+    }
+    
+    .stat .label {
+        font-size: 10px;
+    }
+    
+    .right {
+        grid-template-columns: 1fr;
+    }
+    
+    .post-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+    
+    .post-card {
+        padding: 10px 12px;
+    }
+    
+    .post-card .ph img {
+        width: 24px;
+        height: 24px;
+    }
+    
+    .post-card .pt {
+        font-size: 11px;
+    }
+    
+    .post-card .pgal {
+        grid-template-columns: repeat(auto-fill, 50px);
+    }
+    
+    .post-card .pgal img {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .quick-schedule {
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+    }
+    
+    .quick-btn {
+        padding: 10px;
+        font-size: 12px;
+    }
+    
+    .vault-filters {
+        gap: 4px;
+    }
+    
+    .vault-filter-btn {
+        padding: 6px 10px;
+        font-size: 11px;
+        flex: 1;
+        text-align: center;
+        justify-content: center;
+    }
+    
+    .vault-selection-bar {
+        padding: 10px 14px;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    
+    .vault-selection-bar .btn {
+        flex: 1;
+        min-width: 60px;
+        justify-content: center;
+        padding: 8px 10px;
+        font-size: 11px;
+    }
+    
+    .handlers-list {
+        max-height: 150px;
+    }
+    
+    .handler-item {
+        padding: 6px 8px;
+    }
+    
+    .handler-item .hi .n {
+        font-size: 11px;
+    }
+    
+    .add-handler-row {
+        flex-wrap: wrap;
+    }
+    
+    .add-handler-row input {
+        min-height: 36px;
+        font-size: 13px;
+    }
+    
+    .segmented {
+        flex-wrap: wrap;
+    }
+    
+    .segmented-option {
+        flex: 1;
+        min-width: 80px;
+        padding: 8px 6px;
+        font-size: 11px;
+    }
+    
+    .chip-toggle {
+        padding: 6px 10px;
+        font-size: 11px;
+    }
+    
+    .platform-chip {
+        padding: 5px 10px;
+        font-size: 11px;
+    }
+    
+    .account-chip {
+        padding: 6px 10px;
+        font-size: 11px;
+    }
+    
+    .current-time {
+        font-size: 12px;
+        padding: 6px 10px;
+    }
+    
+    .current-time .time {
+        font-size: 13px;
+    }
+    
+    .toast {
+        top: 16px;
+        right: 16px;
+        left: 16px;
+        max-width: none;
+        font-size: 13px;
+        padding: 12px 16px;
+    }
+    
+    .sel-modal {
+        padding: 20px;
+        margin: 16px;
+    }
+    
+    .sel-modal .big-count {
+        font-size: 36px;
+    }
+    
+    .engine-banner {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+        padding: 12px 14px;
+    }
+    
+    .engine-banner .engine-meta {
+        flex-direction: column;
+        gap: 4px;
+    }
+    
+    .engine-banner > div:last-child {
+        display: flex;
+        gap: 8px;
+    }
+    
+    .engine-banner > div:last-child .btn {
+        flex: 1;
+        justify-content: center;
+    }
+    
+    .schedule-list {
+        max-height: 400px;
+    }
+    
+    .schedule-item {
+        padding: 12px 14px;
+    }
+    
+    .schedule-item .countdown {
+        font-size: 14px;
+        min-width: unset;
+    }
+    
+    .btn {
+        padding: 8px 14px;
+        font-size: 13px;
+        min-height: 40px;
+    }
+    
+    .btn-sm {
+        padding: 5px 10px;
+        font-size: 11px;
+        min-height: 32px;
+    }
+    
+    .btn-xs {
+        padding: 3px 8px;
+        font-size: 10px;
+        min-height: 28px;
+    }
+    
+    .form-group {
+        margin-bottom: 12px;
+    }
+    
+    .form-group label {
+        font-size: 12px;
+    }
+    
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        padding: 8px 12px;
+        font-size: 13px;
+        min-height: 38px;
+    }
+    
+    .form-group textarea {
+        min-height: 60px;
+    }
+    
+    .hint {
+        font-size: 10px;
+    }
+    
+    .lightbox img {
+        max-width: 98%;
+        max-height: 80vh;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 8px;
+        padding-bottom: 80px;
+    }
+    
+    .stats {
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 4px;
+    }
+    
+    .stat {
+        padding: 8px 6px;
+        border-radius: var(--radius-sm);
+    }
+    
+    .stat .number {
+        font-size: 16px;
+    }
+    
+    .stat .label {
+        font-size: 9px;
+    }
+    
+    .card {
+        padding: 12px 14px;
+        border-radius: 10px;
+    }
+    
+    .card-header h2 {
+        font-size: 14px;
+    }
+    
+    .card-header h2 i {
+        font-size: 14px;
+    }
+    
+    .post-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+    }
+    
+    .post-card {
+        padding: 8px 10px;
+    }
+    
+    .post-card .ph .an {
+        font-size: 11px;
+    }
+    
+    .post-card .ph .ah {
+        font-size: 9px;
+    }
+    
+    .post-card .pt {
+        font-size: 10px;
+        -webkit-line-clamp: 2;
+    }
+    
+    .post-card .pgal {
+        grid-template-columns: repeat(auto-fill, 40px);
+    }
+    
+    .post-card .pgal img {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .post-card .pstats {
+        font-size: 9px;
+        gap: 8px;
+    }
+    
+    .vault-item {
+        padding: 10px 12px;
+        margin-bottom: 6px;
+    }
+    
+    .vault-item .vh img {
+        width: 28px;
+        height: 28px;
+    }
+    
+    .vault-item .vh .handle {
+        font-size: 12px;
+    }
+    
+    .vault-item .vh .vtime {
+        font-size: 9px;
+    }
+    
+    .vault-item .text {
+        font-size: 11px;
+    }
+    
+    .vault-item .gallery {
+        grid-template-columns: repeat(auto-fill, 50px);
+        gap: 4px;
+    }
+    
+    .vault-item .gallery img {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .vault-item .notes {
+        font-size: 10px;
+        padding: 4px 8px;
+    }
+    
+    .vault-item .vactions {
+        gap: 4px;
+    }
+    
+    .quick-schedule {
+        grid-template-columns: 1fr 1fr;
+        gap: 4px;
+    }
+    
+    .quick-btn {
+        padding: 8px;
+        font-size: 11px;
+    }
+    
+    .quick-btn .sub {
+        font-size: 8px;
+    }
+    
+    .vault-filter-btn {
+        font-size: 10px;
+        padding: 4px 8px;
+    }
+    
+    .vault-filter-count {
+        font-size: 9px;
+    }
+    
+    .vault-selection-bar {
+        padding: 8px 10px;
+        gap: 4px;
+        flex-wrap: wrap;
+    }
+    
+    .vault-selection-bar .count {
+        font-size: 12px;
+        width: 100%;
+    }
+    
+    .vault-selection-bar .btn {
+        font-size: 10px;
+        padding: 6px 8px;
+        min-height: 30px;
+        flex: 1;
+        min-width: 40px;
+    }
+    
+    .handler-item {
+        padding: 4px 6px;
+        gap: 6px;
+    }
+    
+    .handler-item img {
+        width: 24px;
+        height: 24px;
+    }
+    
+    .handler-item .hi .n {
+        font-size: 10px;
+    }
+    
+    .handler-item .hi .h {
+        font-size: 9px;
+    }
+    
+    .handler-item input[type="checkbox"] {
+        width: 14px;
+        height: 14px;
+    }
+    
+    .add-handler-row input {
+        font-size: 12px;
+        min-height: 32px;
+        padding: 6px 10px;
+    }
+    
+    .add-handler-row .btn {
+        min-height: 32px;
+        padding: 0 12px;
+        font-size: 12px;
+    }
+    
+    .handler-quick-actions .btn {
+        font-size: 10px;
+        padding: 6px 8px;
+    }
+    
+    .segmented-option {
+        font-size: 10px;
+        padding: 6px 4px;
+        min-width: 60px;
+    }
+    
+    .chip-toggle {
+        font-size: 10px;
+        padding: 4px 8px;
+    }
+    
+    .platform-chip {
+        font-size: 10px;
+        padding: 4px 8px;
+    }
+    
+    .account-chip {
+        font-size: 10px;
+        padding: 4px 8px;
+    }
+    
+    .btn {
+        font-size: 12px;
+        padding: 6px 12px;
+        min-height: 34px;
+    }
+    
+    .btn-sm {
+        font-size: 10px;
+        padding: 4px 8px;
+        min-height: 28px;
+    }
+    
+    .btn-xs {
+        font-size: 9px;
+        padding: 2px 6px;
+        min-height: 24px;
+    }
+    
+    .schedule-item {
+        padding: 10px 12px;
+    }
+    
+    .schedule-item .handle {
+        font-size: 12px;
+    }
+    
+    .schedule-item .text {
+        font-size: 11px;
+    }
+    
+    .schedule-item .time {
+        font-size: 12px;
+    }
+    
+    .schedule-item .badge {
+        font-size: 9px;
+        padding: 2px 10px;
+    }
+    
+    .schedule-item .countdown {
+        font-size: 12px;
+    }
+    
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        font-size: 12px;
+        min-height: 34px;
+        padding: 6px 10px;
+    }
+    
+    .form-group textarea {
+        min-height: 50px;
+    }
+    
+    .modal-content {
+        padding: 16px;
+        margin: 8px;
+    }
+    
+    .modal-content h2 {
+        font-size: 16px;
+    }
+    
+    .current-time .time {
+        font-size: 12px;
+    }
+    
+    .current-time .tz {
+        font-size: 9px;
+    }
+    
+    .engine-banner {
+        font-size: 11px;
+        padding: 10px 12px;
+    }
+    
+    .engine-banner .engine-meta {
+        font-size: 10px;
+    }
+    
+    .selection-bar {
+        padding: 8px 12px;
+        gap: 8px;
+    }
+    
+    .selection-bar .count {
+        font-size: 11px;
+        width: 100%;
+    }
+    
+    .selection-bar .btn {
+        flex: 1;
+        font-size: 10px;
+        padding: 6px 8px;
+        min-height: 28px;
+    }
+    
+    .lightbox-close {
+        top: 12px;
+        right: 16px;
+        width: 36px;
+        height: 36px;
+        font-size: 18px;
+    }
+}
+
+/* Extra small devices */
+@media (max-width: 360px) {
+    .stats {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .post-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .quick-schedule {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .vault-filters {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        gap: 4px;
+        padding-bottom: 4px;
+    }
+    
+    .vault-filter-btn {
+        white-space: nowrap;
+        flex: 0 0 auto;
+    }
+}
+
+
+
+
+
+
+
     </style>
 </head>
 <body>
 
 <div class="app">
+
+
+
+
+
+<!-- Mobile Menu Toggle -->
+<button class="mobile-menu-toggle" onclick="toggleMobileSidebar()" aria-label="Toggle menu">
+    <i class="fas fa-bars"></i>
+</button>
+
+<!-- Mobile Sidebar Overlay -->
+<div class="mobile-sidebar-overlay" id="mobileOverlay" onclick="closeMobileSidebar()"></div>
+
+<!-- Mobile Sidebar -->
+<div class="mobile-sidebar" id="mobileSidebar">
+    <button class="close-btn" onclick="closeMobileSidebar()">✕</button>
+    <div class="logo">
+        <i class="fas fa-feather"></i>
+        <h1>Vault</h1>
+        <span class="badge">v4</span>
+    </div>
+    <nav class="nav">
+        <a href="#" class="active" data-page="fetch" onclick="navigateTo('fetch')">
+            <i class="fas fa-satellite-dish"></i> Fetch Posts
+            <span class="count" id="navHandlerCountMobile">0</span>
+        </a>
+        <a href="#" data-page="vault" onclick="navigateTo('vault')">
+            <i class="fas fa-archive"></i> Vault
+            <span class="count" id="navVaultCountMobile">0</span>
+        </a>
+        <a href="#" data-page="postnow" onclick="navigateTo('postnow')">
+            <i class="fas fa-rocket"></i> Post Now
+        </a>
+        <a href="#" data-page="schedule" onclick="navigateTo('schedule')">
+            <i class="fas fa-calendar-plus"></i> Smart Schedule
+        </a>
+        <a href="#" data-page="autonews" onclick="navigateTo('autonews')">
+            <i class="fas fa-robot"></i> Auto Post
+            <span class="live-dot" id="autoNewsNavDotMobile"></span>
+        </a>
+        <a href="#" data-page="scheduled" onclick="navigateTo('scheduled')">
+            <i class="fas fa-calendar-check"></i> Scheduled
+            <span class="count" id="navSchedCountMobile">0</span>
+        </a>
+    </nav>
+</div>
+
+<!-- Mobile Bottom Navigation Bar -->
+<div class="mobile-nav-bar" id="mobileNavBar">
+    <a href="#" class="active" data-page="fetch" onclick="navigateTo('fetch')">
+        <i class="fas fa-satellite-dish"></i>
+        <span>Fetch</span>
+    </a>
+    <a href="#" data-page="vault" onclick="navigateTo('vault')">
+        <i class="fas fa-archive"></i>
+        <span>Vault</span>
+        <span class="count" id="navVaultCountBottom">0</span>
+    </a>
+    <a href="#" data-page="postnow" onclick="navigateTo('postnow')">
+        <i class="fas fa-rocket"></i>
+        <span>Post</span>
+    </a>
+    <a href="#" data-page="schedule" onclick="navigateTo('schedule')">
+        <i class="fas fa-calendar-plus"></i>
+        <span>Schedule</span>
+    </a>
+    <a href="#" data-page="scheduled" onclick="navigateTo('scheduled')">
+        <i class="fas fa-calendar-check"></i>
+        <span>Scheduled</span>
+        <span class="count" id="navSchedCountBottom">0</span>
+    </a>
+</div>
+
+
+
+
+
+
+
+
 
     <aside class="sidebar">
         <div class="logo">
@@ -1836,7 +2772,7 @@ function renderHandlers() {
     updateActiveHandlersBanner();
 }
 
-
+    updateMobileCounts();
 
 
 
@@ -3355,6 +4291,127 @@ container.innerHTML = items.map(item => {
 
 
 
+
+// ==============================
+// MOBILE NAVIGATION
+// ==============================
+
+function toggleMobileSidebar() {
+    const sidebar = document.getElementById('mobileSidebar');
+    const overlay = document.getElementById('mobileOverlay');
+    sidebar.classList.toggle('open');
+    overlay.classList.toggle('active');
+    document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
+}
+
+function closeMobileSidebar() {
+    document.getElementById('mobileSidebar').classList.remove('open');
+    document.getElementById('mobileOverlay').classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+async function navigateTo(page) {
+    // Close mobile sidebar
+    closeMobileSidebar();
+    
+    // Update active states
+    document.querySelectorAll('.nav a[data-page]').forEach(l => l.classList.remove('active'));
+    document.querySelectorAll('.mobile-nav-bar a[data-page]').forEach(l => l.classList.remove('active'));
+    
+    const navLink = document.querySelector(`.nav a[data-page="${page}"]`);
+    const mobileNavLink = document.querySelector(`.mobile-nav-bar a[data-page="${page}"]`);
+    const mobileSidebarLink = document.querySelector(`.mobile-sidebar .nav a[data-page="${page}"]`);
+    
+    if (navLink) navLink.classList.add('active');
+    if (mobileNavLink) mobileNavLink.classList.add('active');
+    if (mobileSidebarLink) mobileSidebarLink.classList.add('active');
+    
+    // Show the page
+    document.querySelectorAll('.main > section').forEach(s => s.style.display = 'none');
+    const target = document.getElementById('page-' + page);
+    if (target) target.style.display = 'block';
+    
+    // Load page data
+    if (page === 'scheduled') loadScheduled();
+    else if (page === 'vault') loadVault();
+    else if (page === 'fetch') { renderHandlers(); loadHandlersFromServer(); }
+    else if (page === 'schedule') { setScheduleDefaults(); updateSchedSelCount(); loadIgAccounts(); }
+    else if (page === 'autonews') { loadAutoNewsPage(); startAutoNewsStatusPolling(true); }
+    else if (page === 'postnow') {
+        const el = document.getElementById('postNowPageAccountChips');
+        if (el) el.innerHTML = '<span class="hint">Loading accounts…</span>';
+        
+        // ✅ Fixed: Add 'await' inside async function
+        if (!postNowAccounts.length) {
+            await loadPostNowAccounts();
+        }
+        renderPostNowPageAccounts();
+        renderPostNowPageVaultItems();
+        document.querySelector('input[name="postNowPageSource"][value="vault"]').checked = true;
+        switchPostNowPageSource('vault');
+    }
+    else { startAutoNewsStatusPolling(false); }
+}
+// Also update mobile counts
+function updateMobileCounts() {
+    // Update mobile sidebar counts
+    const navHandlerCount = document.getElementById('navHandlerCount');
+    const navHandlerCountMobile = document.getElementById('navHandlerCountMobile');
+    if (navHandlerCount && navHandlerCountMobile) {
+        navHandlerCountMobile.textContent = navHandlerCount.textContent;
+    }
+    
+    const navVaultCount = document.getElementById('navVaultCount');
+    const navVaultCountMobile = document.getElementById('navVaultCountMobile');
+    if (navVaultCount && navVaultCountMobile) {
+        navVaultCountMobile.textContent = navVaultCount.textContent;
+    }
+    
+    const navSchedCount = document.getElementById('navSchedCount');
+    const navSchedCountMobile = document.getElementById('navSchedCountMobile');
+    const navSchedCountBottom = document.getElementById('navSchedCountBottom');
+    if (navSchedCount) {
+        if (navSchedCountMobile) navSchedCountMobile.textContent = navSchedCount.textContent;
+        if (navSchedCountBottom) navSchedCountBottom.textContent = navSchedCount.textContent;
+    }
+    
+    // Update vault count in bottom nav
+    const navVaultCountBottom = document.getElementById('navVaultCountBottom');
+    if (navVaultCount && navVaultCountBottom) {
+        navVaultCountBottom.textContent = navVaultCount.textContent;
+    }
+}
+
+// Hook into existing update functions
+const originalUpdateStats = updateStats;
+updateStats = function() {
+    originalUpdateStats();
+    updateMobileCounts();
+};
+
+const originalRenderVault = renderVault;
+renderVault = function(items) {
+    originalRenderVault(items);
+    updateMobileCounts();
+};
+
+const originalRenderScheduled = renderScheduled;
+renderScheduled = function(items) {
+    originalRenderScheduled(items);
+    updateMobileCounts();
+};
+
+const originalRenderHandlers = renderHandlers;
+renderHandlers = function() {
+    originalRenderHandlers();
+    updateMobileCounts();
+};
+
+
+
+
+
+    
 
 
 
