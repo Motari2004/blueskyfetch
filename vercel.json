@@ -24,7 +24,13 @@
     }
   ],
   "env": {
-    "DATABASE_URL": "@database_url",
-    "ZERNIO_API_KEY": "@zernio_api_key"
+    "DATABASE_URL": "postgresql://neondb_owner:npg_0URQHn2lKXeh@ep-divine-rice-ayb8kut7-pooler.c-5.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require",
+    "ZERNIO_API_KEY": "sk_7b484f17f3be9f7faa5cabc822983e5760cf4256db3ffa565fb3befdfb6535a6",
+    "SCHEDULE_TIMEZONE": "Africa/Nairobi",
+    "VERCEL": "true",
+    "FLASK_ENV": "production",
+    "FLASK_DEBUG": "false",
+    "ENABLE_BACKGROUND_SCHEDULER": "false",
+    "LOG_LEVEL": "WARNING"
   }
 }
