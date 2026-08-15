@@ -4447,51 +4447,139 @@ function toggleAutoNewsRunning() {
         }
     });
 
-    // ==============================
-    // INIT
-    // ==============================
-    function initializeApp() {
-        loadRemovedUris();
-        const savedHandlers = getFromStorage('handlers');
-        if (savedHandlers && Array.isArray(savedHandlers) && savedHandlers.length > 0) {
-            handlers = savedHandlers.map(h => ({ ...h }));
-            const ids = handlers.map(h => h.id || 0);
-            handlerIdCounter = Math.max(handlerIdCounter, ...(ids.length ? ids : [0]));
-        } else {
-            handlerIdCounter++;
-            handlers = [{ id: handlerIdCounter, handle: 'dailymotivator.bsky.social', displayName: 'Daily Motivator', avatar: '', selected: true, isDefault: true }];
-            persistHandlers();
+
+
+
+
+
+
+
+
+
+
+
+
+
+// ==============================
+// PERSISTENT SESSION MANAGEMENT (NEW)
+// ==============================
+
+// Try to restore session from database FIRST
+async function restorePersistentSession() {
+    const savedHandle = localStorage.getItem('bvault_handle');
+    const savedUsername = localStorage.getItem('bvault_username');
+    
+    if (!savedHandle) {
+        console.log('No saved handle found in localStorage');
+        return false;
+    }
+    
+    console.log(`🔍 Attempting to restore session for @${savedHandle} from database...`);
+    
+    try {
+        const res = await fetch(`${API_BASE}/api/restore-session`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ handle: savedHandle })
+        });
+        const data = await res.json();
+        
+        if (data.success && data.valid) {
+            sessionId = data.session_id;
+            setOnline({
+                handle: data.handle,
+                display_name: data.display_name || data.handle,
+                avatar: data.avatar
+            });
+            
+            // Save for next time
+            localStorage.setItem('bvault_session_id', sessionId);
+            localStorage.setItem('bvault_handle', data.handle);
+            localStorage.setItem('bvault_username', savedUsername);
+            if (data.expires_at) {
+                localStorage.setItem('bvault_session_expires', data.expires_at);
+            }
+            
+            console.log(`✅ Session restored successfully for @${data.handle}`);
+            console.log(`   Session ID: ${sessionId}`);
+            
+            // Load data after session restore
+            await loadSavedHandlers();
+            await loadVault();
+            await loadScheduled();
+            
+            toast('🔄 Session restored! Welcome back.', 'success');
+            return true;
         }
+        
+        console.log('⚠️ No valid session found in database');
+        return false;
+        
+    } catch (e) {
+        console.warn('Could not restore session:', e);
+        return false;
+    }
+}
+
+// Check session from database OR memory
+async function verifySession(sessionId) {
+    if (!sessionId) return false;
+    
+    try {
+        const res = await fetch(`${API_BASE}/api/verify-session`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ session_id: sessionId })
+        });
+        const data = await res.json();
+        
+        if (data.success && data.valid) {
+            console.log('✅ Session verified');
+            return data;
+        }
+        return null;
+    } catch (e) {
+        console.warn('Session verification error:', e);
+        return null;
+    }
+}
+
+// ==============================
+// INIT
+// ==============================
+async function initializeApp() {
+    console.log('🦋 Bluesky Vault Scheduler loading...');
+    console.log(`   Time: ${new Date().toLocaleString()}`);
+    
+    loadRemovedUris();
+    
+    // Load handlers from storage
+    const savedHandlers = getFromStorage('handlers');
+    if (savedHandlers && Array.isArray(savedHandlers) && savedHandlers.length > 0) {
+        handlers = savedHandlers.map(h => ({ ...h }));
+        const ids = handlers.map(h => h.id || 0);
+        handlerIdCounter = Math.max(handlerIdCounter, ...(ids.length ? ids : [0]));
+    } else {
+        handlerIdCounter++;
+        handlers = [{ id: handlerIdCounter, handle: 'dailymotivator.bsky.social', displayName: 'Daily Motivator', avatar: '', selected: true, isDefault: true }];
+        persistHandlers();
+    }
+    renderHandlers();
+
+    // STEP 1: Try to restore session from DATABASE FIRST
+    console.log('📌 Step 1: Checking for persistent session in database...');
+    const restored = await restorePersistentSession();
+    
+    if (restored) {
+        console.log('✅ Session restored from database, loading data...');
+        // Data is already loaded in restorePersistentSession()
+        updateStats();
         renderHandlers();
-
-        const savedSessionId = getFromStorage('session_id');
-        const savedUsername = getFromStorage('username');
-        if (savedSessionId && savedUsername) {
-            $('username').value = savedUsername;
-            $('accountStatus').textContent = 'Verifying...';
-            verifySession(savedSessionId).then(async data => {
-                if (data.success && data.valid) {
-                    sessionId = savedSessionId;
-                    setOnline({ handle: data.handle, display_name: data.display_name || data.handle, avatar: data.avatar });
-                    await loadSavedHandlers();
-                    await loadVault();
-                    await loadScheduled();
-                    toast('Welcome back!', 'success');
-                } else {
-                    setOffline();
-                    localStorage.removeItem('bvault_session_id');
-                    localStorage.removeItem('bvault_user_data');
-                }
-            }).catch(() => { setOffline(); });
-        }
-
-
-
-
-
-
-
-
+        renderPosts();
+        startAutoNewsStatusPolling(false);
+        loadHandlersFromServer();
+        
+        // Load other data
         loadScheduled();
         setScheduleDefaults();
         try {
@@ -4500,15 +4588,96 @@ function toggleAutoNewsRunning() {
         } catch(e) {}
         loadIgAccounts();
         loadPostNowAccounts();
-        startAutoNewsStatusPolling(false);
-        loadHandlersFromServer();
-
-
-
-
-        console.log('🦋 Bluesky Vault Scheduler loaded — GMT+3');
+        
+        console.log('✅ App fully initialized with restored session');
+        return;
     }
-    initializeApp();
+    
+    // STEP 2: If no database session, check localStorage for old session
+    console.log('📌 Step 2: No database session found, checking localStorage...');
+    const savedSessionId = getFromStorage('session_id');
+    const savedUsername = getFromStorage('username');
+    
+    if (savedSessionId && savedUsername) {
+        console.log(`   Found saved session in localStorage: ${savedSessionId}`);
+        $('username').value = savedUsername;
+        $('accountStatus').textContent = 'Verifying...';
+        
+        try {
+            const data = await verifySession(savedSessionId);
+            if (data && data.valid) {
+                sessionId = savedSessionId;
+                setOnline({ 
+                    handle: data.handle, 
+                    display_name: data.display_name || data.handle, 
+                    avatar: data.avatar 
+                });
+                
+                // Save handle for future database lookups
+                localStorage.setItem('bvault_handle', data.handle);
+                localStorage.setItem('bvault_username', savedUsername);
+                
+                console.log('✅ Session verified from memory');
+                
+                await loadSavedHandlers();
+                await loadVault();
+                await loadScheduled();
+                toast('Welcome back!', 'success');
+                
+                startAutoNewsStatusPolling(false);
+                loadHandlersFromServer();
+                
+                // Load other data
+                loadScheduled();
+                setScheduleDefaults();
+                try {
+                    const sf = localStorage.getItem('bvault_vault_filter');
+                    if (sf && ['all','posted','not_posted'].includes(sf)) vaultFilter = sf;
+                } catch(e) {}
+                loadIgAccounts();
+                loadPostNowAccounts();
+                
+                return;
+            } else {
+                console.log('⚠️ Saved session invalid, clearing...');
+                localStorage.removeItem('bvault_session_id');
+                localStorage.removeItem('bvault_user_data');
+                localStorage.removeItem('bvault_handle');
+            }
+        } catch (e) {
+            console.warn('Session verification error:', e);
+            setOffline();
+        }
+    }
+    
+    // STEP 3: No session found - show offline state
+    console.log('📌 Step 3: No valid session found, showing offline state');
+    setOffline();
+
+    // Continue with rest of initialization (without user session)
+    loadScheduled();
+    setScheduleDefaults();
+    try {
+        const sf = localStorage.getItem('bvault_vault_filter');
+        if (sf && ['all','posted','not_posted'].includes(sf)) vaultFilter = sf;
+    } catch(e) {}
+    loadIgAccounts();
+    loadPostNowAccounts();
+    startAutoNewsStatusPolling(false);
+    loadHandlersFromServer();
+
+    console.log('✅ App initialized (offline mode)');
+}
+
+// ==============================
+// START THE APP
+// ==============================
+initializeApp();
+
+
+
+
+
 </script>
 </body>
 </html>

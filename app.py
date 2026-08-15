@@ -1135,38 +1135,91 @@ def login():
 
 
 
-
 @app.route('/api/logout', methods=['POST'])
 def logout():
     data = request.json
     session_id = data.get('session_id')
+    handle = data.get('handle')
     
+    # Remove from memory
     if session_id and session_id in sessions:
         del sessions[session_id]
     
+    # Remove from database
+    if handle or session_id:
+        try:
+            conn = get_db_connection()
+            if conn:
+                cur = conn.cursor()
+                if session_id:
+                    cur.execute('DELETE FROM sessions WHERE session_id = %s', (session_id,))
+                elif handle:
+                    cur.execute('DELETE FROM sessions WHERE handle = %s', (handle,))
+                conn.commit()
+                cur.close()
+                conn.close()
+                print(f"✅ Session removed from database for {handle or session_id}")
+        except Exception as e:
+            print(f"Error removing session from database: {e}")
+    
     return jsonify({'success': True})
+
+
+
+
+
+
+
+
 
 @app.route('/api/verify-session', methods=['POST'])
 def verify_session():
     """Verify if a session is still valid"""
     data = request.json
     session_id = data.get('session_id')
+    handle = data.get('handle')  # Optional: for restoring by handle
     
-    if not session_id or session_id not in sessions:
+    # If session_id is in memory, use it
+    if session_id and session_id in sessions:
+        session_data = sessions[session_id]
         return jsonify({
-            'success': False, 
-            'error': 'Session expired or invalid',
-            'valid': False
-        }), 401
+            'success': True,
+            'valid': True,
+            'handle': session_data['handle'],
+            'display_name': session_data['display_name'],
+            'avatar': session_data['avatar']
+        })
     
-    session_data = sessions[session_id]
+    # If handle is provided, try to restore from database
+    if handle:
+        # Try to restore the session
+        restore_response = restore_session()
+        if restore_response.status_code == 200:
+            data = restore_response.get_json()
+            if data.get('success'):
+                return jsonify({
+                    'success': True,
+                    'valid': True,
+                    'handle': data.get('handle'),
+                    'display_name': data.get('display_name'),
+                    'avatar': data.get('avatar'),
+                    'session_id': data.get('session_id')
+                })
+    
     return jsonify({
-        'success': True,
-        'valid': True,
-        'handle': session_data['handle'],
-        'display_name': session_data['display_name'],
-        'avatar': session_data['avatar']
-    })
+        'success': False, 
+        'error': 'Session expired or invalid. Please login again.',
+        'valid': False
+    }), 401
+
+
+
+
+
+
+
+
+
 
 @app.route('/api/fetch-posts', methods=['POST'])
 def fetch_posts():
