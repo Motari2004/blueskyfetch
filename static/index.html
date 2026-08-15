@@ -3022,39 +3022,158 @@ $('logoutBtn').addEventListener('click', async function() {
     toast('Logged out', 'info');
 });
 
-    function setOnline(userData) {
-        $('statusDot').className = 'dot online';
-        $('accountStatus').textContent = 'Online';
-        $('accountName').textContent = userData.display_name || userData.handle || 'Bluesky Vault';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function setOnline(userData) {
+    // Main sidebar
+    $('statusDot').className = 'dot online';
+    $('accountStatus').textContent = 'Online';
+    $('accountName').textContent = userData.display_name || userData.handle || 'Bluesky Vault';
+    if (userData.avatar) {
+        const box = $('avatarBox');
+        box.innerHTML = `<img src="${userData.avatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+    }
+    
+    // ============================================================
+    // MOBILE SIDEBAR - UPDATE STATUS
+    // ============================================================
+    const statusDotMobile = document.getElementById('statusDotMobile');
+    const accountStatusMobile = document.getElementById('accountStatusMobile');
+    const accountNameMobile = document.getElementById('accountNameMobile');
+    const avatarBoxMobile = document.getElementById('avatarBoxMobile');
+    
+    if (statusDotMobile) {
+        statusDotMobile.className = 'dot online';
+    }
+    if (accountStatusMobile) {
+        accountStatusMobile.textContent = 'Online';
+    }
+    if (accountNameMobile) {
+        accountNameMobile.textContent = userData.display_name || userData.handle || 'Bluesky Vault';
+    }
+    if (avatarBoxMobile) {
         if (userData.avatar) {
-            const box = $('avatarBox');
-            box.innerHTML = `<img src="${userData.avatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+            avatarBoxMobile.innerHTML = `<img src="${userData.avatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+        } else {
+            avatarBoxMobile.textContent = (userData.display_name || userData.handle || 'V')[0].toUpperCase();
+            avatarBoxMobile.style.background = 'var(--accent)';
+            avatarBoxMobile.style.display = 'flex';
+            avatarBoxMobile.style.alignItems = 'center';
+            avatarBoxMobile.style.justifyContent = 'center';
+            avatarBoxMobile.style.color = '#fff';
+            avatarBoxMobile.style.fontWeight = '700';
+            avatarBoxMobile.style.fontSize = '14px';
         }
-        $('loginBtn').style.display = 'none';
-        $('logoutBtn').style.display = 'inline-block';
-        $('fetchBtn').disabled = !handlers.some(h => h.selected);
-        updateActiveHandlersBanner && updateActiveHandlersBanner();
-        saveToStorage('session_id', sessionId);
-        saveToStorage('username', $('username').value.trim());
-        saveToStorage('user_data', userData);
     }
+    
+    // UI updates
+    $('loginBtn').style.display = 'none';
+    $('logoutBtn').style.display = 'inline-block';
+    $('fetchBtn').disabled = !handlers.some(h => h.selected);
+    updateActiveHandlersBanner && updateActiveHandlersBanner();
+    saveToStorage('session_id', sessionId);
+    saveToStorage('username', $('username').value.trim());
+    saveToStorage('user_data', userData);
+}
 
-    function setOffline() {
-        $('statusDot').className = 'dot offline';
-        $('accountStatus').textContent = 'Offline';
-        $('accountName').textContent = 'Bluesky Vault';
-        $('avatarBox').textContent = 'V';
-        $('loginBtn').style.display = 'inline-block';
-        $('logoutBtn').style.display = 'none';
-        $('fetchBtn').disabled = true;
+function setOffline() {
+    // Main sidebar
+    $('statusDot').className = 'dot offline';
+    $('accountStatus').textContent = 'Offline';
+    $('accountName').textContent = 'Bluesky Vault';
+    $('avatarBox').textContent = 'V';
+    
+    // ============================================================
+    // MOBILE SIDEBAR - UPDATE STATUS TO OFFLINE
+    // ============================================================
+    const statusDotMobile = document.getElementById('statusDotMobile');
+    const accountStatusMobile = document.getElementById('accountStatusMobile');
+    const accountNameMobile = document.getElementById('accountNameMobile');
+    const avatarBoxMobile = document.getElementById('avatarBoxMobile');
+    
+    if (statusDotMobile) {
+        statusDotMobile.className = 'dot offline';
     }
+    if (accountStatusMobile) {
+        accountStatusMobile.textContent = 'Offline';
+    }
+    if (accountNameMobile) {
+        accountNameMobile.textContent = 'Bluesky Vault';
+    }
+    if (avatarBoxMobile) {
+        avatarBoxMobile.textContent = 'V';
+        avatarBoxMobile.style.background = 'var(--accent)';
+        avatarBoxMobile.style.display = 'flex';
+        avatarBoxMobile.style.alignItems = 'center';
+        avatarBoxMobile.style.justifyContent = 'center';
+        avatarBoxMobile.style.color = '#fff';
+        avatarBoxMobile.style.fontWeight = '700';
+        avatarBoxMobile.style.fontSize = '14px';
+    }
+    
+    // UI updates
+    $('loginBtn').style.display = 'inline-block';
+    $('logoutBtn').style.display = 'none';
+    $('fetchBtn').disabled = true;
+}
 
-    async function verifySession(sid) {
-        try {
-            const res = await fetch(`${API_BASE}/api/verify-session`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ session_id: sid }) });
-            return await res.json();
-        } catch(e) { return { success: false, valid: false }; }
-    }
+async function verifySession(sid) {
+    try {
+        const res = await fetch(`${API_BASE}/api/verify-session`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ session_id: sid }) });
+        return await res.json();
+    } catch(e) { return { success: false, valid: false }; }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     // ==============================
     // HANDLERS
