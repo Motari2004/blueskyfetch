@@ -1537,6 +1537,16 @@ html, body {
 }
 
 
+
+
+
+
+
+
+
+
+
+
 /* Mobile Sidebar Header - Fix close button overlap */
 .mobile-sidebar-header {
     display: flex;
@@ -1551,7 +1561,7 @@ html, body {
 .mobile-sidebar-header .logo {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 4px; /* Reduced from 10px to 4px to bring v4 closer */
     padding-bottom: 0;
     border-bottom: none;
     margin-bottom: 0;
@@ -1566,6 +1576,7 @@ html, body {
 .mobile-sidebar-header .logo h1 {
     font-size: 18px;
     font-weight: 700;
+    margin-right: 2px; /* Add small margin to bring badge closer */
 }
 
 .mobile-sidebar-header .logo .badge {
@@ -1575,6 +1586,7 @@ html, body {
     border-radius: 20px;
     font-weight: 600;
     text-transform: uppercase;
+    margin-left: 0; /* Remove any margin */
 }
 
 .mobile-sidebar .close-btn {
@@ -1606,6 +1618,18 @@ html, body {
     top: auto;
     right: auto;
 }
+
+
+
+
+
+
+
+
+
+
+
+
     </style>
 </head>
 <body>
