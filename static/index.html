@@ -569,38 +569,169 @@ html, body {
     display: block;
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Mobile Sidebar - Not full height, ends at account info */
 .mobile-sidebar {
     position: fixed;
-    top: 0;
+    top: 10px;
     left: -300px;
     width: 280px;
-    height: 100%;
+    max-height: 85vh;
     background: var(--card);
     z-index: 1000;
     transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     padding: 20px;
     overflow-y: auto;
     border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    border-radius: 0 16px 16px 0;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
 }
 
 .mobile-sidebar.open {
-    left: 0;
+    left: 10px;
+}
+
+.mobile-sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 16px;
+    width: 100%;
+}
+
+.mobile-sidebar-header .logo {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding-bottom: 0;
+    border-bottom: none;
+    margin-bottom: 0;
+    flex: 1;
+}
+
+.mobile-sidebar-header .logo i {
+    font-size: 24px;
+    color: var(--accent);
+}
+
+.mobile-sidebar-header .logo h1 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-right: 2px;
+}
+
+.mobile-sidebar-header .logo .badge {
+    font-size: 8px;
+    background: var(--accent);
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-left: 0;
 }
 
 .mobile-sidebar .close-btn {
-    position: absolute;
-    top: 16px;
-    right: 16px;
-    background: transparent;
-    border: none;
+    position: static;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: 50%;
     color: var(--text-secondary);
-    font-size: 24px;
+    font-size: 18px;
     cursor: pointer;
-    padding: 8px;
+    padding: 6px 10px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+    flex-shrink: 0;
 }
 
-.mobile-sidebar .logo {
-    margin-top: 8px;
+.mobile-sidebar .close-btn:hover {
+    background: rgba(255,255,255,0.1);
+    color: var(--text);
+}
+
+/* Mobile Sidebar Footer - Account info at bottom */
+.mobile-sidebar-footer {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+}
+
+.mobile-sidebar-footer .account-box {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: var(--bg);
+    border-radius: var(--radius-sm);
+}
+
+.mobile-sidebar-footer .account-box .avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    flex-shrink: 0;
+    object-fit: cover;
+}
+
+.mobile-sidebar-footer .account-box .info {
+    flex: 1;
+    min-width: 0;
+}
+
+.mobile-sidebar-footer .account-box .info .name {
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mobile-sidebar-footer .account-box .info .status {
+    font-size: 11px;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.mobile-sidebar-footer .account-box .info .status .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.mobile-sidebar-footer .account-box .info .status .dot.online {
+    background: var(--success);
+}
+
+.mobile-sidebar-footer .account-box .info .status .dot.offline {
+    background: var(--error);
 }
 
 /* Responsive adjustments for all screen sizes */
@@ -1322,10 +1453,6 @@ html, body {
         flex: 0 0 auto;
     }
 }
-
-
-
-
 
 
 
