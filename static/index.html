@@ -3145,6 +3145,48 @@ window.saveHandlersNow = async function() {
 
 
 
+// ==============================
+// CAROUSEL CENTERING
+// ==============================
+
+function centerCarouselItems() {
+    const carousel = document.querySelector('.carousel-scroll');
+    if (!carousel) return;
+    
+    const items = carousel.querySelectorAll('a');
+    const containerWidth = carousel.offsetWidth;
+    let totalWidth = 0;
+    
+    items.forEach(item => {
+        totalWidth += item.offsetWidth + 2; // +2 for gap
+    });
+    
+    // If items fit in container, center them
+    if (totalWidth <= containerWidth) {
+        carousel.style.justifyContent = 'center';
+    } else {
+        carousel.style.justifyContent = 'flex-start';
+    }
+}
+
+// Run on load and resize
+window.addEventListener('load', centerCarouselItems);
+window.addEventListener('resize', centerCarouselItems);
+
+// Also run after navigation changes
+const originalNavigateTo = navigateTo;
+navigateTo = async function(page) {
+    await originalNavigateTo(page);
+    setTimeout(centerCarouselItems, 100);
+};
+
+
+
+
+
+
+
+
 
 
 
