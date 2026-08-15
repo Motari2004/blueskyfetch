@@ -1314,12 +1314,8 @@
 
 
 
-
-
-
-
 /* ============================================================
-   MOBILE CAROUSEL NAVIGATION
+   MOBILE CAROUSEL NAVIGATION - FIXED CENTERING
    ============================================================ */
 
 .mobile-carousel-nav {
@@ -1328,13 +1324,17 @@
     bottom: 0;
     left: 0;
     right: 0;
+    max-width: 100%;
     background: var(--card);
     border-top: 1px solid var(--border);
-    padding: 8px 0 env(safe-area-inset-bottom, 8px) 0;
+    padding: 6px 0 env(safe-area-inset-bottom, 6px) 0;
     z-index: 1000;
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     overflow: hidden;
+    /* Center the carousel */
+    display: flex;
+    justify-content: center;
 }
 
 .carousel-scroll {
@@ -1344,8 +1344,17 @@
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
     padding: 0 8px;
-    gap: 4px;
+    gap: 2px;
     scroll-snap-type: x mandatory;
+    max-width: 100%;
+    width: 100%;
+    /* Center items when not overflowing */
+    justify-content: center;
+}
+
+/* When content overflows, allow scrolling */
+.carousel-scroll:overflow {
+    justify-content: flex-start;
 }
 
 .carousel-scroll::-webkit-scrollbar {
@@ -1357,23 +1366,37 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 2px;
+    gap: 1px;
     color: var(--text-muted);
     text-decoration: none;
-    font-size: 10px;
-    padding: 6px 14px;
-    border-radius: 12px;
+    font-size: 9px;
+    padding: 4px 10px;
+    border-radius: 10px;
     transition: var(--transition);
-    min-width: 60px;
-    min-height: 44px;
-    scroll-snap-align: start;
+    min-width: 50px;
+    max-width: 70px;
+    min-height: 38px;
+    scroll-snap-align: center;
     flex-shrink: 0;
     position: relative;
     border: 1.5px solid transparent;
+    white-space: nowrap;
+    /* Prevent shrinking */
+    flex-grow: 0;
 }
 
 .carousel-scroll a i {
-    font-size: 18px;
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.carousel-scroll a span {
+    font-size: 8px;
+    line-height: 1.1;
+    text-align: center;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .carousel-scroll a.active {
@@ -1383,17 +1406,18 @@
 }
 
 .carousel-scroll a .count {
-    font-size: 8px;
+    font-size: 7px;
     background: rgba(255,255,255,0.1);
-    padding: 0 6px;
-    border-radius: 10px;
-    min-width: 16px;
+    padding: 0 4px;
+    border-radius: 8px;
+    min-width: 12px;
     text-align: center;
+    line-height: 1.4;
 }
 
 .carousel-scroll a .live-dot {
-    width: 5px;
-    height: 5px;
+    width: 4px;
+    height: 4px;
     margin-left: 0;
 }
 
@@ -1401,18 +1425,18 @@
 .carousel-scroll a.active::after {
     content: '';
     position: absolute;
-    bottom: 4px;
-    left: 30%;
-    right: 30%;
-    height: 2.5px;
+    bottom: 2px;
+    left: 25%;
+    right: 25%;
+    height: 2px;
     background: var(--accent);
-    border-radius: 4px;
+    border-radius: 2px;
 }
 
 /* Show carousel on mobile */
 @media (max-width: 1024px) {
     .mobile-carousel-nav {
-        display: block;
+        display: flex;
     }
     
     .mobile-nav-bar {
@@ -1420,16 +1444,73 @@
     }
 }
 
-@media (max-width: 480px) {
+/* Medium screens */
+@media (min-width: 481px) and (max-width: 768px) {
     .carousel-scroll a {
-        padding: 4px 10px;
-        min-width: 50px;
-        min-height: 38px;
-        font-size: 9px;
+        min-width: 60px;
+        max-width: 80px;
+        padding: 6px 14px;
+        font-size: 10px;
     }
     
     .carousel-scroll a i {
-        font-size: 16px;
+        font-size: 18px;
+    }
+    
+    .carousel-scroll a span {
+        font-size: 9px;
+    }
+}
+
+/* Small screens - items fit perfectly */
+@media (max-width: 480px) {
+    .carousel-scroll {
+        padding: 0 4px;
+        gap: 1px;
+        justify-content: center;
+    }
+    
+    .carousel-scroll a {
+        min-width: 44px;
+        max-width: 56px;
+        padding: 3px 6px;
+        min-height: 34px;
+        font-size: 8px;
+        border-radius: 8px;
+        flex: 0 0 auto;
+    }
+    
+    .carousel-scroll a i {
+        font-size: 14px;
+    }
+    
+    .carousel-scroll a span {
+        font-size: 7px;
+    }
+    
+    .carousel-scroll a .count {
+        font-size: 6px;
+        padding: 0 3px;
+        min-width: 10px;
+    }
+}
+
+/* Extra small devices */
+@media (max-width: 360px) {
+    .carousel-scroll a {
+        min-width: 38px;
+        max-width: 46px;
+        padding: 2px 4px;
+        min-height: 30px;
+        font-size: 7px;
+    }
+    
+    .carousel-scroll a i {
+        font-size: 12px;
+    }
+    
+    .carousel-scroll a span {
+        font-size: 6px;
     }
 }
 
