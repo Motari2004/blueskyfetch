@@ -1475,45 +1475,83 @@ document.querySelectorAll('.nav a[data-page]').forEach(link => {
     // ==============================
     // LOGIN
     // ==============================
-    $('loginBtn').addEventListener('click', async function() {
-        const username = $('username').value.trim();
-        const password = $('password').value.trim();
-        if (!username || !password) { toast('Enter username and password', 'error'); return; }
-        this.disabled = true;
-        this.textContent = '⏳ Logging in...';
-        try {
-            const res = await fetch(`${API_BASE}/api/login`, {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
-            });
-            const data = await res.json();
-            if (data.success) {
-                sessionId = data.session_id;
-                setOnline(data);
-                loadRemovedUris();
-                await loadSavedHandlers();
-                loadVault();
-                loadScheduled();
-                toast('✅ Login successful!', 'success');
-            } else {
-                toast('❌ Login failed: ' + data.error, 'error');
+$('loginBtn').addEventListener('click', async function() {
+    const username = $('username').value.trim();
+    const password = $('password').value.trim();
+    if (!username || !password) { toast('Enter username and password', 'error'); return; }
+    this.disabled = true;
+    this.textContent = '⏳ Logging in...';
+    try {
+        const res = await fetch(`${API_BASE}/api/login`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+        if (data.success) {
+            sessionId = data.session_id;
+            setOnline(data);
+            
+            // Save handle for persistence - THIS IS THE KEY FOR CROSS-DEVICE
+            localStorage.setItem('bvault_handle', data.handle);
+            localStorage.setItem('bvault_username', username);
+            localStorage.setItem('bvault_session_id', sessionId);
+            localStorage.setItem('bvault_user_data', JSON.stringify(data));
+            
+            if (data.expires_at) {
+                localStorage.setItem('bvault_session_expires', data.expires_at);
             }
-        } catch(e) { toast('❌ Login error: ' + e.message, 'error'); }
-        finally { this.disabled = false; this.textContent = '🔐 Login'; }
-    });
-
-    $('logoutBtn').addEventListener('click', async function() {
-        if (sessionId) {
-            try { await fetch(`${API_BASE}/api/logout`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ session_id: sessionId }) }); } catch(e) {}
+            
+            console.log(`✅ Login successful for @${data.handle}`);
+            console.log(`   Session ID: ${sessionId}`);
+            console.log(`   Persistent: Yes (cross-device)`);
+            
+            loadRemovedUris();
+            await loadSavedHandlers();
+            loadVault();
+            loadScheduled();
+            toast('✅ Login successful! Session saved for all devices.', 'success');
+        } else {
+            toast('❌ Login failed: ' + data.error, 'error');
         }
-        sessionId = null;
-        setOffline();
-        allPosts = []; vaultItems = []; scheduledPosts = []; removedUris.clear(); selectedUris.clear();
-        renderPosts(); renderVault([]); renderScheduled([]);
-        localStorage.removeItem('bvault_session_id');
-        localStorage.removeItem('bvault_user_data');
-        toast('Logged out', 'info');
-    });
+    } catch(e) { toast('❌ Login error: ' + e.message, 'error'); }
+    finally { this.disabled = false; this.textContent = '🔐 Login'; }
+});
+
+$('logoutBtn').addEventListener('click', async function() {
+    const handle = localStorage.getItem('bvault_handle');
+    
+    if (sessionId) {
+        try { 
+            await fetch(`${API_BASE}/api/logout`, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify({ 
+                    session_id: sessionId,
+                    handle: handle 
+                }) 
+            });
+        } catch(e) { console.warn('Logout error:', e); }
+    }
+    
+    sessionId = null;
+    setOffline();
+    allPosts = []; 
+    vaultItems = []; 
+    scheduledPosts = []; 
+    removedUris.clear(); 
+    selectedUris.clear();
+    renderPosts(); 
+    renderVault([]); 
+    renderScheduled([]);
+    
+    // Clear all stored session data
+    localStorage.removeItem('bvault_session_id');
+    localStorage.removeItem('bvault_user_data');
+    localStorage.removeItem('bvault_handle');
+    localStorage.removeItem('bvault_username');
+    
+    toast('Logged out', 'info');
+});
 
     function setOnline(userData) {
         $('statusDot').className = 'dot online';
@@ -4458,67 +4496,113 @@ function toggleAutoNewsRunning() {
 
 
 
-
-
 // ==============================
-// PERSISTENT SESSION MANAGEMENT (NEW)
+// CROSS-DEVICE SESSION MANAGEMENT
 // ==============================
 
-// Try to restore session from database FIRST
+// Try to restore session from database using JUST the handle (cross-device)
 async function restorePersistentSession() {
     const savedHandle = localStorage.getItem('bvault_handle');
     const savedUsername = localStorage.getItem('bvault_username');
     
-    if (!savedHandle) {
-        console.log('No saved handle found in localStorage');
-        return false;
-    }
-    
-    console.log(`🔍 Attempting to restore session for @${savedHandle} from database...`);
-    
-    try {
-        const res = await fetch(`${API_BASE}/api/restore-session`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ handle: savedHandle })
-        });
-        const data = await res.json();
+    // If we have a handle saved, try to restore from database
+    if (savedHandle) {
+        console.log(`🔍 Attempting to restore session for @${savedHandle} from database (cross-device)...`);
         
-        if (data.success && data.valid) {
-            sessionId = data.session_id;
-            setOnline({
-                handle: data.handle,
-                display_name: data.display_name || data.handle,
-                avatar: data.avatar
+        try {
+            const res = await fetch(`${API_BASE}/api/restore-session-by-handle`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ handle: savedHandle })
             });
+            const data = await res.json();
             
-            // Save for next time
-            localStorage.setItem('bvault_session_id', sessionId);
-            localStorage.setItem('bvault_handle', data.handle);
-            localStorage.setItem('bvault_username', savedUsername);
-            if (data.expires_at) {
-                localStorage.setItem('bvault_session_expires', data.expires_at);
+            if (data.success && data.valid) {
+                sessionId = data.session_id;
+                setOnline({
+                    handle: data.handle,
+                    display_name: data.display_name || data.handle,
+                    avatar: data.avatar
+                });
+                
+                // Save for next time on this device
+                localStorage.setItem('bvault_session_id', sessionId);
+                localStorage.setItem('bvault_handle', data.handle);
+                localStorage.setItem('bvault_username', savedUsername || data.handle);
+                if (data.expires_at) {
+                    localStorage.setItem('bvault_session_expires', data.expires_at);
+                }
+                
+                console.log(`✅ Session restored successfully for @${data.handle} (cross-device)`);
+                console.log(`   Session ID: ${sessionId}`);
+                console.log(`   Expires: ${data.expires_at || '30 days'}`);
+                
+                // Load data after session restore
+                await loadSavedHandlers();
+                await loadVault();
+                await loadScheduled();
+                
+                toast('🔄 Session restored! Welcome back.', 'success');
+                return true;
             }
             
-            console.log(`✅ Session restored successfully for @${data.handle}`);
-            console.log(`   Session ID: ${sessionId}`);
+            console.log('⚠️ No valid session found in database for this handle');
+            return false;
             
-            // Load data after session restore
-            await loadSavedHandlers();
-            await loadVault();
-            await loadScheduled();
-            
-            toast('🔄 Session restored! Welcome back.', 'success');
-            return true;
+        } catch (e) {
+            console.warn('Could not restore session:', e);
+            return false;
         }
-        
-        console.log('⚠️ No valid session found in database');
-        return false;
-        
-    } catch (e) {
-        console.warn('Could not restore session:', e);
-        return false;
     }
+    
+    // If no handle saved, try to get from username input
+    const usernameInput = document.getElementById('username');
+    if (usernameInput && usernameInput.value) {
+        const handle = usernameInput.value.trim();
+        if (handle) {
+            // Try to restore using the username from the input field
+            console.log(`🔍 Attempting to restore session for @${handle} from username field...`);
+            try {
+                const res = await fetch(`${API_BASE}/api/restore-session-by-handle`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ handle: handle })
+                });
+                const data = await res.json();
+                
+                if (data.success && data.valid) {
+                    sessionId = data.session_id;
+                    setOnline({
+                        handle: data.handle,
+                        display_name: data.display_name || data.handle,
+                        avatar: data.avatar
+                    });
+                    
+                    // Save for next time
+                    localStorage.setItem('bvault_session_id', sessionId);
+                    localStorage.setItem('bvault_handle', data.handle);
+                    localStorage.setItem('bvault_username', handle);
+                    if (data.expires_at) {
+                        localStorage.setItem('bvault_session_expires', data.expires_at);
+                    }
+                    
+                    console.log(`✅ Session restored for @${data.handle} from username field`);
+                    
+                    await loadSavedHandlers();
+                    await loadVault();
+                    await loadScheduled();
+                    
+                    toast('🔄 Session restored! Welcome back.', 'success');
+                    return true;
+                }
+            } catch (e) {
+                console.warn('Could not restore session from username:', e);
+            }
+        }
+    }
+    
+    console.log('No saved handle found, cannot restore cross-device session');
+    return false;
 }
 
 // Check session from database OR memory
@@ -4566,8 +4650,8 @@ async function initializeApp() {
     }
     renderHandlers();
 
-    // STEP 1: Try to restore session from DATABASE FIRST
-    console.log('📌 Step 1: Checking for persistent session in database...');
+    // STEP 1: Try to restore session from DATABASE FIRST (cross-device)
+    console.log('📌 Step 1: Checking for persistent session in database (cross-device)...');
     const restored = await restorePersistentSession();
     
     if (restored) {
@@ -4673,8 +4757,6 @@ async function initializeApp() {
 // START THE APP
 // ==============================
 initializeApp();
-
-
 
 
 

@@ -1069,14 +1069,14 @@ def login():
         # Export session string for persistence
         session_string = client.export_session_string()
         
+        # Calculate expiration (30 days from now)
+        expires_at = datetime.now() + timedelta(days=30)
+        
         # Store session in database
         conn = get_db_connection()
         if conn:
             try:
                 cur = conn.cursor()
-                
-                # Calculate expiration (30 days from now)
-                expires_at = datetime.now() + timedelta(days=30)
                 
                 # Delete old sessions for this handle
                 cur.execute('DELETE FROM sessions WHERE handle = %s', (profile.handle,))
@@ -1118,14 +1118,13 @@ def login():
             'handle': profile.handle,
             'display_name': profile.display_name or username,
             'avatar': profile.avatar,
-            'persistent': True
+            'persistent': True,
+            'expires_at': expires_at.isoformat() if expires_at else None
         })
     except Exception as e:
         print(f"❌ Login error: {e}")
         traceback.print_exc()
         return jsonify({'success': False, 'error': str(e)}), 401
-
-
 
 
 
@@ -1163,6 +1162,120 @@ def logout():
             print(f"Error removing session from database: {e}")
     
     return jsonify({'success': True})
+
+
+
+
+
+
+
+
+
+
+
+
+@app.route('/api/restore-session-by-handle', methods=['POST'])
+def restore_session_by_handle():
+    """Restore a session using just the Bluesky handle (cross-device)"""
+    data = request.json
+    handle = data.get('handle')
+    
+    if not handle:
+        return jsonify({'success': False, 'error': 'Handle required'}), 400
+    
+    try:
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({'success': False, 'error': 'Database connection failed'}), 500
+        
+        cur = conn.cursor()
+        # Get the most recent valid session for this handle
+        cur.execute('''
+            SELECT session_id, username, handle, display_name, avatar, session_string, expires_at
+            FROM sessions 
+            WHERE handle = %s AND expires_at > CURRENT_TIMESTAMP
+            ORDER BY last_used_at DESC
+            LIMIT 1
+        ''', (handle,))
+        
+        row = cur.fetchone()
+        cur.close()
+        conn.close()
+        
+        if not row:
+            return jsonify({
+                'success': False, 
+                'error': 'No valid session found. Please login again.',
+                'valid': False
+            }), 401
+        
+        session_id = row[0]
+        username = row[1]
+        handle = row[2]
+        display_name = row[3]
+        avatar = row[4]
+        session_string = row[5]
+        expires_at = row[6]
+        
+        # Restore the client from session string
+        try:
+            client = Client()
+            client.login(session_string=session_string)
+            
+            # Store in memory for immediate use
+            sessions[session_id] = {
+                'client': client,
+                'username': username,
+                'handle': handle,
+                'display_name': display_name or handle,
+                'avatar': avatar,
+                'session_string': session_string
+            }
+            
+            # Update last_used_at
+            conn = get_db_connection()
+            if conn:
+                cur = conn.cursor()
+                cur.execute('UPDATE sessions SET last_used_at = CURRENT_TIMESTAMP WHERE session_id = %s', (session_id,))
+                conn.commit()
+                cur.close()
+                conn.close()
+            
+            print(f"✅ Session restored for {handle} (cross-device)")
+            return jsonify({
+                'success': True,
+                'valid': True,
+                'session_id': session_id,
+                'handle': handle,
+                'display_name': display_name or handle,
+                'avatar': avatar,
+                'expires_at': expires_at.isoformat() if expires_at else None
+            })
+            
+        except Exception as e:
+            print(f"❌ Failed to restore session: {e}")
+            # Session string might be expired or invalid
+            conn = get_db_connection()
+            if conn:
+                cur = conn.cursor()
+                cur.execute('DELETE FROM sessions WHERE session_id = %s', (session_id,))
+                conn.commit()
+                cur.close()
+                conn.close()
+            
+            return jsonify({
+                'success': False,
+                'error': f'Session expired or invalid: {str(e)}',
+                'valid': False
+            }), 401
+            
+    except Exception as e:
+        print(f"Error restoring session: {e}")
+        traceback.print_exc()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+
 
 
 
