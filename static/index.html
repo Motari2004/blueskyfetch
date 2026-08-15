@@ -1877,12 +1877,12 @@ html, body {
         </div>
     </div>
 
-    <div class="selection-bar" id="selectionBar" style="display:none;align-items:center;gap:14px;background:var(--bg);border:1px solid var(--accent);border-radius:var(--radius-sm);padding:12px 18px;margin-top:14px;flex-wrap:wrap;">
-        <div class="count" style="font-weight:700;color:var(--text);font-size:13px;">📋 <span id="selectedCount">0</span> posts selected</div>
-        <button class="btn btn-sm btn-success" onclick="saveSelectedPosts()" style="padding:6px 16px;font-size:12px;">⭐ Save to Vault</button>
-        <button class="btn btn-sm btn-secondary" onclick="selectAllVisible()" style="padding:6px 16px;font-size:12px;">✅ Select All</button>
-        <button class="btn btn-sm btn-secondary" onclick="clearFetchSelection()" style="padding:6px 16px;font-size:12px;">✕ Clear</button>
-    </div>
+<div class="selection-bar" id="selectionBar">
+    <div class="count">📋 <span id="selectedCount">0</span> posts selected</div>
+    <button class="btn btn-sm btn-success" onclick="saveSelectedPosts()">Save to Vault</button>
+    <button class="btn btn-sm btn-secondary" onclick="selectAllVisible()">✅ Select All</button>
+    <button class="btn btn-sm btn-secondary" onclick="clearFetchSelection()">✕ Cancel</button>
+</div>
 
     <div class="post-grid" id="postGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-top:16px;">
         <div class="empty" style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--text-muted);">
