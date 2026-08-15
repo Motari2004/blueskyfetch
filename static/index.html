@@ -5699,8 +5699,20 @@ async function fetchAutoNewsEngineStatus() {
     }
 }
 
+
+
+
+
+
+
+
+
+
+
+
 function renderAutoNewsEngineStatus(cfg, schedulerRunning) {
     const navDot = $('autoNewsNavDot');
+    const navDotMobile = $('autoNewsNavDotMobile');
     const bannerDot = $('autoNewsBannerDot');
     const banner = $('autoNewsEngineBanner');
     const title = $('autoNewsEngineTitle');
@@ -5708,7 +5720,17 @@ function renderAutoNewsEngineStatus(cfg, schedulerRunning) {
 
     const isRunning = !!(cfg && cfg.enabled && schedulerRunning);
 
-    [navDot, bannerDot].forEach(dot => { if (dot) dot.classList.toggle('on', isRunning); });
+    // Update all auto-news dots (main nav, mobile nav, banner)
+    [navDot, navDotMobile, bannerDot].forEach(dot => { 
+        if (dot) {
+            if (isRunning) {
+                dot.className = 'live-dot on';
+            } else {
+                dot.className = 'live-dot';
+            }
+        }
+    });
+    
     if (banner) banner.classList.toggle('running', isRunning);
 
     if (!cfg) {
@@ -5739,6 +5761,19 @@ function renderAutoNewsEngineStatus(cfg, schedulerRunning) {
     }
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 function updateAutoNewsButtons(running) {
     const startBtns = ['autoNewsStartBtn', 'autoNewsStartBtn2'];
     const stopBtns = ['autoNewsStopBtn', 'autoNewsStopBtn2'];
@@ -5760,7 +5795,29 @@ function updateAutoNewsButtons(running) {
             el.disabled = !running;
         }
     });
+    
+    // Also update the nav dots
+    const navDot = $('autoNewsNavDot');
+    const navDotMobile = $('autoNewsNavDotMobile');
+    
+    if (navDot) {
+        navDot.className = running ? 'live-dot on' : 'live-dot';
+    }
+    if (navDotMobile) {
+        navDotMobile.className = running ? 'live-dot on' : 'live-dot';
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
 
 // ==============================
 // START LOOP - Enables config and starts the scheduler
