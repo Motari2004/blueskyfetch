@@ -366,7 +366,6 @@ def claim_due_config(name: str, min_interval_sec: int = 10) -> dict | None:
         print(f"[auto_news] claim_due_config DB error (skipping this cycle, will retry): {e}")
         return None
 
-
 def save_config(cfg: dict):
     conn = get_db()
     cur = conn.cursor()
@@ -375,8 +374,23 @@ def save_config(cfg: dict):
     existing = get_config(cfg.get('name', 'default'))
     was_disabled = existing and not existing.get('enabled', False) and bool(cfg.get('enabled', False))
     
+    # Get the current enabled_at if it exists
+    current_enabled_at = None
+    if existing:
+        current_enabled_at = existing.get('enabled_at')
+    
+    # Determine the new enabled_at value
+    # If enabling (was disabled -> now enabled), set to CURRENT_TIMESTAMP
+    # Otherwise, keep the existing value
+    if was_disabled:
+        enabled_at_value = 'CURRENT_TIMESTAMP'
+    elif current_enabled_at:
+        enabled_at_value = f"'{current_enabled_at}'"
+    else:
+        enabled_at_value = 'CURRENT_TIMESTAMP'
+    
     cur.execute(
-        """
+        f"""
         INSERT INTO auto_news_config (
             name, enabled, handler_handle, account_id, platform, content_type,
             poll_interval_sec, media_only, include_reposts, include_replies,
@@ -386,7 +400,7 @@ def save_config(cfg: dict):
             %(name)s, %(enabled)s, %(handler_handle)s, %(account_id)s, %(platform)s, %(content_type)s,
             %(poll_interval_sec)s, %(media_only)s, %(include_reposts)s, %(include_replies)s,
             %(caption_template)s, %(bluesky_handle)s, %(bluesky_app_password)s,
-            CASE WHEN %(enabled)s AND %(was_disabled)s THEN CURRENT_TIMESTAMP ELSE COALESCE(auto_news_config.enabled_at, CURRENT_TIMESTAMP) END,
+            {enabled_at_value},
             CURRENT_TIMESTAMP
         )
         ON CONFLICT (name) DO UPDATE SET
@@ -404,7 +418,7 @@ def save_config(cfg: dict):
             bluesky_app_password = COALESCE(EXCLUDED.bluesky_app_password, auto_news_config.bluesky_app_password),
             enabled_at = CASE 
                 WHEN EXCLUDED.enabled = TRUE AND auto_news_config.enabled = FALSE THEN CURRENT_TIMESTAMP 
-                ELSE COALESCE(auto_news_config.enabled_at, CURRENT_TIMESTAMP)
+                ELSE auto_news_config.enabled_at 
             END,
             updated_at = CURRENT_TIMESTAMP
         RETURNING id
@@ -423,7 +437,6 @@ def save_config(cfg: dict):
             "caption_template": cfg.get("caption_template") or "{text}",
             "bluesky_handle": cfg.get("bluesky_handle"),
             "bluesky_app_password": cfg.get("bluesky_app_password"),
-            "was_disabled": was_disabled,
         },
     )
     rid = cur.fetchone()[0]
