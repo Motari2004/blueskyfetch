@@ -6,7 +6,7 @@ Zernio Instagram account.
 
 Usage (CLI):
   python auto_news_poster.py once
-  python auto_news_poster.py loop --interval 300
+  python auto_news_poster.py loop --interval 15  # CHANGED: default 300 → 15
 
 Or via Flask routes registered by register_auto_news_routes(app).
 Config is stored in Postgres table auto_news_config + auto_news_seen.
@@ -29,6 +29,10 @@ PERFORMANCE NOTES (this version):
   one bulk INSERT at the end, instead of 1 query per post per direction.
 - The Zernio fallback HTTP calls now go through a requests.Session with
   automatic retries/backoff on transient failures (429/500/502/503/504).
+
+CHANGELOG:
+- v2: Changed default poll_interval_sec from 300 → 15 seconds for faster
+  auto-posting (posts appear within ~20-30 seconds instead of 5+ minutes).
 """
 
 from __future__ import annotations
@@ -143,7 +147,7 @@ def init_auto_tables():
                 account_id TEXT NOT NULL,
                 platform TEXT DEFAULT 'instagram',
                 content_type TEXT DEFAULT 'feed',
-                poll_interval_sec INTEGER DEFAULT 300,
+                poll_interval_sec INTEGER DEFAULT 15,  -- 🔥 FIXED: was 300 (5 min), now 15 seconds
                 media_only BOOLEAN DEFAULT TRUE,
                 include_reposts BOOLEAN DEFAULT FALSE,
                 include_replies BOOLEAN DEFAULT FALSE,
@@ -550,7 +554,7 @@ def save_config(cfg: dict):
                 "account_id": cfg["account_id"],
                 "platform": cfg.get("platform", "instagram"),
                 "content_type": cfg.get("content_type", "feed"),
-                "poll_interval_sec": int(cfg.get("poll_interval_sec", 300)),
+                "poll_interval_sec": int(cfg.get("poll_interval_sec", 15)),  # 🔥 FIXED: was 300, now 15
                 "media_only": bool(cfg.get("media_only", True)),
                 "include_reposts": bool(cfg.get("include_reposts", False)),
                 "include_replies": bool(cfg.get("include_replies", False)),
@@ -905,10 +909,10 @@ def run_loop(name: str = "default", interval: int | None = None):
     time.sleep() and waits for the next cycle, no matter what."""
     ensure_tables()
     while True:
-        sec = 300
+        sec = 15  # 🔥 FIXED: was 300, now 15
         try:
             cfg = get_config(name)
-            sec = interval or (cfg.get("poll_interval_sec") if cfg else 300) or 300
+            sec = interval or (cfg.get("poll_interval_sec") if cfg else 15) or 15  # 🔥 FIXED: was 300
             print(f"[{datetime.now().isoformat()}] auto_news run '{name}'")
             result = run_once(name)
             print(json.dumps(result, indent=2, default=str))
@@ -955,9 +959,9 @@ def _heartbeat_tick(heartbeat_sec: int):
             continue  # not due yet, or another process already claimed this cycle
 
         try:
-            interval = int(cfg.get("poll_interval_sec") or 300)
+            interval = int(cfg.get("poll_interval_sec") or 15)  # 🔥 FIXED: was 300, now 15
         except (TypeError, ValueError):
-            interval = 300
+            interval = 15  # 🔥 FIXED: was 300, now 15
         interval = max(MIN_POLL_INTERVAL_SEC, interval)
 
         try:

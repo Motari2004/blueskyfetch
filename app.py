@@ -197,7 +197,7 @@ def init_db():
                 account_id TEXT NOT NULL,
                 platform TEXT DEFAULT 'instagram',
                 content_type TEXT DEFAULT 'feed',
-                poll_interval_sec INTEGER DEFAULT 300,
+                poll_interval_sec INTEGER DEFAULT 15,
                 media_only BOOLEAN DEFAULT TRUE,
                 include_reposts BOOLEAN DEFAULT FALSE,
                 include_replies BOOLEAN DEFAULT FALSE,
