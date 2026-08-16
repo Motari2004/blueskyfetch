@@ -3080,6 +3080,13 @@ def get_scheduled_posts():
 
 
 
+
+
+
+# ============================================================
+# POST NOW - Direct Instagram Posting
+# ============================================================
+
 @app.route('/api/post-now/accounts', methods=['GET'])
 def get_post_now_accounts():
     """Get available Instagram accounts for Post Now"""
@@ -3097,14 +3104,22 @@ def get_post_now_accounts():
             display_name = acc.get('displayName', '')
             acc_id = acc.get('_id', '')
             
-            # Use display name or username as label
-            label = display_name or username or acc_id
+            # Try to identify the account
+            account_type = 'unknown'
+            label = username or display_name or acc_id
+            
+            if 'serpent' in username.lower() or 'serpent' in display_name.lower():
+                account_type = 'serpent'
+                label = '🐍 Serpent'
+            elif 'eastern' in username.lower() or 'eastern' in display_name.lower():
+                account_type = 'easternfront'
+                label = '🌅 Eastern Front'
             
             accounts.append({
                 'account_id': acc_id,
                 'username': username,
                 'display_name': display_name,
-                'account_type': 'instagram',
+                'account_type': account_type,
                 'label': label,
                 'platform': 'instagram',
                 'profile_picture': acc.get('profilePicture')
@@ -3119,12 +3134,6 @@ def get_post_now_accounts():
         print(f"❌ Error getting post-now accounts: {e}")
         traceback.print_exc()
         return jsonify({'success': False, 'error': str(e)}), 500
-
-
-
-
-
-
 
 
 
