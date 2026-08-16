@@ -88,7 +88,7 @@ def _get_db_pool():
         with _db_pool_lock:
             if _db_pool is None:
                 import psycopg2.pool
-                _db_pool = psycopg2.pool.ThreadedConnectionPool(1, 10, DATABASE_URL)
+                _db_pool = psycopg2.pool.ThreadedConnectionPool(1, 50, DATABASE_URL)  # 10 → 50= psycopg2.pool.ThreadedConnectionPool(1, 10, DATABASE_URL)
     return _db_pool
 
 
