@@ -22,7 +22,6 @@ import pytz
 from PIL import Image, ImageDraw, ImageFont
 from io import BytesIO
 import textwrap
-import threading  # ← ADD THIS
 
 
 import os
@@ -239,36 +238,11 @@ def init_db():
 
 
 # Initialize database on startup
-# ============================================================
-# LAZY DATABASE INITIALIZATION (No startup blocking!)
-# ============================================================
+init_db()
 
-_db_initialized = False
-_db_init_lock = threading.Lock()
 
-def ensure_db_initialized():
-    """Lazy initialize database - runs on first request only"""
-    global _db_initialized
-    if _db_initialized:
-        return True
-    
-    with _db_init_lock:
-        if _db_initialized:
-            return True
-        
-        try:
-            print("🚀 Initializing database on first request...")
-            init_db()
-            _db_initialized = True
-            print("✅ Database initialized successfully")
-            return True
-        except Exception as e:
-            print(f"❌ Database initialization failed: {e}")
-            traceback.print_exc()
-            return False
 
-# ❌ DO NOT CALL init_db() HERE!
-# init_db()  # ← DELETE OR COMMENT OUT THIS LINE
+
 
 
 
@@ -2836,65 +2810,6 @@ def zernio_accounts():
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
-
-
-
-
-
-# ============================================================
-# AUTO-NEWS MODULE - Lazy initialization (No startup blocking!)
-# ============================================================
-
-_auto_news_initialized = False
-_auto_news_lock = threading.Lock()
-
-def ensure_auto_news_initialized():
-    """Lazy initialize auto-news on first request only"""
-    global _auto_news_initialized
-    if _auto_news_initialized:
-        return
-    
-    with _auto_news_lock:
-        if _auto_news_initialized:
-            return
-        
-        try:
-            from auto_news_poster import register_auto_news_routes
-            register_auto_news_routes(app, autostart=True, default_interval_sec=10)
-            _auto_news_initialized = True
-            print("✅ Auto-news initialized on first request")
-        except Exception as e:
-            print(f"⚠️ Auto-news initialization error: {e}")
-            traceback.print_exc()
-
-
-
-
-
-
-
-
-
-
-@app.before_request
-def lazy_init():
-    """Initialize everything on the first request only"""
-    ensure_db_initialized()
-    ensure_auto_news_initialized()  # ← ADD THIS
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 @app.route('/api/zernio/post', methods=['POST'])
 def zernio_post():
     """Post a vault item to Zernio"""
@@ -3454,11 +3369,74 @@ def zernio_posts():
 
 
 
+
+
 # ============================================================
-# AUTO-NEWS MODULE - Now lazy loaded via ensure_auto_news_initialized()
+# AUTO-NEWS MODULE - Register routes
 # ============================================================
-# The auto-news module is now initialized lazily on first request.
-# See ensure_auto_news_initialized() function above.
+
+try:
+    from auto_news_poster import register_auto_news_routes
+    AUTO_NEWS_AVAILABLE = True
+except ImportError as e:
+    AUTO_NEWS_AVAILABLE = False
+    print(f"⚠️ Auto news module not found: {e}")
+
+if AUTO_NEWS_AVAILABLE:
+    try:
+        # Register routes with autostart=True to start the background scheduler
+        register_auto_news_routes(app, autostart=True, default_interval_sec=10)
+        print("✅ Auto-news routes registered successfully")
+        print("✅ Auto-news background scheduler started (checks every 10s)")
+    except Exception as e:
+        print(f"⚠️ Error registering auto-news routes: {e}")
+        traceback.print_exc()
+else:
+    # Add placeholder routes to avoid 404s if module not found
+    @app.route('/api/auto-news/config', methods=['GET', 'POST'])
+    def auto_news_placeholder_config():
+        return jsonify({
+            'success': False, 
+            'error': 'Auto-news module not loaded. Please check auto_news_poster.py exists.'
+        }), 404
+    
+    @app.route('/api/auto-news/status', methods=['GET'])
+    def auto_news_placeholder_status():
+        return jsonify({
+            'success': False, 
+            'error': 'Auto-news module not loaded.'
+        }), 404
+    
+    @app.route('/api/auto-news/run', methods=['POST'])
+    def auto_news_placeholder_run():
+        return jsonify({
+            'success': False, 
+            'error': 'Auto-news module not loaded.'
+        }), 404
+    
+    @app.route('/api/auto-news/seen', methods=['GET'])
+    def auto_news_placeholder_seen():
+        return jsonify({
+            'success': False, 
+            'error': 'Auto-news module not loaded.'
+        }), 404
+    
+    @app.route('/api/auto-news/start', methods=['POST'])
+    def auto_news_placeholder_start():
+        return jsonify({
+            'success': False, 
+            'error': 'Auto-news module not loaded.'
+        }), 404
+    
+    @app.route('/api/auto-news/stop', methods=['POST'])
+    def auto_news_placeholder_stop():
+        return jsonify({
+            'success': False, 
+            'error': 'Auto-news module not loaded.'
+        }), 404
+    
+    print("⚠️ Auto-news routes not registered - module not available")
+
 
 
 
