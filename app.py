@@ -197,7 +197,7 @@ def init_db():
                 account_id TEXT NOT NULL,
                 platform TEXT DEFAULT 'instagram',
                 content_type TEXT DEFAULT 'feed',
-                poll_interval_sec INTEGER DEFAULT 15,
+                poll_interval_sec INTEGER DEFAULT 300,
                 media_only BOOLEAN DEFAULT TRUE,
                 include_reposts BOOLEAN DEFAULT FALSE,
                 include_replies BOOLEAN DEFAULT FALSE,
@@ -237,34 +237,8 @@ def init_db():
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 # Initialize database on startup
 init_db()
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 # ============================================================
 # ZERNIO CONFIGURATION
@@ -3105,6 +3079,7 @@ def get_scheduled_posts():
 
 
 
+
 @app.route('/api/post-now/accounts', methods=['GET'])
 def get_post_now_accounts():
     """Get available Instagram accounts for Post Now"""
@@ -3121,7 +3096,6 @@ def get_post_now_accounts():
             username = acc.get('username', '')
             display_name = acc.get('displayName', '')
             acc_id = acc.get('_id', '')
-            profile_picture = acc.get('profilePicture', '')
             
             # Use display name or username as label
             label = display_name or username or acc_id
@@ -3133,7 +3107,7 @@ def get_post_now_accounts():
                 'account_type': 'instagram',
                 'label': label,
                 'platform': 'instagram',
-                'profile_picture': profile_picture
+                'profile_picture': acc.get('profilePicture')
             })
         
         return jsonify({
@@ -3145,6 +3119,8 @@ def get_post_now_accounts():
         print(f"❌ Error getting post-now accounts: {e}")
         traceback.print_exc()
         return jsonify({'success': False, 'error': str(e)}), 500
+
+
 
 
 
