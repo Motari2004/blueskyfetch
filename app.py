@@ -16,6 +16,7 @@ import uuid
 import urllib.parse
 import re
 import random
+import threading
 import time
 import base64
 import pytz
@@ -37,17 +38,57 @@ CORS(app)
 # DATABASE SETUP
 # ============================================================
 
+# ============================================================
+# DATABASE SETUP
+# ============================================================
+
 DATABASE_URL = 'postgresql://neondb_owner:npg_0URQHn2lKXeh@ep-divine-rice-ayb8kut7-pooler.c-5.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require'
 
-def get_db_connection():
-    """Get a database connection"""
-    try:
-        conn = psycopg2.connect(DATABASE_URL)
-        return conn
-    except Exception as e:
-        print(f"❌ Database connection error: {e}")
-        return None
+_db_initialized = False
+_db_init_lock = threading.Lock()
 
+def get_db_connection():
+    """Get a database connection with retry"""
+    max_retries = 3
+    for attempt in range(max_retries):
+        try:
+            conn = psycopg2.connect(DATABASE_URL)
+            return conn
+        except Exception as e:
+            print(f"❌ Database connection error (attempt {attempt+1}/{max_retries}): {e}")
+            if attempt < max_retries - 1:
+                time.sleep(1)
+            else:
+                return None
+    return None
+
+def release_db_connection(conn):
+    """Close a database connection"""
+    if conn:
+        try:
+            conn.close()
+        except Exception:
+            pass
+
+def ensure_db_initialized():
+    """Lazy initialize database - retries on failure"""
+    global _db_initialized
+    if _db_initialized:
+        return True
+    
+    with _db_init_lock:
+        if _db_initialized:
+            return True
+        
+        try:
+            init_db()
+            _db_initialized = True
+            print("✅ Database initialized successfully")
+            return True
+        except Exception as e:
+            print(f"❌ Database initialization failed: {e}")
+            traceback.print_exc()
+            return False
 
 
 
@@ -239,7 +280,7 @@ def init_db():
         
         conn.commit()
         cur.close()
-        conn.close()
+        release_db_connection(conn)
         print("✅ Database initialized successfully with sessions table and user_status")
     except Exception as e:
         print(f"❌ Database init error: {e}")
@@ -264,7 +305,12 @@ def init_db():
 
 
 # Initialize database on startup
-init_db()
+# Initialize database on startup (with error handling)
+try:
+    ensure_db_initialized()
+except Exception as e:
+    print(f"⚠️ Database init error (will retry later): {e}")
+    traceback.print_exc()
 
 # ============================================================
 # ZERNIO CONFIGURATION
@@ -1089,6 +1135,46 @@ def download_video_segments_cdn(cid, did, quality='720p', session_string=None):
 @app.route('/')
 def index():
     return send_from_directory('static', 'index.html')
+
+
+
+
+
+
+
+
+
+@app.route('/api/health', methods=['GET'])
+def health_check():
+    """Health check endpoint for Vercel"""
+    try:
+        conn = get_db_connection()
+        if conn:
+            release_db_connection(conn)
+            return jsonify({
+                'status': 'healthy',
+                'database': 'connected',
+                'timestamp': datetime.now().isoformat()
+            })
+        else:
+            return jsonify({
+                'status': 'unhealthy',
+                'database': 'disconnected',
+                'timestamp': datetime.now().isoformat()
+            }), 500
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'error': str(e),
+            'timestamp': datetime.now().isoformat()
+        }), 500
+
+
+
+
+
+
+
 
 
 
