@@ -33,6 +33,9 @@ PERFORMANCE NOTES (this version):
 CHANGELOG:
 - v2: Changed default poll_interval_sec from 300 → 15 seconds for faster
   auto-posting (posts appear within ~20-30 seconds instead of 5+ minutes).
+- v3: Increased connection pool from 10 → 50 to prevent pool exhaustion.
+- v3: Added retry logic to get_db() for pool exhaustion recovery.
+- v3: Added try/except to auto_news_status route to prevent crashes.
 """
 
 from __future__ import annotations
@@ -88,13 +91,23 @@ def _get_db_pool():
         with _db_pool_lock:
             if _db_pool is None:
                 import psycopg2.pool
-                _db_pool = psycopg2.pool.ThreadedConnectionPool(1, 50, DATABASE_URL)  # 10 → 50= psycopg2.pool.ThreadedConnectionPool(1, 10, DATABASE_URL)
+                _db_pool = psycopg2.pool.ThreadedConnectionPool(1, 50, DATABASE_URL)  # FIXED: 10 → 50
     return _db_pool
 
 
 def get_db():
-    """Get a pooled connection. Always pair with release_db(conn) — use
-    try/finally, not conn.close()."""
+    """Get a pooled connection with retry on exhaustion."""
+    import time
+    max_retries = 3
+    for attempt in range(max_retries):
+        try:
+            return _get_db_pool().getconn()
+        except psycopg2.pool.PoolError as e:
+            if attempt < max_retries - 1:
+                print(f"[DB] Pool exhausted, waiting 0.5s... (attempt {attempt+1}/{max_retries})")
+                time.sleep(0.5)
+            else:
+                raise e
     return _get_db_pool().getconn()
 
 
@@ -147,7 +160,7 @@ def init_auto_tables():
                 account_id TEXT NOT NULL,
                 platform TEXT DEFAULT 'instagram',
                 content_type TEXT DEFAULT 'feed',
-                poll_interval_sec INTEGER DEFAULT 15,  -- 🔥 FIXED: was 300 (5 min), now 15 seconds
+                poll_interval_sec INTEGER DEFAULT 15,  -- FIXED: was 300 (5 min), now 15 seconds
                 media_only BOOLEAN DEFAULT TRUE,
                 include_reposts BOOLEAN DEFAULT FALSE,
                 include_replies BOOLEAN DEFAULT FALSE,
@@ -554,7 +567,7 @@ def save_config(cfg: dict):
                 "account_id": cfg["account_id"],
                 "platform": cfg.get("platform", "instagram"),
                 "content_type": cfg.get("content_type", "feed"),
-                "poll_interval_sec": int(cfg.get("poll_interval_sec", 15)),  # 🔥 FIXED: was 300, now 15
+                "poll_interval_sec": int(cfg.get("poll_interval_sec", 15)),  # FIXED: was 300, now 15
                 "media_only": bool(cfg.get("media_only", True)),
                 "include_reposts": bool(cfg.get("include_reposts", False)),
                 "include_replies": bool(cfg.get("include_replies", False)),
@@ -909,10 +922,10 @@ def run_loop(name: str = "default", interval: int | None = None):
     time.sleep() and waits for the next cycle, no matter what."""
     ensure_tables()
     while True:
-        sec = 15  # 🔥 FIXED: was 300, now 15
+        sec = 15  # FIXED: was 300, now 15
         try:
             cfg = get_config(name)
-            sec = interval or (cfg.get("poll_interval_sec") if cfg else 15) or 15  # 🔥 FIXED: was 300
+            sec = interval or (cfg.get("poll_interval_sec") if cfg else 15) or 15  # FIXED: was 300
             print(f"[{datetime.now().isoformat()}] auto_news run '{name}'")
             result = run_once(name)
             print(json.dumps(result, indent=2, default=str))
@@ -959,9 +972,9 @@ def _heartbeat_tick(heartbeat_sec: int):
             continue  # not due yet, or another process already claimed this cycle
 
         try:
-            interval = int(cfg.get("poll_interval_sec") or 15)  # 🔥 FIXED: was 300, now 15
+            interval = int(cfg.get("poll_interval_sec") or 15)  # FIXED: was 300, now 15
         except (TypeError, ValueError):
-            interval = 15  # 🔥 FIXED: was 300, now 15
+            interval = 15  # FIXED: was 300, now 15
         interval = max(MIN_POLL_INTERVAL_SEC, interval)
 
         try:
@@ -1070,18 +1083,27 @@ def register_auto_news_routes(app, autostart: bool = True, default_interval_sec:
     @app.route("/api/auto-news/status", methods=["GET"])
     def auto_news_status():
         """See scheduler state and each config's last run info."""
-        configs = get_all_configs()
-        safe_configs = []
-        for c in configs:
-            c = dict(c)
-            if c.get("bluesky_app_password"):
-                c["bluesky_app_password"] = "********"
-            safe_configs.append(c)
-        return jsonify({
-            "success": True,
-            "scheduler_running": _scheduler is not None and getattr(_scheduler, "is_alive", lambda: False)(),
-            "configs": safe_configs,
-        })
+        try:
+            configs = get_all_configs()
+            safe_configs = []
+            for c in configs:
+                c = dict(c)
+                if c.get("bluesky_app_password"):
+                    c["bluesky_app_password"] = "********"
+                safe_configs.append(c)
+            return jsonify({
+                "success": True,
+                "scheduler_running": _scheduler is not None and getattr(_scheduler, "is_alive", lambda: False)(),
+                "configs": safe_configs,
+            })
+        except Exception as e:
+            print(f"[auto_news] status error: {e}")
+            return jsonify({
+                "success": True,
+                "scheduler_running": False,
+                "configs": [],
+                "error": str(e)
+            })
 
     @app.route("/api/auto-news/start", methods=["POST"])
     def auto_news_start():
