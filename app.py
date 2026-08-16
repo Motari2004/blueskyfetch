@@ -16,7 +16,6 @@ import uuid
 import urllib.parse
 import re
 import random
-import threading
 import time
 import base64
 import pytz
@@ -38,57 +37,19 @@ CORS(app)
 # DATABASE SETUP
 # ============================================================
 
-# ============================================================
-# DATABASE SETUP
-# ============================================================
-
 DATABASE_URL = 'postgresql://neondb_owner:npg_0URQHn2lKXeh@ep-divine-rice-ayb8kut7-pooler.c-5.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require'
 
-_db_initialized = False
-_db_init_lock = threading.Lock()
-
 def get_db_connection():
-    """Get a database connection with retry"""
-    max_retries = 3
-    for attempt in range(max_retries):
-        try:
-            conn = psycopg2.connect(DATABASE_URL)
-            return conn
-        except Exception as e:
-            print(f"❌ Database connection error (attempt {attempt+1}/{max_retries}): {e}")
-            if attempt < max_retries - 1:
-                time.sleep(1)
-            else:
-                return None
-    return None
+    """Get a database connection"""
+    try:
+        conn = psycopg2.connect(DATABASE_URL)
+        return conn
+    except Exception as e:
+        print(f"❌ Database connection error: {e}")
+        return None
 
-def release_db_connection(conn):
-    """Close a database connection"""
-    if conn:
-        try:
-            conn.close()
-        except Exception:
-            pass
 
-def ensure_db_initialized():
-    """Lazy initialize database - retries on failure"""
-    global _db_initialized
-    if _db_initialized:
-        return True
-    
-    with _db_init_lock:
-        if _db_initialized:
-            return True
-        
-        try:
-            init_db()
-            _db_initialized = True
-            print("✅ Database initialized successfully")
-            return True
-        except Exception as e:
-            print(f"❌ Database initialization failed: {e}")
-            traceback.print_exc()
-            return False
+
 
 
 
@@ -262,26 +223,10 @@ def init_db():
             )
         ''')
         
-        # ============================================================
-        # NEW: User status table for cross-device online/offline status
-        # ============================================================
-        cur.execute('''
-            CREATE TABLE IF NOT EXISTS user_status (
-                handle TEXT PRIMARY KEY,
-                status VARCHAR(20) DEFAULT 'offline',
-                last_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        ''')
-        
-        # Add indexes for faster lookups
-        cur.execute('CREATE INDEX IF NOT EXISTS idx_user_status_handle ON user_status(handle)')
-        cur.execute('CREATE INDEX IF NOT EXISTS idx_user_status_last_seen ON user_status(last_seen)')
-        
         conn.commit()
         cur.close()
-        release_db_connection(conn)
-        print("✅ Database initialized successfully with sessions table and user_status")
+        conn.close()
+        print("✅ Database initialized successfully with sessions table")
     except Exception as e:
         print(f"❌ Database init error: {e}")
         traceback.print_exc()
@@ -304,13 +249,9 @@ def init_db():
 
 
 
+
 # Initialize database on startup
-# Initialize database on startup (with error handling)
-try:
-    ensure_db_initialized()
-except Exception as e:
-    print(f"⚠️ Database init error (will retry later): {e}")
-    traceback.print_exc()
+init_db()
 
 # ============================================================
 # ZERNIO CONFIGURATION
@@ -1135,46 +1076,6 @@ def download_video_segments_cdn(cid, did, quality='720p', session_string=None):
 @app.route('/')
 def index():
     return send_from_directory('static', 'index.html')
-
-
-
-
-
-
-
-
-
-@app.route('/api/health', methods=['GET'])
-def health_check():
-    """Health check endpoint for Vercel"""
-    try:
-        conn = get_db_connection()
-        if conn:
-            release_db_connection(conn)
-            return jsonify({
-                'status': 'healthy',
-                'database': 'connected',
-                'timestamp': datetime.now().isoformat()
-            })
-        else:
-            return jsonify({
-                'status': 'unhealthy',
-                'database': 'disconnected',
-                'timestamp': datetime.now().isoformat()
-            }), 500
-    except Exception as e:
-        return jsonify({
-            'status': 'error',
-            'error': str(e),
-            'timestamp': datetime.now().isoformat()
-        }), 500
-
-
-
-
-
-
-
 
 
 
@@ -3529,172 +3430,6 @@ else:
         }), 404
     
     print("⚠️ Auto-news routes not registered - module not available")
-
-
-
-
-
-
-
-# ============================================================
-# USER STATUS ROUTES - Cross-device online/offline
-# ============================================================
-
-@app.route('/api/status/update', methods=['POST'])
-def update_user_status():
-    """Update user's online/offline status in database"""
-    data = request.json
-    handle = data.get('handle')
-    status = data.get('status', 'online')
-    
-    if not handle:
-        return jsonify({'success': False, 'error': 'Handle required'}), 400
-    
-    try:
-        conn = get_db_connection()
-        if not conn:
-            return jsonify({'success': False, 'error': 'Database connection failed'}), 500
-        
-        cur = conn.cursor()
-        cur.execute('''
-            INSERT INTO user_status (handle, status, last_seen, updated_at)
-            VALUES (%s, %s, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-            ON CONFLICT (handle) DO UPDATE SET
-                status = EXCLUDED.status,
-                last_seen = CURRENT_TIMESTAMP,
-                updated_at = CURRENT_TIMESTAMP
-        ''', (handle, status))
-        
-        conn.commit()
-        cur.close()
-        conn.close()
-        
-        return jsonify({
-            'success': True,
-            'handle': handle,
-            'status': status,
-            'last_seen': datetime.now().isoformat()
-        })
-    except Exception as e:
-        print(f"❌ Error updating status: {e}")
-        return jsonify({'success': False, 'error': str(e)}), 500
-
-
-@app.route('/api/status/get', methods=['POST'])
-def get_user_status():
-    """Get user's online/offline status from database"""
-    data = request.json
-    handle = data.get('handle')
-    
-    if not handle:
-        return jsonify({'success': False, 'error': 'Handle required'}), 400
-    
-    try:
-        conn = get_db_connection()
-        if not conn:
-            return jsonify({'success': False, 'error': 'Database connection failed'}), 500
-        
-        cur = conn.cursor()
-        cur.execute('''
-            SELECT handle, status, last_seen, updated_at
-            FROM user_status
-            WHERE handle = %s
-        ''', (handle,))
-        
-        row = cur.fetchone()
-        cur.close()
-        conn.close()
-        
-        if not row:
-            return jsonify({
-                'success': True,
-                'handle': handle,
-                'status': 'offline',
-                'last_seen': None,
-                'message': 'No status found for this user'
-            })
-        
-        # Check if status is stale (older than 2 minutes)
-        last_seen = row[2]
-        is_stale = False
-        if last_seen:
-            time_diff = (datetime.now() - last_seen).total_seconds()
-            if time_diff > 120:  # 2 minutes
-                is_stale = True
-                # Auto-correct to offline
-                if row[1] == 'online':
-                    try:
-                        conn = get_db_connection()
-                        if conn:
-                            cur = conn.cursor()
-                            cur.execute('''
-                                UPDATE user_status 
-                                SET status = 'offline', updated_at = CURRENT_TIMESTAMP
-                                WHERE handle = %s
-                            ''', (handle,))
-                            conn.commit()
-                            cur.close()
-                            conn.close()
-                    except:
-                        pass
-        
-        return jsonify({
-            'success': True,
-            'handle': row[0],
-            'status': 'offline' if is_stale else row[1],
-            'last_seen': last_seen.isoformat() if last_seen else None,
-            'is_stale': is_stale
-        })
-    except Exception as e:
-        print(f"❌ Error getting status: {e}")
-        return jsonify({'success': False, 'error': str(e)}), 500
-
-
-@app.route('/api/status/heartbeat', methods=['POST'])
-def status_heartbeat():
-    """Keep user's status alive (call every 30-60 seconds)"""
-    data = request.json
-    handle = data.get('handle')
-    
-    if not handle:
-        return jsonify({'success': False, 'error': 'Handle required'}), 400
-    
-    try:
-        conn = get_db_connection()
-        if not conn:
-            return jsonify({'success': False, 'error': 'Database connection failed'}), 500
-        
-        cur = conn.cursor()
-        cur.execute('''
-            UPDATE user_status 
-            SET last_seen = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
-            WHERE handle = %s
-        ''', (handle,))
-        
-        # If no row updated, insert new row
-        if cur.rowcount == 0:
-            cur.execute('''
-                INSERT INTO user_status (handle, status, last_seen, updated_at)
-                VALUES (%s, 'online', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-            ''', (handle,))
-        
-        conn.commit()
-        cur.close()
-        conn.close()
-        
-        return jsonify({
-            'success': True,
-            'handle': handle,
-            'status': 'online',
-            'message': 'Heartbeat received'
-        })
-    except Exception as e:
-        print(f"❌ Error sending heartbeat: {e}")
-        return jsonify({'success': False, 'error': str(e)}), 500
-
-
-
-
 
 
 
