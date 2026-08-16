@@ -3509,59 +3509,100 @@ $('logoutBtn').addEventListener('click', async function() {
 
 
 
-
-
 function setOnline(userData) {
+    console.log('🟢 Setting online status for:', userData);
+    
     // Main sidebar
-    $('statusDot').className = 'dot online';
-    $('accountStatus').textContent = 'Online';
-    $('accountName').textContent = userData.display_name || userData.handle || 'Bluesky Vault';
-    if (userData.avatar) {
-        const box = $('avatarBox');
-        box.innerHTML = `<img src="${userData.avatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+    const statusDot = document.getElementById('statusDot');
+    const accountStatus = document.getElementById('accountStatus');
+    const accountName = document.getElementById('accountName');
+    const avatarBox = document.getElementById('avatarBox');
+    
+    if (statusDot) statusDot.className = 'dot online';
+    if (accountStatus) accountStatus.textContent = 'Online';
+    if (accountName) accountName.textContent = userData.display_name || userData.handle || 'Bluesky Vault';
+    
+    if (userData.avatar && avatarBox) {
+        avatarBox.innerHTML = `<img src="${userData.avatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+    } else if (avatarBox) {
+        avatarBox.textContent = (userData.display_name || userData.handle || 'V')[0].toUpperCase();
+        avatarBox.style.background = 'var(--accent)';
+        avatarBox.style.display = 'flex';
+        avatarBox.style.alignItems = 'center';
+        avatarBox.style.justifyContent = 'center';
+        avatarBox.style.color = '#fff';
+        avatarBox.style.fontWeight = '700';
+        avatarBox.style.fontSize = '14px';
     }
     
-    // ============================================================
-    // MOBILE SIDEBAR - UPDATE STATUS
-    // ============================================================
+    // Mobile sidebar
     const statusDotMobile = document.getElementById('statusDotMobile');
     const accountStatusMobile = document.getElementById('accountStatusMobile');
     const accountNameMobile = document.getElementById('accountNameMobile');
     const avatarBoxMobile = document.getElementById('avatarBoxMobile');
     
-    if (statusDotMobile) {
-        statusDotMobile.className = 'dot online';
-    }
-    if (accountStatusMobile) {
-        accountStatusMobile.textContent = 'Online';
-    }
-    if (accountNameMobile) {
-        accountNameMobile.textContent = userData.display_name || userData.handle || 'Bluesky Vault';
-    }
-    if (avatarBoxMobile) {
-        if (userData.avatar) {
-            avatarBoxMobile.innerHTML = `<img src="${userData.avatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
-        } else {
-            avatarBoxMobile.textContent = (userData.display_name || userData.handle || 'V')[0].toUpperCase();
-            avatarBoxMobile.style.background = 'var(--accent)';
-            avatarBoxMobile.style.display = 'flex';
-            avatarBoxMobile.style.alignItems = 'center';
-            avatarBoxMobile.style.justifyContent = 'center';
-            avatarBoxMobile.style.color = '#fff';
-            avatarBoxMobile.style.fontWeight = '700';
-            avatarBoxMobile.style.fontSize = '14px';
-        }
+    if (statusDotMobile) statusDotMobile.className = 'dot online';
+    if (accountStatusMobile) accountStatusMobile.textContent = 'Online';
+    if (accountNameMobile) accountNameMobile.textContent = userData.display_name || userData.handle || 'Bluesky Vault';
+    
+    if (userData.avatar && avatarBoxMobile) {
+        avatarBoxMobile.innerHTML = `<img src="${userData.avatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+    } else if (avatarBoxMobile) {
+        avatarBoxMobile.textContent = (userData.display_name || userData.handle || 'V')[0].toUpperCase();
+        avatarBoxMobile.style.background = 'var(--accent)';
+        avatarBoxMobile.style.display = 'flex';
+        avatarBoxMobile.style.alignItems = 'center';
+        avatarBoxMobile.style.justifyContent = 'center';
+        avatarBoxMobile.style.color = '#fff';
+        avatarBoxMobile.style.fontWeight = '700';
+        avatarBoxMobile.style.fontSize = '14px';
     }
     
     // UI updates
-    $('loginBtn').style.display = 'none';
-    $('logoutBtn').style.display = 'inline-block';
-    $('fetchBtn').disabled = !handlers.some(h => h.selected);
-    updateActiveHandlersBanner && updateActiveHandlersBanner();
-    saveToStorage('session_id', sessionId);
-    saveToStorage('username', $('username').value.trim());
-    saveToStorage('user_data', userData);
+    const loginBtn = document.getElementById('loginBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const fetchBtn = document.getElementById('fetchBtn');
+    
+    if (loginBtn) loginBtn.style.display = 'none';
+    if (logoutBtn) logoutBtn.style.display = 'inline-block';
+    if (fetchBtn) fetchBtn.disabled = !handlers.some(h => h.selected);
+    
+    if (typeof updateActiveHandlersBanner === 'function') updateActiveHandlersBanner();
+    
+    // ✅ SAVE SESSION DATA TO LOCALSTORAGE - THIS IS CRITICAL!
+    try {
+        if (sessionId) {
+            localStorage.setItem('bvault_session_id', sessionId);
+        }
+        if (userData && userData.handle) {
+            localStorage.setItem('bvault_handle', userData.handle);
+        }
+        if (userData && userData.display_name) {
+            localStorage.setItem('bvault_display_name', userData.display_name);
+        }
+        if (userData && userData.avatar) {
+            localStorage.setItem('bvault_avatar', userData.avatar);
+        }
+        saveToStorage('session_id', sessionId);
+        saveToStorage('username', document.getElementById('username')?.value?.trim() || '');
+        saveToStorage('user_data', userData);
+        console.log('💾 Session data saved to localStorage');
+    } catch (e) {
+        console.warn('Could not save session data:', e);
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 function setOffline() {
     // Main sidebar
@@ -7153,12 +7194,56 @@ window.runAutoNewsNow = async function() {
 // Try to restore session from database using JUST the handle (cross-device)
 async function restorePersistentSession() {
     const savedHandle = localStorage.getItem('bvault_handle');
+    const savedSessionId = localStorage.getItem('bvault_session_id');
     const savedUsername = localStorage.getItem('bvault_username');
     
-    // If we have a handle saved, try to restore from database
+    console.log('🔍 Attempting to restore session...');
+    console.log('   Saved handle:', savedHandle);
+    console.log('   Saved session ID:', savedSessionId);
+    
+    // FIRST: Try to restore using session_id from localStorage
+    if (savedSessionId) {
+        try {
+            console.log('📌 Trying to verify existing session_id...');
+            const res = await fetch(`${API_BASE}/api/verify-session`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ session_id: savedSessionId })
+            });
+            const data = await res.json();
+            
+            if (data.success && data.valid) {
+                sessionId = savedSessionId;
+                setOnline({
+                    handle: data.handle,
+                    display_name: data.display_name || data.handle,
+                    avatar: data.avatar
+                });
+                console.log(`✅ Session verified from session_id: ${sessionId}`);
+                
+                // Make sure we have the handle saved
+                if (data.handle) {
+                    localStorage.setItem('bvault_handle', data.handle);
+                }
+                
+                // Load data after session restore
+                await loadSavedHandlers();
+                await loadVault();
+                await loadScheduled();
+                
+                toast('🔄 Session restored! Welcome back.', 'success');
+                return true;
+            } else {
+                console.log('⚠️ Session ID invalid, trying handle...');
+            }
+        } catch (e) {
+            console.warn('Session verification failed:', e);
+        }
+    }
+    
+    // SECOND: Try to restore using handle from database (cross-device)
     if (savedHandle) {
-        console.log(`🔍 Attempting to restore session for @${savedHandle} from database (cross-device)...`);
-        
+        console.log(`📌 Trying to restore using handle: ${savedHandle}`);
         try {
             const res = await fetch(`${API_BASE}/api/restore-session-by-handle`, {
                 method: 'POST',
@@ -7194,24 +7279,20 @@ async function restorePersistentSession() {
                 
                 toast('🔄 Session restored! Welcome back.', 'success');
                 return true;
+            } else {
+                console.log('⚠️ No valid session found in database for this handle');
             }
-            
-            console.log('⚠️ No valid session found in database for this handle');
-            return false;
-            
         } catch (e) {
-            console.warn('Could not restore session:', e);
-            return false;
+            console.warn('Could not restore session from handle:', e);
         }
     }
     
-    // If no handle saved, try to get from username input
+    // THIRD: Try to get handle from username input field
     const usernameInput = document.getElementById('username');
     if (usernameInput && usernameInput.value) {
         const handle = usernameInput.value.trim();
         if (handle) {
-            // Try to restore using the username from the input field
-            console.log(`🔍 Attempting to restore session for @${handle} from username field...`);
+            console.log(`📌 Trying to restore using username field: ${handle}`);
             try {
                 const res = await fetch(`${API_BASE}/api/restore-session-by-handle`, {
                     method: 'POST',
@@ -7228,7 +7309,6 @@ async function restorePersistentSession() {
                         avatar: data.avatar
                     });
                     
-                    // Save for next time
                     localStorage.setItem('bvault_session_id', sessionId);
                     localStorage.setItem('bvault_handle', data.handle);
                     localStorage.setItem('bvault_username', handle);
@@ -7251,9 +7331,29 @@ async function restorePersistentSession() {
         }
     }
     
-    console.log('No saved handle found, cannot restore cross-device session');
+    console.log('❌ No valid session found');
     return false;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // Check session from database OR memory
 async function verifySession(sessionId) {
@@ -7281,28 +7381,15 @@ async function verifySession(sessionId) {
 // ==============================
 // INIT
 // ==============================
+
+
 async function initializeApp() {
     console.log('🦋 Bluesky Vault Scheduler loading...');
     console.log(`   Time: ${new Date().toLocaleString()}`);
+    console.log(`   API_BASE: ${API_BASE || '(empty)'}`);
     
     loadRemovedUris();
-    
     loadAutoNewsActivities();
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     // Load handlers from storage
     const savedHandlers = getFromStorage('handlers');
@@ -7341,6 +7428,7 @@ async function initializeApp() {
         loadPostNowAccounts();
         
         console.log('✅ App fully initialized with restored session');
+        toast('🔄 Session restored! Welcome back.', 'success');
         return;
     }
     
@@ -7351,8 +7439,8 @@ async function initializeApp() {
     
     if (savedSessionId && savedUsername) {
         console.log(`   Found saved session in localStorage: ${savedSessionId}`);
-        $('username').value = savedUsername;
-        $('accountStatus').textContent = 'Verifying...';
+        document.getElementById('username').value = savedUsername;
+        document.getElementById('accountStatus').textContent = 'Verifying...';
         
         try {
             const data = await verifySession(savedSessionId);
@@ -7419,7 +7507,6 @@ async function initializeApp() {
 
     console.log('✅ App initialized (offline mode)');
 }
-
 
 
 
