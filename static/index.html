@@ -215,6 +215,22 @@ html, body {
         .btn .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.6s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
+
+
+        /* Auto-refresh spin animation */
+        @keyframes spin-icon {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .fa-sync-alt.spinning {
+            animation: spin-icon 0.8s ease-in-out;
+        }
+
+
+
+
+
+
         .form-group { margin-bottom: 16px; }
         .form-group label { display: block; font-size: 13px; font-weight: 500; color: var(--text-secondary); margin-bottom: 6px; }
         .form-group label i { color: var(--accent); margin-right: 8px; }
@@ -1834,7 +1850,40 @@ html, body {
 
 
 
+/* Account chips with profile images */
+.account-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 40px;
+    border: 2px solid var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    transition: var(--transition);
+    font-family: 'Inter', sans-serif;
+}
 
+.account-chip img {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.account-chip:hover {
+    border-color: var(--text-secondary);
+    color: var(--text);
+}
+
+.account-chip.selected {
+    border-color: #e1306c;
+    background: rgba(225, 48, 108, 0.15);
+    color: #f77737;
+}
 
 
 
@@ -2056,6 +2105,44 @@ html, body {
             <div class="stat"><div class="number" id="statFetched">0</div><div class="label">Fetched</div></div>
             <div class="stat"><div class="number" id="statHandlers">0</div><div class="label">Handlers</div></div>
         </div>
+
+
+
+
+
+
+
+
+
+
+        <!-- AUTO-REFRESH CONTROLS -->
+        <div class="card" style="padding:12px 20px; display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:0;">
+            <div style="display:flex; align-items:center; gap:8px;">
+                <i class="fas fa-sync-alt" style="color:var(--accent);"></i>
+                <span style="font-size:13px; color:var(--text-secondary);">Auto-refresh:</span>
+                <span id="autoRefreshStatus" style="font-size:12px; font-weight:600; color:var(--success);">ON (30s)</span>
+            </div>
+            <button class="btn btn-sm btn-secondary" onclick="toggleAutoRefresh()">
+                <i class="fas fa-pause"></i> Toggle
+            </button>
+            <button class="btn btn-sm btn-secondary" onclick="refreshDashboard()">
+                <i class="fas fa-rotate"></i> Refresh Now
+            </button>
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         <!-- LOGIN -->
         <div class="card" style="padding:20px 24px;">
@@ -2478,14 +2565,23 @@ html, body {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
 <!-- POST NOW PAGE -->
 <section id="page-postnow" style="display:none;" class="card">
     <div class="card-header">
-        <h2><i class="fas fa-rocket" style="color:var(--warning);"></i> Post Now</h2>
+        <h2><i class="fas fa-rocket" style="color:var(--accent);"></i> Post Now</h2>
         <div class="card-actions">
-            <span style="font-size:12px;color:var(--text-muted);">
-                ⚡ Keyboard shortcut: <kbd style="background:var(--bg);padding:2px 8px;border-radius:4px;border:1px solid var(--border);">Ctrl+Shift+P</kbd>
-            </span>
+            <span style="font-size:12px;color:var(--text-muted);"></span>
         </div>
     </div>
 
@@ -2518,10 +2614,7 @@ html, body {
     </div>
 
     <!-- Vault Selection -->
-
-
-
-<div id="postNowPageVaultSection">
+    <div id="postNowPageVaultSection">
         <div class="form-group">
             <label><i class="fas fa-archive"></i> Select from Vault</label>
             <div style="display:flex;gap:8px;margin-bottom:8px;">
@@ -2530,10 +2623,6 @@ html, body {
                 <span style="margin-left:auto;font-size:12px;color:var(--text-muted);align-self:center;"><span id="postNowPageSelCount">0</span> selected</span>
             </div>
             <div style="max-height:300px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);">
-
-
-
-
                 <div id="postNowPageVaultList">
                     <div class="empty" style="padding:20px;"><i class="fas fa-archive"></i><p>Loading vault items…</p></div>
                 </div>
@@ -2595,8 +2684,6 @@ html, body {
     </div>
     <div id="postNowPageStatus" style="margin-top:14px;font-size:13px;color:var(--text-muted);"></div>
 </section>
-
-
 
 
 
@@ -5215,13 +5302,55 @@ function renderPostNowPageAccounts() {
     
     el.innerHTML = postNowAccounts.map(a => {
         const sel = selectedPostNowPageAccountId === a.account_id ? 'selected' : '';
-        const icon = a.account_type === 'serpent' ? '🐍' : a.account_type === 'easternfront' ? '🌅' : '📸';
-        return `<button type="button" class="account-chip ${sel}" onclick="selectPostNowPageAccount('${a.account_id}')">${icon} ${escapeHtml(a.label)}</button>`;
+        const avatar = a.profile_picture ? 
+            `<img src="${a.profile_picture}" style="width:20px;height:20px;border-radius:50%;object-fit:cover;margin-right:4px;">` : 
+            `<i class="fas fa-user" style="margin-right:4px;font-size:12px;"></i>`;
+        return `<button type="button" class="account-chip ${sel}" onclick="selectPostNowPageAccount('${a.account_id}')">${avatar} ${escapeHtml(a.label)}</button>`;
     }).join('');
 }
 
+function renderPostNowAccounts() {
+    const el = document.getElementById('postNowAccountChips');
+    if (!el) return;
+    if (!postNowAccounts.length) {
+        el.innerHTML = '<span class="hint" style="color:var(--error);">No Instagram accounts found. Connect in Zernio.</span>';
+        return;
+    }
+    if (!selectedPostNowAccountId && postNowAccounts.length) {
+        const preferred = postNowAccounts.find(a => a.account_type === 'serpent' || a.account_type === 'easternfront');
+        selectedPostNowAccountId = preferred ? preferred.account_id : postNowAccounts[0].account_id;
+    }
+    el.innerHTML = postNowAccounts.map(a => {
+        const sel = selectedPostNowAccountId === a.account_id ? 'selected' : '';
+        const avatar = a.profile_picture ? 
+            `<img src="${a.profile_picture}" style="width:20px;height:20px;border-radius:50%;object-fit:cover;margin-right:4px;">` : 
+            `<i class="fas fa-user" style="margin-right:4px;font-size:12px;"></i>`;
+        return `<button type="button" class="account-chip ${sel}" onclick="selectPostNowAccount('${a.account_id}')">${avatar} ${escapeHtml(a.label)}</button>`;
+    }).join('');
+}
 
-
+// Also update the Auto News account chips
+function renderAutoNewsIgChips() {
+    const el = $('autoNewsIgChips');
+    if (!el) return;
+    if (!igAccounts.length) {
+        el.innerHTML = '<span class="hint">No IG accounts — connect in Zernio</span>';
+        return;
+    }
+    if (!selectedAutoNewsAccountId && igAccounts.length) {
+        selectedAutoNewsAccountId = igAccounts[0].account_id;
+    }
+    // Check if we have profile pictures from the postNowAccounts
+    el.innerHTML = igAccounts.map(a => {
+        const sel = selectedAutoNewsAccountId === a.account_id ? 'selected' : '';
+        // Try to get profile picture from postNowAccounts
+        const account = postNowAccounts.find(p => p.account_id === a.account_id);
+        const avatar = account && account.profile_picture ? 
+            `<img src="${account.profile_picture}" style="width:18px;height:18px;border-radius:50%;object-fit:cover;margin-right:4px;">` : 
+            `<i class="fas fa-user" style="margin-right:4px;font-size:11px;"></i>`;
+        return `<button type="button" class="account-chip ${sel}" onclick="selectAutoNewsAccount('${a.account_id}')">${avatar} @${escapeHtml(a.label)}</button>`;
+    }).join('');
+}
 
 
 
@@ -5819,6 +5948,14 @@ function updateAutoNewsButtons(running) {
 
 
 
+
+
+
+
+
+// ==============================
+// START LOOP - Enables config and starts the scheduler
+// ==============================
 // ==============================
 // START LOOP - Enables config and starts the scheduler
 // ==============================
@@ -5847,14 +5984,54 @@ async function startAutoNewsLoop() {
         
         // Get Bluesky credentials
         const bskyHandle = ($('autoNewsBskyHandle') && $('autoNewsBskyHandle').value) || '';
-        const bskyPass = ($('autoNewsBskyPass') && $('autoNewsBskyPass').value) || null;
+        let bskyPass = ($('autoNewsBskyPass') && $('autoNewsBskyPass').value) || null;
         
         if (!bskyHandle) {
             toast('❌ Please enter your Bluesky handle (for login)', 'error');
             return;
         }
         
-        // Save config with enabled: TRUE
+        // ============================================================
+        // HANDLE PASSWORD - Check localStorage FIRST
+        // ============================================================
+        if (bskyPass === '********' || !bskyPass) {
+            // Try localStorage first
+            const savedPass = localStorage.getItem('autoNews_saved_password');
+            if (savedPass) {
+                bskyPass = savedPass;
+                console.log('✅ Using password from localStorage');
+            } else {
+                // Try to load from config
+                try {
+                    const configRes = await fetch(`${API_BASE}/api/auto-news/config?name=default`);
+                    const configData = await configRes.json();
+                    const existingConfig = configData.config;
+                    if (existingConfig && existingConfig.bluesky_app_password && existingConfig.bluesky_app_password !== '********') {
+                        bskyPass = existingConfig.bluesky_app_password;
+                        // Save to localStorage for next time
+                        localStorage.setItem('autoNews_saved_password', bskyPass);
+                        console.log('✅ Using saved Bluesky password from config');
+                    } else {
+                        toast('❌ No saved password found. Please enter your Bluesky app password.', 'error');
+                        return;
+                    }
+                } catch (e) {
+                    toast('❌ Could not retrieve saved password. Please re-enter it.', 'error');
+                    return;
+                }
+            }
+        }
+        
+        // Validate password
+        if (!bskyPass || bskyPass === '********') {
+            toast('❌ Please enter your Bluesky app password', 'error');
+            return;
+        }
+        
+        // Save password to localStorage
+        localStorage.setItem('autoNews_saved_password', bskyPass);
+        
+        // Save config with enabled: TRUE (password will be saved)
         const saveRes = await fetch(`${API_BASE}/api/auto-news/config`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -5923,6 +6100,18 @@ async function stopAutoNewsLoop() {
     }
     
     try {
+        // Get current config to preserve password
+        let currentPassword = null;
+        try {
+            const configRes = await fetch(`${API_BASE}/api/auto-news/config?name=default`);
+            const configData = await configRes.json();
+            if (configData.config && configData.config.bluesky_app_password) {
+                currentPassword = configData.config.bluesky_app_password;
+            }
+        } catch (e) {
+            console.warn('Could not fetch current config for password:', e);
+        }
+        
         // First, disable the config by saving with enabled: FALSE
         const configRes = await fetch(`${API_BASE}/api/auto-news/config`, {
             method: 'POST',
@@ -5940,7 +6129,8 @@ async function stopAutoNewsLoop() {
                 include_replies: !!document.getElementById('autoNewsReplies')?.checked,
                 caption_template: document.getElementById('autoNewsCaption')?.value || '{text}',
                 bluesky_handle: document.getElementById('autoNewsBskyHandle')?.value || '',
-                bluesky_app_password: null  // Don't overwrite password
+                // Preserve the password when disabling
+                bluesky_app_password: currentPassword
             })
         });
         
@@ -5982,6 +6172,33 @@ async function stopAutoNewsLoop() {
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // Fast poll (5s) while the Auto News page is open, slow poll (20s) everywhere else
 function startAutoNewsStatusPolling(fast) {
@@ -6123,88 +6340,224 @@ function toggleAutoNewsRunning() {
         renderAutoNewsIgChips();
     };
 
-    window.loadAutoNewsConfig = async function() {
-        const status = $('autoNewsStatus');
-        try {
-            const res = await fetch(`${API_BASE}/api/auto-news/config?name=default`);
-            const data = await res.json();
-            const c = data.config;
-            if (!c) {
-                if (status) status.textContent = 'No config saved — fill form and Save.';
-                const u = $('username');
-                if (u && u.value && $('autoNewsBskyHandle') && !$('autoNewsBskyHandle').value) {
-                    $('autoNewsBskyHandle').value = u.value.trim();
-                }
-                return;
-            }
-            if (c.enabled) { const on = $('autoNewsEnabledOn'); if (on) on.checked = true; }
-            else { const off = $('autoNewsEnabledOff'); if (off) off.checked = true; }
-            if ($('autoNewsHandler')) $('autoNewsHandler').value = c.handler_handle || '';
-            if ($('autoNewsInterval')) $('autoNewsInterval').value = c.poll_interval_sec || 300;
-            if ($('autoNewsMediaOnly')) $('autoNewsMediaOnly').checked = !!c.media_only;
-            if ($('autoNewsReposts')) $('autoNewsReposts').checked = !!c.include_reposts;
-            if ($('autoNewsReplies')) $('autoNewsReplies').checked = !!c.include_replies;
-            if ($('autoNewsCaption')) $('autoNewsCaption').value = c.caption_template || '{text}';
-            if ($('autoNewsBskyHandle')) $('autoNewsBskyHandle').value = c.bluesky_handle || ($('username') && $('username').value) || '';
-            if (c.account_id) {
-                selectedAutoNewsAccountId = c.account_id;
-                renderAutoNewsIgChips();
-            }
-            const ct = c.content_type || 'feed';
-            document.querySelectorAll('input[name="autoNewsContentType"]').forEach(r => { r.checked = r.value === ct; });
-            let msg = c.enabled ? '🟢 Enabled' : '⚪ Disabled';
-            if (c.last_run_at) msg += ' · last run ' + c.last_run_at;
-            if (c.last_error) msg += ' · last error: ' + c.last_error;
-            if (status) status.textContent = msg;
-        } catch (e) {
-            if (status) status.textContent = 'Could not load config: ' + e.message;
-        }
-    };
 
-    window.saveAutoNewsConfig = async function() {
-        const handler = ($('autoNewsHandler') && $('autoNewsHandler').value || '').trim().replace(/^@/, '');
-        if (!handler) { toast('Enter a news handler', 'error'); return false; }
-        if (!selectedAutoNewsAccountId) { toast('Select an Instagram account', 'error'); return false; }
-        const enabled = document.querySelector('input[name="autoNewsEnabled"]:checked')?.value === '1';
-        const contentType = document.querySelector('input[name="autoNewsContentType"]:checked')?.value || 'feed';
-        const payload = {
-            name: 'default',
-            enabled,
-            handler_handle: handler.includes('.') ? handler : handler + '.bsky.social',
-            account_id: selectedAutoNewsAccountId,
-            platform: 'instagram',
-            content_type: contentType,
-            poll_interval_sec: parseInt($('autoNewsInterval') && $('autoNewsInterval').value) || 300,
-            media_only: !!($('autoNewsMediaOnly') && $('autoNewsMediaOnly').checked),
-            include_reposts: !!($('autoNewsReposts') && $('autoNewsReposts').checked),
-            include_replies: !!($('autoNewsReplies') && $('autoNewsReplies').checked),
-            caption_template: ($('autoNewsCaption') && $('autoNewsCaption').value) || '{text}',
-            bluesky_handle: (($('autoNewsBskyHandle') && $('autoNewsBskyHandle').value) || '').trim() || null,
-            bluesky_app_password: (($('autoNewsBskyPass') && $('autoNewsBskyPass').value) || '').trim() || null
-        };
-        const btn = $('autoNewsSaveBtn');
-        if (btn) { btn.disabled = true; btn.innerHTML = 'Saving…'; }
-        try {
-            const res = await fetch(`${API_BASE}/api/auto-news/config`, {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-            const data = await res.json();
-            if (data.success) {
-                toast('✅ Config saved', 'success');
-                if ($('autoNewsBskyPass')) $('autoNewsBskyPass').value = '';
-                await loadAutoNewsConfig();
-                return true;
+
+
+
+
+
+
+
+
+
+
+
+
+window.loadAutoNewsConfig = async function() {
+    const status = $('autoNewsStatus');
+    try {
+        const res = await fetch(`${API_BASE}/api/auto-news/config?name=default`);
+        const data = await res.json();
+        const c = data.config;
+        if (!c) {
+            if (status) status.textContent = 'No config saved — fill form and Save.';
+            const u = $('username');
+            if (u && u.value && $('autoNewsBskyHandle') && !$('autoNewsBskyHandle').value) {
+                $('autoNewsBskyHandle').value = u.value.trim();
             }
-            toast('❌ ' + (data.error || 'Save failed'), 'error');
-            return false;
-        } catch (e) {
-            toast('❌ ' + e.message, 'error');
-            return false;
-        } finally {
-            if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-save"></i> Save config'; }
+            if ($('autoNewsBskyPass')) {
+                $('autoNewsBskyPass').value = '';
+                $('autoNewsBskyPass').dataset.hasPassword = 'false';
+            }
+            // Clear stored password
+            localStorage.removeItem('autoNews_saved_password');
+            return;
         }
+        
+        // Handle Enabled/Disabled toggle
+        if (c.enabled) { const on = $('autoNewsEnabledOn'); if (on) on.checked = true; }
+        else { const off = $('autoNewsEnabledOff'); if (off) off.checked = true; }
+        
+        // Fill form fields
+        if ($('autoNewsHandler')) $('autoNewsHandler').value = c.handler_handle || '';
+        if ($('autoNewsInterval')) $('autoNewsInterval').value = c.poll_interval_sec || 300;
+        if ($('autoNewsMediaOnly')) $('autoNewsMediaOnly').checked = !!c.media_only;
+        if ($('autoNewsReposts')) $('autoNewsReposts').checked = !!c.include_reposts;
+        if ($('autoNewsReplies')) $('autoNewsReplies').checked = !!c.include_replies;
+        if ($('autoNewsCaption')) $('autoNewsCaption').value = c.caption_template || '{text}';
+        if ($('autoNewsBskyHandle')) $('autoNewsBskyHandle').value = c.bluesky_handle || ($('username') && $('username').value) || '';
+        
+        // ============================================================
+        // HANDLE PASSWORD - Store in localStorage for persistence across refreshes
+        // ============================================================
+        if ($('autoNewsBskyPass')) {
+            if (c.bluesky_app_password && c.bluesky_app_password !== '********') {
+                // Password exists in database - store it in localStorage
+                localStorage.setItem('autoNews_saved_password', c.bluesky_app_password);
+                // Show masked
+                $('autoNewsBskyPass').value = '********';
+                $('autoNewsBskyPass').dataset.hasPassword = 'true';
+                $('autoNewsBskyPass').placeholder = 'Password saved (********)';
+                console.log('✅ Auto-news password loaded from database');
+            } else {
+                // Check if we have a saved password in localStorage
+                const savedPass = localStorage.getItem('autoNews_saved_password');
+                if (savedPass) {
+                    $('autoNewsBskyPass').value = '********';
+                    $('autoNewsBskyPass').dataset.hasPassword = 'true';
+                    $('autoNewsBskyPass').placeholder = 'Password saved (********)';
+                    console.log('✅ Auto-news password loaded from localStorage');
+                } else {
+                    $('autoNewsBskyPass').value = '';
+                    $('autoNewsBskyPass').dataset.hasPassword = 'false';
+                    $('autoNewsBskyPass').placeholder = 'xxxx-xxxx-xxxx-xxxx';
+                }
+            }
+        }
+        
+        // Handle account selection
+        if (c.account_id) {
+            selectedAutoNewsAccountId = c.account_id;
+            renderAutoNewsIgChips();
+        }
+        
+        // Handle content type
+        const ct = c.content_type || 'feed';
+        document.querySelectorAll('input[name="autoNewsContentType"]').forEach(r => { r.checked = r.value === ct; });
+        
+        // Update status message
+        let msg = c.enabled ? '🟢 Enabled' : '⚪ Disabled';
+        if (c.last_run_at) msg += ' · last run ' + c.last_run_at;
+        if (c.last_error) msg += ' · last error: ' + c.last_error;
+        if (status) status.textContent = msg;
+        
+        // Store that we have a valid config loaded
+        window._autoNewsConfigLoaded = true;
+        
+    } catch (e) {
+        if (status) status.textContent = 'Could not load config: ' + e.message;
+        console.warn('loadAutoNewsConfig error:', e);
+    }
+};
+
+
+
+
+
+
+
+
+window.saveAutoNewsConfig = async function() {
+    const handler = ($('autoNewsHandler') && $('autoNewsHandler').value || '').trim().replace(/^@/, '');
+    if (!handler) { toast('Enter a news handler', 'error'); return false; }
+    if (!selectedAutoNewsAccountId) { toast('Select an Instagram account', 'error'); return false; }
+    
+    const enabled = document.querySelector('input[name="autoNewsEnabled"]:checked')?.value === '1';
+    const contentType = document.querySelector('input[name="autoNewsContentType"]:checked')?.value || 'feed';
+    
+    // ============================================================
+    // HANDLE PASSWORD - Check localStorage for saved password
+    // ============================================================
+    let password = ($('autoNewsBskyPass') && $('autoNewsBskyPass').value) || null;
+    
+    // If the password is '********' (masked), try to get from localStorage
+    if (password === '********') {
+        const savedPass = localStorage.getItem('autoNews_saved_password');
+        if (savedPass) {
+            password = savedPass;
+            console.log('✅ Using password from localStorage');
+        } else {
+            // Try to get from config
+            try {
+                const configRes = await fetch(`${API_BASE}/api/auto-news/config?name=default`);
+                const configData = await configRes.json();
+                if (configData.config && configData.config.bluesky_app_password) {
+                    password = configData.config.bluesky_app_password;
+                    console.log('✅ Using password from database');
+                }
+            } catch (e) {
+                console.warn('Could not fetch password from config:', e);
+            }
+        }
+    }
+    
+    // If we have a valid password, save it to localStorage
+    if (password && password !== '********') {
+        localStorage.setItem('autoNews_saved_password', password);
+    }
+    
+    const payload = {
+        name: 'default',
+        enabled,
+        handler_handle: handler.includes('.') ? handler : handler + '.bsky.social',
+        account_id: selectedAutoNewsAccountId,
+        platform: 'instagram',
+        content_type: contentType,
+        poll_interval_sec: parseInt($('autoNewsInterval') && $('autoNewsInterval').value) || 300,
+        media_only: !!($('autoNewsMediaOnly') && $('autoNewsMediaOnly').checked),
+        include_reposts: !!($('autoNewsReposts') && $('autoNewsReposts').checked),
+        include_replies: !!($('autoNewsReplies') && $('autoNewsReplies').checked),
+        caption_template: ($('autoNewsCaption') && $('autoNewsCaption').value) || '{text}',
+        bluesky_handle: (($('autoNewsBskyHandle') && $('autoNewsBskyHandle').value) || '').trim() || null,
+        bluesky_app_password: password
     };
+    
+    const btn = $('autoNewsSaveBtn');
+    if (btn) { btn.disabled = true; btn.innerHTML = 'Saving…'; }
+    try {
+        const res = await fetch(`${API_BASE}/api/auto-news/config`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.success) {
+            toast('✅ Config saved', 'success');
+            // If password was saved, show masked version
+            if ($('autoNewsBskyPass') && password) {
+                $('autoNewsBskyPass').value = '********';
+                $('autoNewsBskyPass').dataset.hasPassword = 'true';
+                $('autoNewsBskyPass').placeholder = 'Password saved (********)';
+            }
+            await loadAutoNewsConfig();
+            return true;
+        }
+        toast('❌ ' + (data.error || 'Save failed'), 'error');
+        return false;
+    } catch (e) {
+        toast('❌ ' + e.message, 'error');
+        return false;
+    } finally {
+        if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-save"></i> Save config'; }
+    }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     window.runAutoNewsNow = async function() {
         const btn = $('autoNewsRunBtn');
@@ -6298,6 +6651,18 @@ function toggleAutoNewsRunning() {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+    
 
 
 
@@ -6561,10 +6926,151 @@ async function initializeApp() {
     console.log('✅ App initialized (offline mode)');
 }
 
+
+
+
+
+
+
+
+
+
+
+// ==============================
+// AUTO-REFRESH DASHBOARD
+// ==============================
+
+let autoRefreshInterval = null;
+let autoRefreshIntervalMs = 30000;
+
+function startAutoRefresh(intervalMs = 30000) {
+    stopAutoRefresh();
+    autoRefreshIntervalMs = intervalMs;
+    console.log(`🔄 Auto-refresh started (every ${intervalMs/1000}s)`);
+    
+    // Update status display
+    const statusEl = document.getElementById('autoRefreshStatus');
+    if (statusEl) {
+        statusEl.textContent = `ON (${intervalMs/1000}s)`;
+        statusEl.style.color = 'var(--success)';
+    }
+    
+    refreshDashboard();
+    autoRefreshInterval = setInterval(refreshDashboard, intervalMs);
+}
+
+function stopAutoRefresh() {
+    if (autoRefreshInterval) {
+        clearInterval(autoRefreshInterval);
+        autoRefreshInterval = null;
+        console.log('⏹ Auto-refresh stopped');
+        
+        const statusEl = document.getElementById('autoRefreshStatus');
+        if (statusEl) {
+            statusEl.textContent = 'OFF';
+            statusEl.style.color = 'var(--error)';
+        }
+    }
+}
+
+async function refreshDashboard() {
+    // Show refresh animation
+    const icon = document.querySelector('.fa-sync-alt');
+    if (icon) {
+        icon.classList.add('spinning');
+        setTimeout(() => { icon.classList.remove('spinning'); }, 800);
+    }
+    
+    console.log('🔄 Refreshing dashboard...');
+    
+    try {
+        // Get current page
+        const activePage = document.querySelector('.nav a.active, .mobile-nav-bar a.active, .carousel-scroll a.active');
+        let page = 'fetch';
+        if (activePage) {
+            page = activePage.dataset.page || 'fetch';
+        }
+        
+        // Refresh data based on current page
+        switch(page) {
+            case 'scheduled':
+                await loadScheduled();
+                break;
+            case 'vault':
+                await loadVault();
+                break;
+            case 'fetch':
+                if (sessionId && handlers.length > 0) {
+                    renderHandlers();
+                    loadHandlersFromServer();
+                }
+                break;
+            case 'autonews':
+                await loadAutoNewsConfig();
+                await loadAutoNewsSeen();
+                await fetchAutoNewsEngineStatus();
+                break;
+            case 'postnow':
+                if (!postNowAccounts.length) {
+                    await loadPostNowAccounts();
+                }
+                renderPostNowPageAccounts();
+                renderPostNowPageVaultItems();
+                break;
+            default:
+                await loadVault();
+                await loadScheduled();
+                break;
+        }
+        
+        // Always update stats
+        updateStats();
+        updateMobileCounts();
+        updateVaultFilterCounts();
+        
+        console.log('✅ Dashboard refreshed');
+    } catch (e) {
+        console.warn('Auto-refresh error:', e);
+    }
+}
+
+// Toggle auto-refresh on/off
+function toggleAutoRefresh() {
+    if (autoRefreshInterval) {
+        stopAutoRefresh();
+        toast('Auto-refresh disabled', 'info');
+    } else {
+        startAutoRefresh(30000);
+        toast('Auto-refresh enabled (every 30s)', 'success');
+    }
+}
+
+// Start auto-refresh after page loads
+setTimeout(() => {
+    startAutoRefresh(30000);
+}, 5000);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // ==============================
 // START THE APP
 // ==============================
 initializeApp();
+
+
+
+
 
 
 
