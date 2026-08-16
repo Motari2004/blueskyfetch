@@ -1890,6 +1890,146 @@ html, body {
 
 
 
+
+
+
+
+
+
+
+
+
+
+/* ============================================================
+   FILTER CHIP CLICK COLOR STATES
+   ============================================================ */
+
+/* When checked (selected) - different colors for each */
+.chip-toggle:has(input:checked) {
+    transform: scale(0.97);
+    box-shadow: 0 2px 12px rgba(79, 159, 255, 0.2);
+}
+
+/* Media only - Blue when selected */
+.chip-toggle:has(#filterMedia:checked) {
+    background: rgba(79, 159, 255, 0.2) !important;
+    border-color: var(--accent) !important;
+    color: var(--accent) !important;
+}
+
+/* Reposts - Yellow/Orange when selected */
+.chip-toggle:has(#includeReposts:checked) {
+    background: rgba(245, 158, 11, 0.2) !important;
+    border-color: var(--warning) !important;
+    color: var(--warning) !important;
+}
+
+/* Replies - Purple when selected */
+.chip-toggle:has(#includeReplies:checked) {
+    background: rgba(139, 124, 246, 0.2) !important;
+    border-color: var(--purple) !important;
+    color: var(--purple) !important;
+}
+
+/* When unchecked - dimmed */
+.chip-toggle:not(:has(input:checked)) {
+    opacity: 0.6;
+    border-color: var(--border);
+}
+
+/* Hover effect for unchecked */
+.chip-toggle:not(:has(input:checked)):hover {
+    opacity: 0.9;
+    border-color: var(--text-secondary);
+}
+
+/* Hover effect for checked */
+.chip-toggle:has(input:checked):hover {
+    transform: scale(0.97);
+}
+
+/* Click animation */
+.chip-toggle:active {
+    transform: scale(0.92) !important;
+    transition-duration: 0.05s;
+}
+
+/* Tooltip styles */
+.chip-toggle {
+    position: relative;
+    cursor: pointer;
+}
+
+.chip-toggle:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--card);
+    color: var(--text);
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 400;
+    white-space: nowrap;
+    border: 1px solid var(--border);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+    z-index: 1000;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    transform: translateX(-50%) translateY(4px);
+}
+
+.chip-toggle:hover::before {
+    content: '';
+    position: absolute;
+    bottom: calc(100% + 2px);
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: var(--border);
+    z-index: 1000;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+}
+
+.chip-toggle:hover::after,
+.chip-toggle:hover::before {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .chip-toggle:active::after,
+    .chip-toggle:active::before {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+@media (max-width: 480px) {
+    .chip-toggle:hover::after {
+        white-space: normal;
+        max-width: 200px;
+        text-align: center;
+        font-size: 10px;
+        padding: 4px 10px;
+        bottom: calc(100% + 8px);
+    }
+}
+
+
+
+
+
+
+
+
+
     </style>
 </head>
 <body>
@@ -2237,7 +2377,7 @@ html, body {
                 <button class="btn btn-secondary btn-sm" id="selectNoneBtn" style="flex:1;padding:8px 12px;">❌ None</button>
                 <button class="btn btn-primary btn-sm" id="saveHandlersBtn" style="flex:1;padding:8px 12px;" onclick="window.saveHandlersNow()">💾 Save</button>
             </div>
-            <div class="hint" style="margin-top:10px;font-size:11px;color:var(--text-muted);">Check the handlers you want, then click 💾 Save. Nothing is used for fetch until saved. ⭐ = default.</div>
+        
         </div>
 
         <div class="filters-panel">
@@ -2261,24 +2401,43 @@ html, body {
                 </div>
             </div>
 
-            <div class="form-group">
-                <label style="font-size:12px;color:var(--text-secondary);font-weight:600;text-transform:uppercase;letter-spacing:0.04em;"><i class="fas fa-sliders"></i> Include</label>
-                <div class="chip-row" style="display:flex;flex-wrap:wrap;gap:8px;">
-                    <label class="chip-toggle" style="display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:40px;border:1.5px solid var(--border);background:rgba(255,255,255,0.02);font-size:12px;font-weight:600;color:var(--text-secondary);cursor:pointer;transition:var(--transition);">
-                        <input type="checkbox" id="filterMedia" style="position:absolute;opacity:0;pointer-events:none;">
-                        <span>📸 Media only</span>
-                    </label>
-                    <label class="chip-toggle" style="display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:40px;border:1.5px solid var(--border);background:rgba(255,255,255,0.02);font-size:12px;font-weight:600;color:var(--text-secondary);cursor:pointer;transition:var(--transition);">
-                        <input type="checkbox" id="includeReposts" checked style="position:absolute;opacity:0;pointer-events:none;">
-                        <span>🔄 Reposts</span>
-                    </label>
-                    <label class="chip-toggle" style="display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:40px;border:1.5px solid var(--border);background:rgba(255,255,255,0.02);font-size:12px;font-weight:600;color:var(--text-secondary);cursor:pointer;transition:var(--transition);">
-                        <input type="checkbox" id="includeReplies" checked style="position:absolute;opacity:0;pointer-events:none;">
-                        <span>💬 Replies</span>
-                    </label>
-                </div>
-            </div>
 
+
+
+
+
+
+
+
+<div class="form-group">
+    <label style="font-size:12px;color:var(--text-secondary);font-weight:600;text-transform:uppercase;letter-spacing:0.04em;"><i class="fas fa-sliders"></i> Include</label>
+    <div class="chip-row" style="display:flex;flex-wrap:wrap;gap:8px;">
+        <label class="chip-toggle" data-tooltip="Only show posts with images or videos" style="display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:40px;border:1.5px solid var(--border);background:rgba(255,255,255,0.02);font-size:12px;font-weight:600;color:var(--text-secondary);cursor:pointer;transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1);position:relative;">
+            <input type="checkbox" id="filterMedia" style="position:absolute;opacity:0;pointer-events:none;">
+            <span>📸 Media only</span>
+        </label>
+        <label class="chip-toggle" data-tooltip="Include reposted content in results" style="display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:40px;border:1.5px solid var(--border);background:rgba(255,255,255,0.02);font-size:12px;font-weight:600;color:var(--text-secondary);cursor:pointer;transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1);position:relative;">
+            <input type="checkbox" id="includeReposts" checked style="position:absolute;opacity:0;pointer-events:none;">
+            <span>🔄 Reposts</span>
+        </label>
+        <label class="chip-toggle" data-tooltip="Include reply posts in results" style="display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:40px;border:1.5px solid var(--border);background:rgba(255,255,255,0.02);font-size:12px;font-weight:600;color:var(--text-secondary);cursor:pointer;transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1);position:relative;">
+            <input type="checkbox" id="includeReplies" checked style="position:absolute;opacity:0;pointer-events:none;">
+            <span>💬 Replies</span>
+        </label>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+            
             <div class="form-actions" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;">
                 <button class="btn btn-success" id="fetchBtn" disabled style="flex:1;padding:10px 20px;min-height:44px;"><i class="fas fa-download"></i> Fetch Selected Handlers</button>
                 <button class="btn btn-secondary btn-sm" id="downloadImagesBtn" disabled style="padding:10px 16px;min-height:44px;"><i class="fas fa-images"></i> Images</button>
@@ -3591,6 +3750,7 @@ async function verifySession(sid) {
 // FIXED: updateActiveHandlersBanner with better spacing
 // ============================================================
 
+
 function updateActiveHandlersBanner() {
     const el = document.getElementById('activeHandlersText');
     if (!el) return;
@@ -3602,12 +3762,9 @@ function updateActiveHandlersBanner() {
     }
     
     el.innerHTML = selected.map(h => {
-        const def = h.isDefault ? ' <span style="background:rgba(245,158,11,0.15);color:var(--warning);border-color:rgba(245,158,11,0.3);padding:1px 8px;border-radius:12px;font-size:8px;font-weight:700;text-transform:uppercase;border:1px solid;">⭐</span>' : '';
-        return `<span style="display:inline-flex;align-items:center;gap:4px;background:var(--accent-soft);color:var(--accent);border:1px solid rgba(79,159,255,0.25);padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;white-space:nowrap;">@${escapeHtml(h.handle)}${def}</span>`;
+        return `<span style="display:inline-flex;align-items:center;gap:4px;background:var(--accent-soft);color:var(--accent);border:1px solid rgba(79,159,255,0.25);padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;white-space:nowrap;">@${escapeHtml(h.handle)}</span>`;
     }).join(' ');
 }
-
-
 
 
 
@@ -3679,17 +3836,22 @@ function renderHandlers() {
             <div class="hi" style="flex:1;min-width:0;">
                 <div class="n" style="font-size:12.5px;font-weight:600;color:${h.selected ? 'var(--text)' : 'var(--text-muted)'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
                     ${escapeHtml(h.displayName || h.handle)}
-                    ${h.isDefault ? ' <span class="default-badge" style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;padding:2px 8px;border-radius:20px;background:var(--accent-soft);color:var(--accent);border:1px solid rgba(79,159,255,0.3);white-space:nowrap;">⭐ Default</span>' : ''}
+                   
                     ${!h.selected ? ' <span style="font-size:9px;color:var(--text-muted);font-weight:400;">(inactive)</span>' : ''}
                 </div>
                 <div class="h" style="font-size:10.5px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
                     @${escapeHtml(h.handle)}
                 </div>
             </div>
-            <button class="star-btn ${h.isDefault ? 'active' : ''}" 
-                    style="background:transparent;border:none;color:${h.isDefault ? 'var(--warning)' : 'var(--text-muted)'};cursor:pointer;font-size:14px;padding:2px 4px;line-height:1;transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1);"
-                    title="Set as default handler" 
-                    onclick="setDefaultHandler(${h.id})">⭐</button>
+
+
+
+
+
+
+
+
+
             <input type="checkbox" ${h.selected ? 'checked' : ''} 
                    style="width:16px;height:16px;accent-color:var(--accent);cursor:pointer;flex-shrink:0;"
                    onchange="toggleHandler(${h.id})" 
