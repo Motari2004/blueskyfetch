@@ -25,6 +25,7 @@ import threading
 import time
 import traceback
 from datetime import datetime, timezone
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import requests
 
@@ -44,17 +45,48 @@ ZERNIO_API_KEY = os.environ.get(
 ZERNIO_BASE_URL = "https://zernio.com/api/v1"
 SCHEDULE_TIMEZONE = "Africa/Nairobi"
 
-# Global scheduler state (module-level so it survives across requests, and so
-# we don't spin up duplicate schedulers if register_auto_news_routes gets
-# called more than once, e.g. under a reloader).
+# Global scheduler state
 _scheduler = None
 _scheduler_lock = threading.Lock()
 
+# Connection pool for better performance
+_connection_pool = None
+
+def init_connection_pool():
+    """Initialize database connection pool"""
+    global _connection_pool
+    if _connection_pool is None:
+        try:
+            import psycopg2
+            from psycopg2 import pool
+            _connection_pool = psycopg2.pool.SimpleConnectionPool(
+                1, 10, DATABASE_URL
+            )
+            print("✅ Auto-news connection pool initialized")
+        except Exception as e:
+            print(f"⚠️ Could not create connection pool: {e}")
+    return _connection_pool
 
 def get_db():
+    """Get a database connection (with pooling)"""
     import psycopg2
+    pool = init_connection_pool()
+    if pool:
+        try:
+            return pool.getconn()
+        except Exception:
+            pass
     return psycopg2.connect(DATABASE_URL)
 
+def return_db(conn):
+    """Return connection to pool"""
+    if _connection_pool and conn:
+        try:
+            _connection_pool.putconn(conn)
+            return True
+        except Exception:
+            pass
+    return False
 
 def init_auto_tables():
     conn = get_db()
@@ -79,7 +111,7 @@ def init_auto_tables():
             last_run_at TIMESTAMP,
             last_error TEXT,
             last_result TEXT,
-            enabled_at TIMESTAMP,  -- NEW: tracks when config was enabled
+            enabled_at TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
         """
@@ -96,7 +128,7 @@ def init_auto_tables():
         )
         """
     )
-    # Migrate: add missing columns if they don't exist
+    # Add missing columns
     try:
         cur.execute("ALTER TABLE auto_news_config ADD COLUMN IF NOT EXISTS last_result TEXT")
         cur.execute("ALTER TABLE auto_news_config ADD COLUMN IF NOT EXISTS enabled_at TIMESTAMP")
@@ -104,12 +136,12 @@ def init_auto_tables():
         print(f"auto_news_config migrate: {mig_e}")
     conn.commit()
     cur.close()
-    conn.close()
+    return_db(conn)
     print("✅ Auto-news tables initialized")
 
 
 # ---------------------------------------------------------------------------
-# Bluesky fetch (lightweight, no full atproto session store)
+# Bluesky fetch
 # ---------------------------------------------------------------------------
 
 def bluesky_login(handle: str, app_password: str):
@@ -118,8 +150,7 @@ def bluesky_login(handle: str, app_password: str):
     client.login(handle, app_password)
     return client
 
-
-def fetch_author_feed(client, actor: str, limit: int = 20):
+def fetch_author_feed(client, actor: str, limit: int = 30):
     """Return list of post dicts with uri, text, images, created_at, is_repost, is_reply."""
     posts = []
     try:
@@ -135,10 +166,8 @@ def fetch_author_feed(client, actor: str, limit: int = 20):
             is_reply = reply is not None
 
             images = []
-            # Prefer hydrated embed on post
             post_embed = getattr(post, "embed", None)
             if post_embed is not None:
-                # images view
                 imgs = getattr(post_embed, "images", None)
                 if imgs:
                     for im in imgs:
@@ -146,13 +175,11 @@ def fetch_author_feed(client, actor: str, limit: int = 20):
                         thumb = getattr(im, "thumb", None) or full
                         if full:
                             images.append({"url": full, "thumb": thumb})
-                # external with thumb
                 external = getattr(post_embed, "external", None)
                 if external and not images:
                     thumb = getattr(external, "thumb", None)
                     if thumb:
                         images.append({"url": thumb, "thumb": thumb})
-                # recordWithMedia
                 media = getattr(post_embed, "media", None)
                 if media is not None:
                     imgs = getattr(media, "images", None)
@@ -181,104 +208,162 @@ def fetch_author_feed(client, actor: str, limit: int = 20):
 
 
 # ---------------------------------------------------------------------------
-# Post via Zernio — import from app when available, else minimal local
+# Post via Zernio with retry
 # ---------------------------------------------------------------------------
 
-def post_image_to_account(image_url: str, caption: str, account_id: str, platform: str = "instagram", content_type: str = "feed"):
-    """Try app.post_to_zernio; fallback simple call."""
-    try:
-        import importlib
-        for name in ("app", "backend_app"):
-            try:
-                mod = importlib.import_module(name)
-                if hasattr(mod, "post_to_zernio"):
-                    return mod.post_to_zernio(
-                        image_url=image_url,
-                        caption=caption,
-                        platforms=[platform],
-                        content_type=content_type,
-                        account_ids=[account_id],
-                    )
-            except Exception:
-                continue
-    except Exception as e:
-        return {"success": False, "error": str(e)}
+def post_image_to_account(image_url: str, caption: str, account_id: str, platform: str = "instagram", content_type: str = "feed", max_retries: int = 3):
+    """Post image with retry logic"""
+    for attempt in range(max_retries):
+        try:
+            # Try to import from app first
+            import importlib
+            for name in ("app", "backend_app"):
+                try:
+                    mod = importlib.import_module(name)
+                    if hasattr(mod, "post_to_zernio"):
+                        result = mod.post_to_zernio(
+                            image_url=image_url,
+                            caption=caption,
+                            platforms=[platform],
+                            content_type=content_type,
+                            account_ids=[account_id],
+                        )
+                        if result.get("success"):
+                            return result
+                except Exception:
+                    continue
+            
+            # Fallback: direct Zernio API call
+            headers = {
+                'Authorization': f'Bearer {ZERNIO_API_KEY}',
+                'Content-Type': 'application/json'
+            }
+            
+            # Download image with retry
+            img_response = None
+            for retry in range(3):
+                try:
+                    img_response = requests.get(image_url, timeout=30)
+                    if img_response.status_code == 200:
+                        break
+                except Exception:
+                    if retry == 2:
+                        raise
+                    time.sleep(1)
+            
+            if not img_response or img_response.status_code != 200:
+                return {"success": False, "error": f"Failed to download image: {img_response.status_code if img_response else 'No response'}"}
+            
+            # Upload to Zernio
+            presign_response = requests.post(
+                f"{ZERNIO_BASE_URL}/media/presign",
+                headers=headers,
+                json={"filename": "post.jpg", "contentType": "image/jpeg"},
+                timeout=30
+            )
+            
+            if presign_response.status_code not in [200, 201]:
+                return {"success": False, "error": f"Presign failed: {presign_response.text}"}
+            
+            data = presign_response.json()
+            upload_url = data.get('uploadUrl')
+            public_url = data.get('publicUrl')
+            
+            if not upload_url or not public_url:
+                return {"success": False, "error": "Missing upload URL"}
+            
+            upload_response = requests.put(
+                upload_url,
+                headers={'Content-Type': 'image/jpeg'},
+                data=img_response.content,
+                timeout=60
+            )
+            
+            if upload_response.status_code not in [200, 201, 204]:
+                return {"success": False, "error": f"Upload failed: {upload_response.text}"}
+            
+            payload = {
+                "mediaItems": [{"type": "image", "url": public_url}],
+                "platforms": [{"platform": platform, "accountId": account_id}],
+                "content": caption[:2200] if len(caption) > 2200 else caption,
+                "publishNow": True
+            }
+            
+            post_response = requests.post(
+                f"{ZERNIO_BASE_URL}/posts",
+                headers=headers,
+                json=payload,
+                timeout=60
+            )
+            
+            if post_response.status_code in [200, 201]:
+                return {"success": True, "post_id": post_response.json().get('post', {}).get('_id')}
+            else:
+                return {"success": False, "error": f"Post failed: {post_response.text}"}
+                
+        except Exception as e:
+            if attempt == max_retries - 1:
+                return {"success": False, "error": str(e)}
+            print(f"⚠️ Attempt {attempt + 1} failed: {e}, retrying...")
+            time.sleep(2 ** attempt)  # Exponential backoff
+    
+    return {"success": False, "error": "Max retries exceeded"}
 
-    # Fallback: direct Zernio API call
+
+# ---------------------------------------------------------------------------
+# Process a single post (for parallel execution)
+# ---------------------------------------------------------------------------
+
+def process_single_post(p, config_id, cfg, handle, account_id):
+    """Process a single post - used for parallel execution"""
+    uri = p["uri"]
     try:
-        headers = {
-            'Authorization': f'Bearer {ZERNIO_API_KEY}',
-            'Content-Type': 'application/json'
-        }
+        if uri_seen(config_id, uri):
+            return {"uri": uri, "skipped": True}
         
-        # Download image
-        img_response = requests.get(image_url, timeout=30)
-        if img_response.status_code != 200:
-            return {"success": False, "error": f"Failed to download image: {img_response.status_code}"}
+        if not cfg.get("include_reposts") and p.get("is_repost"):
+            mark_seen(config_id, uri, False)
+            return {"uri": uri, "skipped": True}
         
-        # Upload to Zernio
-        presign_payload = {
-            "filename": "post.jpg",
-            "contentType": "image/jpeg"
-        }
-        presign_response = requests.post(
-            f"{ZERNIO_BASE_URL}/media/presign",
-            headers=headers,
-            json=presign_payload,
-            timeout=30
+        if not cfg.get("include_replies") and p.get("is_reply"):
+            mark_seen(config_id, uri, False)
+            return {"uri": uri, "skipped": True}
+        
+        if cfg.get("media_only") and not p.get("has_media"):
+            mark_seen(config_id, uri, False)
+            return {"uri": uri, "skipped": True}
+        
+        if not p.get("images"):
+            mark_seen(config_id, uri, False)
+            return {"uri": uri, "skipped": True}
+        
+        image_url = p["images"][0]["url"]
+        text = p.get("text") or ""
+        template = cfg.get("caption_template") or "{text}"
+        caption = template.replace("{text}", text).replace("{author}", p.get("author") or handle)
+        if len(caption) > 2200:
+            caption = caption[:2197] + "..."
+
+        result = post_image_to_account(
+            image_url=image_url,
+            caption=caption,
+            account_id=account_id,
+            platform=cfg.get("platform") or "instagram",
+            content_type=cfg.get("content_type") or "feed",
         )
         
-        if presign_response.status_code not in [200, 201]:
-            return {"success": False, "error": f"Presign failed: {presign_response.text}"}
-        
-        data = presign_response.json()
-        upload_url = data.get('uploadUrl')
-        public_url = data.get('publicUrl')
-        
-        if not upload_url or not public_url:
-            return {"success": False, "error": "Missing upload URL"}
-        
-        upload_response = requests.put(
-            upload_url,
-            headers={'Content-Type': 'image/jpeg'},
-            data=img_response.content,
-            timeout=60
-        )
-        
-        if upload_response.status_code not in [200, 201, 204]:
-            return {"success": False, "error": f"Upload failed: {upload_response.text}"}
-        
-        payload = {
-            "mediaItems": [{
-                "type": "image",
-                "url": public_url
-            }],
-            "platforms": [{
-                "platform": platform,
-                "accountId": account_id
-            }],
-            "content": caption[:2200] if len(caption) > 2200 else caption,
-            "publishNow": True
-        }
-        
-        post_response = requests.post(
-            f"{ZERNIO_BASE_URL}/posts",
-            headers=headers,
-            json=payload,
-            timeout=60
-        )
-        
-        if post_response.status_code in [200, 201]:
-            return {"success": True, "post_id": post_response.json().get('post', {}).get('_id')}
+        if result.get("success"):
+            mark_seen(config_id, uri, True)
+            return {"uri": uri, "posted": True, "text": text[:80]}
         else:
-            return {"success": False, "error": f"Post failed: {post_response.text}"}
+            return {"uri": uri, "error": result.get("error")}
             
     except Exception as e:
-        return {"success": False, "error": str(e)}
+        return {"uri": uri, "error": str(e)}
 
 
 # ---------------------------------------------------------------------------
-# Core job
+# Core job functions
 # ---------------------------------------------------------------------------
 
 def get_config(name: str = "default"):
@@ -289,7 +374,7 @@ def get_config(name: str = "default"):
         row = cur.fetchone()
         cols = [d[0] for d in cur.description] if cur.description else []
         cur.close()
-        conn.close()
+        return_db(conn)
         if not row:
             return None
         return dict(zip(cols, row))
@@ -299,7 +384,6 @@ def get_config(name: str = "default"):
 
 
 def get_all_configs(enabled_only: bool = False):
-    """Return every saved config (optionally only the enabled ones)."""
     conn = get_db()
     cur = conn.cursor()
     if enabled_only:
@@ -309,7 +393,7 @@ def get_all_configs(enabled_only: bool = False):
     rows = cur.fetchall()
     cols = [d[0] for d in cur.description] if cur.description else []
     cur.close()
-    conn.close()
+    return_db(conn)
     return [dict(zip(cols, r)) for r in rows]
 
 
@@ -322,21 +406,6 @@ def get_enabled_config_names() -> list[str]:
 
 
 def claim_due_config(name: str, min_interval_sec: int = 10) -> dict | None:
-    """
-    Atomically checks whether this ENABLED config is due for a run (based on
-    its own poll_interval_sec) and, if so, claims it in the SAME statement by
-    updating last_run_at. This makes the database the single source of truth
-    for "who runs this cycle" — critical because Flask's dev-mode reloader
-    runs the whole app TWICE (a parent watcher process + a child server
-    process), and a production deploy may run multiple worker processes.
-    Without a DB-level atomic claim, every process's own in-memory clock
-    thinks it's the one that should run, and the same post gets sent twice.
-
-    Postgres guarantees only one concurrent UPDATE...WHERE...RETURNING can
-    match+claim a given row — every other concurrent caller gets 0 rows back
-    and skips this cycle. Returns the claimed config dict, or None if it
-    wasn't due yet (or someone else just claimed it).
-    """
     try:
         conn = get_db()
         cur = conn.cursor()
@@ -358,30 +427,24 @@ def claim_due_config(name: str, min_interval_sec: int = 10) -> dict | None:
         cols = [d[0] for d in cur.description] if cur.description else []
         conn.commit()
         cur.close()
-        conn.close()
+        return_db(conn)
         if not row:
             return None
         return dict(zip(cols, row))
     except Exception as e:
-        print(f"[auto_news] claim_due_config DB error (skipping this cycle, will retry): {e}")
+        print(f"[auto_news] claim_due_config DB error: {e}")
         return None
+
 
 def save_config(cfg: dict):
     conn = get_db()
     cur = conn.cursor()
     
-    # Check if config is being enabled (was disabled and now enabled)
     existing = get_config(cfg.get('name', 'default'))
     was_disabled = existing and not existing.get('enabled', False) and bool(cfg.get('enabled', False))
     
-    # Get the current enabled_at if it exists
-    current_enabled_at = None
-    if existing:
-        current_enabled_at = existing.get('enabled_at')
+    current_enabled_at = existing.get('enabled_at') if existing else None
     
-    # Determine the new enabled_at value
-    # If enabling (was disabled -> now enabled), set to CURRENT_TIMESTAMP
-    # Otherwise, keep the existing value
     if was_disabled:
         enabled_at_value = 'CURRENT_TIMESTAMP'
     elif current_enabled_at:
@@ -442,7 +505,7 @@ def save_config(cfg: dict):
     rid = cur.fetchone()[0]
     conn.commit()
     cur.close()
-    conn.close()
+    return_db(conn)
     return rid
 
 
@@ -453,10 +516,10 @@ def uri_seen(config_id: int, uri: str) -> bool:
         cur.execute("SELECT 1 FROM auto_news_seen WHERE config_id = %s AND uri = %s", (config_id, uri))
         found = cur.fetchone() is not None
         cur.close()
-        conn.close()
+        return_db(conn)
         return found
     except Exception as e:
-        print(f"[auto_news] uri_seen DB error (treating as unseen, will retry): {e}")
+        print(f"[auto_news] uri_seen DB error: {e}")
         return True
 
 
@@ -474,19 +537,12 @@ def mark_seen(config_id: int, uri: str, posted: bool):
         )
         conn.commit()
         cur.close()
-        conn.close()
+        return_db(conn)
     except Exception as e:
-        print(f"[auto_news] mark_seen DB error (non-fatal): {e}")
+        print(f"[auto_news] mark_seen DB error: {e}")
 
 
 def set_last_run(name: str, error: str | None = None, result: str | None = None):
-    """
-    This runs AFTER posting is done for the cycle. It must NEVER raise —
-    a DB hiccup here (e.g. an idle connection timing out during a long
-    posting run) previously killed the whole process right after a
-    successful posting run, instead of just sleeping and waiting for the
-    next cycle.
-    """
     try:
         conn = get_db()
         cur = conn.cursor()
@@ -496,23 +552,12 @@ def set_last_run(name: str, error: str | None = None, result: str | None = None)
         )
         conn.commit()
         cur.close()
-        conn.close()
+        return_db(conn)
     except Exception as e:
-        print(f"[auto_news] set_last_run DB error (non-fatal, cycle already completed): {e}")
+        print(f"[auto_news] set_last_run DB error: {e}")
 
 
 def run_once(name: str = "default") -> dict:
-    """
-    Always runs the fetch/check step for this config. Posting only happens
-    if new, unseen posts matching the filters are found — finding zero new
-    posts is a normal, successful outcome, not an error, and never disables
-    or breaks the config.
-
-    This function is guaranteed to return a dict and never raise — every
-    internal DB/network step is already wrapped, and the outer try/except
-    below is a final safety net so a caller that doesn't wrap this call
-    (e.g. the CLI loop) can never be crashed by it.
-    """
     try:
         return _run_once_inner(name)
     except Exception as e:
@@ -537,9 +582,7 @@ def _run_once_inner(name: str = "default") -> dict:
         set_last_run(name, err, "error")
         return {"success": False, "error": err}
 
-    # ============================================================
-    # GET ENABLED AT TIME - Only fetch posts after this time
-    # ============================================================
+    # Get enabled_at time
     enabled_at = cfg.get("enabled_at")
     if enabled_at:
         if isinstance(enabled_at, str):
@@ -554,9 +597,8 @@ def _run_once_inner(name: str = "default") -> dict:
         enabled_at = enabled_at.replace(tzinfo=timezone.utc)
     
     print(f"📅 Auto-news enabled at: {enabled_at.isoformat()}")
-    print(f"⏳ Only fetching posts created after this time...")
 
-    # --- ALWAYS attempt the fetch/check step -----------------------------
+    # Fetch posts
     try:
         client = bluesky_login(bsky_user, bsky_pass)
         posts = fetch_author_feed(client, handle, limit=30)
@@ -577,24 +619,22 @@ def _run_once_inner(name: str = "default") -> dict:
             "errors": [],
             "handler": handle,
             "account_id": account_id,
-            "message": "Checked feed, no posts found this cycle.",
+            "message": "Checked feed, no posts found.",
         }
 
     posted = []
     skipped = []
     errors = []
+    posts_to_process = []
 
-    # Process oldest first so news order is chronological when posting immediately
+    # Filter and prepare posts
     posts_sorted = sorted(posts, key=lambda p: p.get("created_at") or "")
-    
     print(f"📊 Found {len(posts_sorted)} posts, checking against enabled_at...")
 
     for p in posts_sorted:
         uri = p["uri"]
         
-        # ============================================================
-        # SKIP POSTS CREATED BEFORE ENABLED AT TIME
-        # ============================================================
+        # Check if post is old
         created_at = p.get("created_at")
         if created_at:
             try:
@@ -606,63 +646,42 @@ def _run_once_inner(name: str = "default") -> dict:
                 if post_time.tzinfo is None:
                     post_time = post_time.replace(tzinfo=timezone.utc)
                 
-                # Skip posts created before the config was enabled
                 if post_time < enabled_at:
-                    print(f"⏭️ Skipping old post from {post_time.isoformat()} (enabled at {enabled_at.isoformat()})")
-                    # Mark as seen so we don't process it later
+                    print(f"⏭️ Skipping old post from {post_time.isoformat()}")
                     mark_seen(config_id, uri, False)
                     skipped.append(uri)
                     continue
             except Exception as e:
                 print(f"⚠️ Could not parse date for {uri}: {e}")
-                # If we can't parse the date, process it anyway (fail safe)
         
-        try:
-            if uri_seen(config_id, uri):
-                skipped.append(uri)
-                continue
-            if not cfg.get("include_reposts") and p.get("is_repost"):
-                mark_seen(config_id, uri, False)
-                skipped.append(uri)
-                continue
-            if not cfg.get("include_replies") and p.get("is_reply"):
-                mark_seen(config_id, uri, False)
-                skipped.append(uri)
-                continue
-            if cfg.get("media_only") and not p.get("has_media"):
-                mark_seen(config_id, uri, False)
-                skipped.append(uri)
-                continue
-            if not p.get("images"):
-                mark_seen(config_id, uri, False)
-                skipped.append(uri)
-                continue
+        posts_to_process.append(p)
 
-            image_url = p["images"][0]["url"]
-            text = p.get("text") or ""
-            template = cfg.get("caption_template") or "{text}"
-            caption = template.replace("{text}", text).replace("{author}", p.get("author") or handle)
-            if len(caption) > 2200:
-                caption = caption[:2197] + "..."
-
-            result = post_image_to_account(
-                image_url=image_url,
-                caption=caption,
-                account_id=account_id,
-                platform=cfg.get("platform") or "instagram",
-                content_type=cfg.get("content_type") or "feed",
-            )
-            if result.get("success"):
-                mark_seen(config_id, uri, True)
-                posted.append({"uri": uri, "text": text[:80]})
-                time.sleep(2)
-            else:
-                errors.append({"uri": uri, "error": result.get("error")})
-                continue
-        except Exception as e:
-            errors.append({"uri": uri, "error": str(e)})
-            traceback.print_exc()
-            continue
+    # ============================================================
+    # PROCESS POSTS IN PARALLEL (FASTER)
+    # ============================================================
+    if posts_to_process:
+        print(f"🚀 Processing {len(posts_to_process)} posts in parallel...")
+        max_workers = min(5, len(posts_to_process))
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            future_to_post = {
+                executor.submit(
+                    process_single_post,
+                    p, config_id, cfg, handle, account_id
+                ): p for p in posts_to_process
+            }
+            
+            for future in as_completed(future_to_post):
+                post = future_to_post[future]
+                try:
+                    result = future.result(timeout=90)
+                    if result.get('posted'):
+                        posted.append({"uri": result.get('uri'), "text": result.get('text', '')})
+                    elif result.get('skipped'):
+                        skipped.append(result.get('uri'))
+                    elif result.get('error'):
+                        errors.append({"uri": result.get('uri'), "error": result.get('error')})
+                except Exception as e:
+                    errors.append({"uri": post.get('uri', 'unknown'), "error": str(e)})
 
     err = errors[0]["error"] if errors else None
     result_label = "posted" if posted else ("errors" if errors else "no_new_posts")
@@ -678,16 +697,11 @@ def _run_once_inner(name: str = "default") -> dict:
         "account_id": account_id,
         "enabled_at": enabled_at.isoformat(),
         "posts_processed": len(posts_sorted),
-        "old_posts_skipped": len([s for s in skipped if s not in posted]),
-        "message": f"Processed {len(posts_sorted)} posts, skipped old posts created before {enabled_at.strftime('%Y-%m-%d %H:%M')}"
+        "message": f"Processed {len(posts_sorted)} posts, posted {len(posted)}"
     }
 
 
 def run_all_enabled(log_prefix: str = "") -> dict:
-    """Run the check/post cycle for every enabled config. Always executes,
-    regardless of whether any individual config finds new posts, and
-    regardless of whether posting succeeded — one config's outcome never
-    stops the others, and this function itself never raises."""
     try:
         init_auto_tables()
         configs = get_all_configs(enabled_only=True)
@@ -698,7 +712,6 @@ def run_all_enabled(log_prefix: str = "") -> dict:
 
     results = {}
     if not configs:
-        print(f"{log_prefix}[auto_news] tick: no enabled configs, nothing to check.")
         return {"success": True, "configs_run": 0, "results": {}}
 
     for cfg in configs:
@@ -708,104 +721,44 @@ def run_all_enabled(log_prefix: str = "") -> dict:
         except Exception as e:
             traceback.print_exc()
             results[name] = {"success": False, "error": str(e)}
-    print(f"{log_prefix}[auto_news] tick complete, will run again next interval.")
     return {"success": True, "configs_run": len(configs), "results": results}
 
 
-def run_loop(name: str = "default", interval: int | None = None):
-    """Standalone CLI loop (not used when running inside the Flask app —
-    see start_background_scheduler for that).
-
-    This loop must NEVER exit because of an error in a single cycle —
-    including errors that happen after posting has already finished for
-    that cycle. Every step below is wrapped so the loop always reaches
-    time.sleep() and waits for the next cycle, no matter what."""
-    init_auto_tables()
-    while True:
-        sec = 300
-        try:
-            cfg = get_config(name)
-            sec = interval or (cfg.get("poll_interval_sec") if cfg else 300) or 300
-            print(f"[{datetime.now().isoformat()}] auto_news run '{name}'")
-            result = run_once(name)
-            print(json.dumps(result, indent=2, default=str))
-        except Exception as e:
-            print(f"[auto_news] run_loop cycle error (continuing, will retry): {e}")
-            traceback.print_exc()
-        print(f"[{datetime.now().isoformat()}] auto_news sleeping {sec}s before next check…")
-        time.sleep(int(sec))
-
-
 # ---------------------------------------------------------------------------
-# Always-on background scheduler (runs INSIDE the Flask process)
+# Background scheduler
 # ---------------------------------------------------------------------------
 
-MIN_POLL_INTERVAL_SEC = 10  # hard floor so a misconfigured 0/negative value can't hammer things
-
+MIN_POLL_INTERVAL_SEC = 10
 
 def _heartbeat_tick(heartbeat_sec: int):
-    """
-    Runs on every heartbeat (default every 10s). For each ENABLED config,
-    atomically CLAIMS the cycle via claim_due_config() — this is what
-    prevents duplicate posts when more than one process is alive (Flask's
-    dev reloader running a parent + child process, or multiple production
-    workers): only the process that wins the atomic DB claim actually runs
-    run_once() for this cycle; everyone else sees 0 rows and skips.
-
-    Finding zero posts, or a config's fetch turning up empty, NEVER stops
-    or skips future heartbeats — this function always returns and the loop
-    always continues.
-    """
     try:
         names = get_enabled_config_names()
-    except Exception as e:
-        print(f"[auto_news] heartbeat: could not list configs: {e}")
-        traceback.print_exc()
-        return
+        if not names:
+            return
 
-    if not names:
-        return
+        for name in names:
+            cfg = claim_due_config(name, min_interval_sec=MIN_POLL_INTERVAL_SEC)
+            if not cfg:
+                continue
 
-    for name in names:
-        cfg = claim_due_config(name, min_interval_sec=MIN_POLL_INTERVAL_SEC)
-        if not cfg:
-            continue  # not due yet, or another process already claimed this cycle
-
-        try:
-            interval = int(cfg.get("poll_interval_sec") or 300)
-        except (TypeError, ValueError):
-            interval = 300
-        interval = max(MIN_POLL_INTERVAL_SEC, interval)
-
-        try:
-            print(f"[{datetime.now().isoformat()}] [auto_news] '{name}' claimed this cycle (every {interval}s) — checking now")
+            interval = max(MIN_POLL_INTERVAL_SEC, int(cfg.get("poll_interval_sec") or 300))
+            print(f"[{datetime.now().isoformat()}] [auto_news] '{name}' checking now...")
             result = run_once(name)
             posted = result.get("posted_count", 0) if isinstance(result, dict) else 0
             if posted:
-                print(f"[auto_news] '{name}' posted {posted} item(s) this cycle.")
+                print(f"[auto_news] '{name}' posted {posted} item(s)")
             else:
-                old_skipped = result.get("old_posts_skipped", 0) if isinstance(result, dict) else 0
-                if old_skipped > 0:
-                    print(f"[auto_news] '{name}' checked, skipped {old_skipped} old posts. Will check again in {interval}s.")
+                skipped = result.get("old_posts_skipped", 0) if isinstance(result, dict) else 0
+                if skipped:
+                    print(f"[auto_news] '{name}' checked, skipped {skipped} old posts")
                 else:
-                    print(f"[auto_news] '{name}' checked, nothing new — will check again in {interval}s.")
-        except Exception as e:
-            print(f"[auto_news] '{name}' heartbeat run error (non-fatal): {e}")
-            traceback.print_exc()
+                    print(f"[auto_news] '{name}' checked, nothing new")
+    except Exception as e:
+        print(f"[auto_news] heartbeat error: {e}")
+        traceback.print_exc()
 
 
 def start_background_scheduler(default_interval_sec: int = 10):
-    """
-    Starts a persistent background thread that ticks every `default_interval_sec`
-    seconds (a heartbeat — default 10s) and, on each tick, checks whether any
-    enabled config is due for a check based on ITS OWN poll_interval_sec.
-
-    This is what makes auto-news actually autonomous and responsive: even a
-    config configured to poll every 10 seconds will really be checked every
-    10 seconds, and finding nothing new never stops or pauses future checks.
-
-    Safe to call multiple times; only starts one scheduler thread globally.
-    """
     global _scheduler
     with _scheduler_lock:
         if _scheduler is not None:
@@ -819,7 +772,7 @@ def start_background_scheduler(default_interval_sec: int = 10):
                 try:
                     _heartbeat_tick(heartbeat_sec)
                 except Exception as e:
-                    print(f"[auto_news] heartbeat loop error (continuing): {e}")
+                    print(f"[auto_news] heartbeat loop error: {e}")
                     traceback.print_exc()
                 time.sleep(heartbeat_sec)
 
@@ -827,6 +780,23 @@ def start_background_scheduler(default_interval_sec: int = 10):
         thread.start()
         _scheduler = thread
         return thread
+
+
+def run_loop(name: str = "default", interval: int | None = None):
+    init_auto_tables()
+    while True:
+        sec = 300
+        try:
+            cfg = get_config(name)
+            sec = interval or (cfg.get("poll_interval_sec") if cfg else 300) or 300
+            print(f"[{datetime.now().isoformat()}] auto_news run '{name}'")
+            result = run_once(name)
+            print(json.dumps(result, indent=2, default=str))
+        except Exception as e:
+            print(f"[auto_news] run_loop cycle error: {e}")
+            traceback.print_exc()
+        print(f"[{datetime.now().isoformat()}] auto_news sleeping {sec}s")
+        time.sleep(int(sec))
 
 
 # ---------------------------------------------------------------------------
@@ -865,9 +835,6 @@ def register_auto_news_routes(app, autostart: bool = True, default_interval_sec:
 
     @app.route("/api/auto-news/run", methods=["POST"])
     def auto_news_run():
-        """Manual/on-demand trigger (still works, e.g. for an external cron
-        or a 'Run now' button) — but the background scheduler above means
-        this is no longer required for auto-news to function."""
         data = request.json or {}
         name = data.get("name", "default")
         result = run_once(name)
@@ -876,13 +843,11 @@ def register_auto_news_routes(app, autostart: bool = True, default_interval_sec:
 
     @app.route("/api/auto-news/run-all", methods=["POST"])
     def auto_news_run_all():
-        """Manually trigger a check cycle across every enabled config right now."""
         result = run_all_enabled()
         return jsonify(result)
 
     @app.route("/api/auto-news/status", methods=["GET"])
     def auto_news_status():
-        """See scheduler state and each config's last run info."""
         configs = get_all_configs()
         safe_configs = []
         for c in configs:
@@ -898,7 +863,6 @@ def register_auto_news_routes(app, autostart: bool = True, default_interval_sec:
 
     @app.route("/api/auto-news/start", methods=["POST"])
     def auto_news_start():
-        """Start the auto-news scheduler (already running by default)."""
         return jsonify({
             "success": True,
             "message": "Auto-news scheduler is already running",
@@ -907,7 +871,6 @@ def register_auto_news_routes(app, autostart: bool = True, default_interval_sec:
 
     @app.route("/api/auto-news/stop", methods=["POST"])
     def auto_news_stop():
-        """Stop the auto-news scheduler (cannot be stopped, only disabled via config)."""
         return jsonify({
             "success": True,
             "message": "To stop auto-news, set Enabled = OFF in config and save",
@@ -928,7 +891,7 @@ def register_auto_news_routes(app, autostart: bool = True, default_interval_sec:
         )
         rows = [{"uri": r[0], "posted": r[1], "seen_at": r[2].isoformat() if r[2] else None} for r in cur.fetchall()]
         cur.close()
-        conn.close()
+        return_db(conn)
         return jsonify({"success": True, "seen": rows})
 
 
