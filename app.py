@@ -1079,9 +1079,28 @@ def login():
         return jsonify({'success': False, 'error': 'Username and password required'}), 400
     
     try:
+        # ===== FIX: Create client with longer timeouts =====
+        import httpx
+        from atproto import Client
+        
         client = Client()
+        # Override the HTTPX client with longer timeouts for network stability
+        client._client = httpx.Client(
+            timeout=httpx.Timeout(
+                connect=30.0,    # Connection timeout (seconds)
+                read=60.0,       # Read timeout - increased for slow responses
+                write=30.0,      # Write timeout
+                pool=10.0        # Pool timeout
+            )
+        )
+        # ====================================================
+        
+        print(f"🔐 Attempting login for: {username}")
         client.login(username, password)
+        print(f"✅ Login successful, fetching profile...")
+        
         profile = client.get_profile(username)
+        print(f"✅ Profile fetched: {profile.handle}")
         
         # Generate a persistent session ID
         session_id = f"{username}_{int(datetime.now().timestamp())}"
@@ -1141,10 +1160,31 @@ def login():
             'persistent': True,
             'expires_at': expires_at.isoformat() if expires_at else None
         })
+    except httpx.ReadTimeout:
+        print(f"❌ Login timeout for {username}")
+        return jsonify({
+            'success': False, 
+            'error': 'Connection timed out. Please try again. (Slow network response)'
+        }), 408
+    except httpx.ConnectTimeout:
+        print(f"❌ Connection timeout for {username}")
+        return jsonify({
+            'success': False, 
+            'error': 'Could not connect to Bluesky. Please check your network.'
+        }), 408
     except Exception as e:
-        print(f"❌ Login error: {e}")
+        print(f"❌ Login error for {username}: {e}")
         traceback.print_exc()
         return jsonify({'success': False, 'error': str(e)}), 401
+
+
+
+
+
+
+
+
+
 
 
 
