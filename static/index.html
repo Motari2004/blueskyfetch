@@ -2940,6 +2940,215 @@ html, body {
     let autoNewsLoopRunning = false;
     let selectedAutoNewsAccountId = null;
 
+
+
+
+
+
+
+
+
+
+// ==============================
+// AUTO-NEWS ACTIVITY TRACKING
+// ==============================
+let autoNewsActivities = [];
+const MAX_AUTO_NEWS_ACTIVITIES = 50;
+
+function addAutoNewsActivity(message, type = 'info', details = null) {
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    
+    autoNewsActivities.unshift({
+        time: timeStr,
+        message: message,
+        type: type, // 'found', 'skipped', 'posted', 'error', 'info', 'started', 'stopped', 'processing'
+        details: details,
+        timestamp: now.getTime()
+    });
+    
+    // Keep only the last MAX_AUTO_NEWS_ACTIVITIES
+    if (autoNewsActivities.length > MAX_AUTO_NEWS_ACTIVITIES) {
+        autoNewsActivities = autoNewsActivities.slice(0, MAX_AUTO_NEWS_ACTIVITIES);
+    }
+    
+    renderAutoNewsActivities();
+    
+    // Save to localStorage for persistence
+    try {
+        localStorage.setItem('bvault_auto_news_activities', JSON.stringify(autoNewsActivities.slice(0, 30)));
+    } catch(e) {}
+}
+
+function renderAutoNewsActivities() {
+    const container = document.getElementById('recentList');
+    if (!container) return;
+    
+    // Update the header to show it's Auto-News only
+    const header = container.closest('.card')?.querySelector('.card-header h3');
+    if (header) {
+        header.innerHTML = '<i class="fas fa-robot" style="color:var(--accent);margin-right:8px;"></i> Auto-News Activity';
+    }
+    
+    if (autoNewsActivities.length === 0) {
+        container.innerHTML = `
+            <div class="empty" style="padding:20px;">
+                <i class="fas fa-robot" style="font-size:28px;opacity:0.3;display:block;margin-bottom:8px;"></i>
+                <p style="font-size:12px;">No auto-news activity yet</p>
+                <p style="font-size:10px;color:var(--text-muted);">Enable Auto-News and wait for it to check for new posts</p>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = autoNewsActivities.map((a, index) => {
+        let icon = '🤖';
+        let color = 'var(--text-secondary)';
+        let bgColor = 'rgba(255,255,255,0.02)';
+        let borderColor = 'transparent';
+        let label = '';
+        
+        // Determine styling based on activity type
+        switch(a.type) {
+            case 'found':
+                icon = '📊';
+                color = '#4f9fff';
+                bgColor = 'rgba(79,159,255,0.1)';
+                borderColor = 'rgba(79,159,255,0.3)';
+                label = 'FOUND';
+                break;
+            case 'posted':
+                icon = '📸';
+                color = '#f77737';
+                bgColor = 'rgba(225,48,108,0.1)';
+                borderColor = 'rgba(225,48,108,0.3)';
+                label = 'POSTED';
+                break;
+            case 'skipped':
+                icon = '⏭️';
+                color = 'var(--warning)';
+                bgColor = 'rgba(245,158,11,0.1)';
+                borderColor = 'rgba(245,158,11,0.3)';
+                label = 'SKIPPED';
+                break;
+            case 'processing':
+                icon = '🔄';
+                color = 'var(--accent)';
+                bgColor = 'rgba(79,159,255,0.08)';
+                borderColor = 'rgba(79,159,255,0.2)';
+                label = 'PROCESSING';
+                break;
+            case 'error':
+                icon = '❌';
+                color = 'var(--error)';
+                bgColor = 'rgba(239,68,68,0.1)';
+                borderColor = 'rgba(239,68,68,0.3)';
+                label = 'ERROR';
+                break;
+            case 'started':
+                icon = '▶️';
+                color = 'var(--success)';
+                bgColor = 'rgba(34,197,94,0.1)';
+                borderColor = 'rgba(34,197,94,0.3)';
+                label = 'STARTED';
+                break;
+            case 'stopped':
+                icon = '⏹️';
+                color = 'var(--error)';
+                bgColor = 'rgba(239,68,68,0.08)';
+                borderColor = 'rgba(239,68,68,0.2)';
+                label = 'STOPPED';
+                break;
+            case 'checking':
+                icon = '🔍';
+                color = 'var(--accent)';
+                bgColor = 'rgba(79,159,255,0.06)';
+                borderColor = 'rgba(79,159,255,0.15)';
+                label = 'CHECKING';
+                break;
+            case 'uploading':
+                icon = '📤';
+                color = '#8b7cf6';
+                bgColor = 'rgba(139,124,246,0.1)';
+                borderColor = 'rgba(139,124,246,0.3)';
+                label = 'UPLOADING';
+                break;
+            case 'info':
+            default:
+                icon = '🤖';
+                color = 'var(--text-secondary)';
+                bgColor = 'rgba(255,255,255,0.02)';
+                borderColor = 'var(--border)';
+                label = 'INFO';
+                break;
+        }
+        
+        // Highlight newest activity
+        const isNew = index === 0;
+        
+        return `
+            <div style="display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border-bottom:1px solid var(--border);background:${bgColor};border-radius:4px;margin-bottom:2px;border-left:3px solid ${borderColor};transition:var(--transition);${isNew ? 'animation: fadeIn 0.3s ease;' : ''}">
+                <span style="font-size:16px;flex-shrink:0;line-height:1.4;">${icon}</span>
+                <div style="flex:1;min-width:0;">
+                    <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                        <span style="font-size:8px;font-weight:700;text-transform:uppercase;padding:1px 8px;border-radius:10px;background:${bgColor};color:${color};border:1px solid ${borderColor};flex-shrink:0;letter-spacing:0.5px;">${label}</span>
+                        <span style="font-size:12px;color:${color};word-break:break-word;font-weight:${isNew ? '600' : '400'};">${escapeHtml(a.message)}</span>
+                    </div>
+                    ${a.details ? `<div style="font-size:10px;color:var(--text-muted);margin-top:2px;padding-left:4px;font-family:monospace;word-break:break-all;">${escapeHtml(a.details)}</div>` : ''}
+                </div>
+                <span style="font-size:9px;color:var(--text-muted);flex-shrink:0;font-family:monospace;white-space:nowrap;margin-top:2px;">${a.time}</span>
+            </div>
+        `;
+    }).join('');
+}
+
+// Load saved activities from localStorage
+function loadAutoNewsActivities() {
+    try {
+        const saved = localStorage.getItem('bvault_auto_news_activities');
+        if (saved) {
+            autoNewsActivities = JSON.parse(saved);
+            renderAutoNewsActivities();
+        }
+    } catch(e) {}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     const defaultHandlers = [];
     const $ = id => document.getElementById(id);
 
@@ -5951,11 +6160,6 @@ function updateAutoNewsButtons(running) {
 
 
 
-
-
-// ==============================
-// START LOOP - Enables config and starts the scheduler
-// ==============================
 // ==============================
 // START LOOP - Enables config and starts the scheduler
 // ==============================
@@ -5967,12 +6171,18 @@ async function startAutoNewsLoop() {
     }
     
     try {
-        // Get form values
         const handler = ($('autoNewsHandler') && $('autoNewsHandler').value || '').trim().replace(/^@/, '');
         const accountId = selectedAutoNewsAccountId || '';
         const contentType = document.querySelector('input[name="autoNewsContentType"]:checked')?.value || 'feed';
+        const pollInterval = parseInt($('autoNewsInterval') && $('autoNewsInterval').value) || 300;
         
-        // Validate required fields
+        // 👇 ADD THIS - Log that we're starting
+        addAutoNewsActivity(
+            `▶️ Starting Auto-News loop for @${handler}`,
+            'started',
+            `Polling every ${pollInterval}s`
+        );
+        
         if (!handler) {
             toast('❌ Please enter a news handler (Bluesky handle)', 'error');
             return;
@@ -5982,7 +6192,6 @@ async function startAutoNewsLoop() {
             return;
         }
         
-        // Get Bluesky credentials
         const bskyHandle = ($('autoNewsBskyHandle') && $('autoNewsBskyHandle').value) || '';
         let bskyPass = ($('autoNewsBskyPass') && $('autoNewsBskyPass').value) || null;
         
@@ -5991,24 +6200,18 @@ async function startAutoNewsLoop() {
             return;
         }
         
-        // ============================================================
-        // HANDLE PASSWORD - Check localStorage FIRST
-        // ============================================================
         if (bskyPass === '********' || !bskyPass) {
-            // Try localStorage first
             const savedPass = localStorage.getItem('autoNews_saved_password');
             if (savedPass) {
                 bskyPass = savedPass;
                 console.log('✅ Using password from localStorage');
             } else {
-                // Try to load from config
                 try {
                     const configRes = await fetch(`${API_BASE}/api/auto-news/config?name=default`);
                     const configData = await configRes.json();
                     const existingConfig = configData.config;
                     if (existingConfig && existingConfig.bluesky_app_password && existingConfig.bluesky_app_password !== '********') {
                         bskyPass = existingConfig.bluesky_app_password;
-                        // Save to localStorage for next time
                         localStorage.setItem('autoNews_saved_password', bskyPass);
                         console.log('✅ Using saved Bluesky password from config');
                     } else {
@@ -6022,27 +6225,24 @@ async function startAutoNewsLoop() {
             }
         }
         
-        // Validate password
         if (!bskyPass || bskyPass === '********') {
             toast('❌ Please enter your Bluesky app password', 'error');
             return;
         }
         
-        // Save password to localStorage
         localStorage.setItem('autoNews_saved_password', bskyPass);
         
-        // Save config with enabled: TRUE (password will be saved)
         const saveRes = await fetch(`${API_BASE}/api/auto-news/config`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 name: 'default',
-                enabled: true,  // FORCE ENABLE
+                enabled: true,
                 handler_handle: handler.includes('.') ? handler : handler + '.bsky.social',
                 account_id: accountId,
                 platform: 'instagram',
                 content_type: contentType,
-                poll_interval_sec: parseInt($('autoNewsInterval') && $('autoNewsInterval').value) || 300,
+                poll_interval_sec: pollInterval,
                 media_only: !!($('autoNewsMediaOnly') && $('autoNewsMediaOnly').checked),
                 include_reposts: !!($('autoNewsReposts') && $('autoNewsReposts').checked),
                 include_replies: !!($('autoNewsReplies') && $('autoNewsReplies').checked),
@@ -6054,13 +6254,22 @@ async function startAutoNewsLoop() {
         
         const saveData = await saveRes.json();
         if (!saveData.success) {
+            addAutoNewsActivity(
+                `❌ Failed to save config: ${saveData.error || 'Unknown error'}`,
+                'error'
+            );
             toast('❌ Failed to save config: ' + (saveData.error || 'Unknown error'), 'error');
             return;
         }
         
+        // 👇 ADD THIS
+        addAutoNewsActivity(
+            `✅ Config saved with Enabled: ON`,
+            'started'
+        );
+        
         toast('✅ Config saved with Enabled: ON', 'success');
         
-        // Now start the loop
         const res = await fetch(`${API_BASE}/api/auto-news/start`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -6069,6 +6278,12 @@ async function startAutoNewsLoop() {
         const data = await res.json();
         
         if (data.success) {
+            // 👇 ADD THIS
+            addAutoNewsActivity(
+                `✅ Auto-News loop started successfully`,
+                'started',
+                `Watching @${handler}`
+            );
             toast('✅ Auto News loop started!', 'success');
             autoNewsLoopRunning = true;
             updateAutoNewsButtons(true);
@@ -6076,9 +6291,14 @@ async function startAutoNewsLoop() {
             await loadAutoNewsConfig();
             await loadAutoNewsSeen();
         } else {
+            addAutoNewsActivity(
+                `❌ Failed to start loop: ${data.error || 'Unknown error'}`,
+                'error'
+            );
             toast('❌ ' + (data.error || 'Failed to start'), 'error');
         }
     } catch (e) {
+        addAutoNewsActivity(`❌ Failed to start: ${e.message}`, 'error');
         toast('❌ ' + e.message, 'error');
         console.error('startAutoNewsLoop error:', e);
     } finally {
@@ -6088,6 +6308,25 @@ async function startAutoNewsLoop() {
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // ==============================
 // STOP LOOP - Disables config and stops the scheduler
@@ -6100,7 +6339,13 @@ async function stopAutoNewsLoop() {
     }
     
     try {
-        // Get current config to preserve password
+        // 👇 ADD THIS
+        addAutoNewsActivity(
+            `⏹️ Stopping Auto-News loop`,
+            'stopped',
+            'Manual stop requested'
+        );
+        
         let currentPassword = null;
         try {
             const configRes = await fetch(`${API_BASE}/api/auto-news/config?name=default`);
@@ -6112,13 +6357,12 @@ async function stopAutoNewsLoop() {
             console.warn('Could not fetch current config for password:', e);
         }
         
-        // First, disable the config by saving with enabled: FALSE
         const configRes = await fetch(`${API_BASE}/api/auto-news/config`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 name: 'default',
-                enabled: false,  // FORCE DISABLE
+                enabled: false,
                 handler_handle: document.getElementById('autoNewsHandler')?.value || '',
                 account_id: selectedAutoNewsAccountId || '',
                 platform: 'instagram',
@@ -6129,20 +6373,27 @@ async function stopAutoNewsLoop() {
                 include_replies: !!document.getElementById('autoNewsReplies')?.checked,
                 caption_template: document.getElementById('autoNewsCaption')?.value || '{text}',
                 bluesky_handle: document.getElementById('autoNewsBskyHandle')?.value || '',
-                // Preserve the password when disabling
                 bluesky_app_password: currentPassword
             })
         });
         
         const configData = await configRes.json();
         if (!configData.success) {
+            addAutoNewsActivity(
+                `❌ Failed to disable config: ${configData.error || 'Unknown error'}`,
+                'error'
+            );
             toast('❌ Failed to disable config: ' + (configData.error || 'Unknown error'), 'error');
             return;
         }
         
+        addAutoNewsActivity(
+            `⏹ Config disabled`,
+            'stopped'
+        );
+        
         toast('⏹ Config disabled', 'info');
         
-        // Then call stop endpoint
         const res = await fetch(`${API_BASE}/api/auto-news/stop`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -6151,18 +6402,27 @@ async function stopAutoNewsLoop() {
         const data = await res.json();
         
         if (data.success) {
+            // 👇 ADD THIS
+            addAutoNewsActivity(
+                `✅ Auto-News loop stopped`,
+                'stopped'
+            );
             toast('⏹ Auto News loop stopped', 'info');
             autoNewsLoopRunning = false;
             updateAutoNewsButtons(false);
             await fetchAutoNewsEngineStatus();
             await loadAutoNewsConfig();
-            // Update the Enabled/Disabled toggle in UI
             const offRadio = document.getElementById('autoNewsEnabledOff');
             if (offRadio) offRadio.checked = true;
         } else {
+            addAutoNewsActivity(
+                `❌ Failed to stop: ${data.error || 'Unknown error'}`,
+                'error'
+            );
             toast('❌ ' + (data.error || 'Failed to stop'), 'error');
         }
     } catch (e) {
+        addAutoNewsActivity(`❌ Failed to stop: ${e.message}`, 'error');
         toast('❌ ' + e.message, 'error');
         console.error('stopAutoNewsLoop error:', e);
     } finally {
@@ -6172,7 +6432,6 @@ async function stopAutoNewsLoop() {
         }
     }
 }
-
 
 
 
@@ -6557,49 +6816,105 @@ window.saveAutoNewsConfig = async function() {
 
 
 
-
-
-    window.runAutoNewsNow = async function() {
-        const btn = $('autoNewsRunBtn');
-        const resultEl = $('autoNewsResult');
-        if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Running…'; }
-        if (resultEl) resultEl.innerHTML = '<div style="color:var(--text-muted);">⏳ Running…</div>';
-        try {
-            const saved = await saveAutoNewsConfig();
-            if (saved === false) { if (resultEl) resultEl.innerHTML = ''; return; }
-            const res = await fetch(`${API_BASE}/api/auto-news/run`, {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: 'default' })
-            });
-            const data = await res.json();
-            if (data.skipped) {
-                toast('Auto News is disabled — enable & save first', 'info');
-            } else if (data.success) {
-                toast('✅ Posted ' + (data.posted_count || 0) + ' item(s)', 'success');
+window.runAutoNewsNow = async function() {
+    const btn = $('autoNewsRunBtn');
+    const resultEl = $('autoNewsResult');
+    if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Running…'; }
+    if (resultEl) resultEl.innerHTML = '<div style="color:var(--text-muted);">⏳ Running…</div>';
+    
+    // 👇 ADD THIS - Log that we're checking
+    const handler = ($('autoNewsHandler') && $('autoNewsHandler').value || '').trim().replace(/^@/, '');
+    addAutoNewsActivity(`🔍 Checking feed for @${handler}`, 'checking', 'Manual run triggered');
+    
+    try {
+        const saved = await saveAutoNewsConfig();
+        if (saved === false) { if (resultEl) resultEl.innerHTML = ''; return; }
+        const res = await fetch(`${API_BASE}/api/auto-news/run`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: 'default' })
+        });
+        const data = await res.json();
+        
+        // 👇 ADD THIS - Log the results
+        if (data.success) {
+            if (data.posted_count > 0) {
+                addAutoNewsActivity(
+                    `📊 Found ${data.posts_processed || 0} posts, ${data.posted_count} new`, 
+                    'found', 
+                    `Handler: @${data.handler}`
+                );
+                if (data.posted && data.posted.length > 0) {
+                    data.posted.forEach(p => {
+                        addAutoNewsActivity(
+                            `📸 Posting: ${(p.text || 'Post').slice(0, 50)}...`,
+                            'posted',
+                            `URI: ${p.uri}`
+                        );
+                    });
+                }
+            } else if (data.old_posts_skipped > 0) {
+                addAutoNewsActivity(
+                    `⏭️ Skipped ${data.old_posts_skipped} old posts`,
+                    'skipped',
+                    `Handler: @${data.handler}`
+                );
             } else {
-                toast('❌ ' + (data.error || 'Run failed'), 'error');
+                addAutoNewsActivity(
+                    `🔍 No new posts found for @${data.handler}`,
+                    'info',
+                    `Checked ${data.posts_processed || 0} posts`
+                );
             }
-            if (resultEl) {
-                const posted = (data.posted || []).map(p =>
-                    '<div style="padding:6px 0;border-bottom:1px solid var(--border);">✅ ' + escapeHtml((p.text||p.uri||'').slice(0,100)) + '</div>'
-                ).join('');
-                resultEl.innerHTML =
-                    '<div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;">' +
-                    '<div style="font-weight:600;margin-bottom:8px;">Result</div>' +
-                    '<div style="font-size:13px;color:var(--text-secondary);">Posted: <strong style="color:var(--accent)">' + (data.posted_count || 0) +
-                    '</strong> · Handler: @' + escapeHtml(data.handler || '') + '</div>' +
-                    (posted || '<div style="margin-top:8px;color:var(--text-muted);">No new posts</div>') +
-                    '</div>';
-            }
-            await loadAutoNewsSeen();
-            await loadAutoNewsConfig();
-        } catch (e) {
-            toast('❌ ' + e.message, 'error');
-            if (resultEl) resultEl.innerHTML = '<div style="color:var(--error)">' + escapeHtml(e.message) + '</div>';
-        } finally {
-            if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-bolt"></i> Run now'; }
+        } else if (data.skipped) {
+            addAutoNewsActivity(
+                `⏸️ Auto-News is disabled — enable it first`,
+                'info'
+            );
+        } else {
+            addAutoNewsActivity(
+                `❌ Check failed: ${data.error || 'Unknown error'}`,
+                'error'
+            );
         }
-    };
+        
+        // KEEP YOUR EXISTING CODE BELOW - don't change this part
+        if (data.skipped) {
+            toast('Auto News is disabled — enable & save first', 'info');
+        } else if (data.success) {
+            toast('✅ Posted ' + (data.posted_count || 0) + ' item(s)', 'success');
+        } else {
+            toast('❌ ' + (data.error || 'Run failed'), 'error');
+        }
+        if (resultEl) {
+            const posted = (data.posted || []).map(p =>
+                '<div style="padding:6px 0;border-bottom:1px solid var(--border);">✅ ' + escapeHtml((p.text||p.uri||'').slice(0,100)) + '</div>'
+            ).join('');
+            resultEl.innerHTML =
+                '<div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;">' +
+                '<div style="font-weight:600;margin-bottom:8px;">Result</div>' +
+                '<div style="font-size:13px;color:var(--text-secondary);">Posted: <strong style="color:var(--accent)">' + (data.posted_count || 0) +
+                '</strong> · Handler: @' + escapeHtml(data.handler || '') + '</div>' +
+                (posted || '<div style="margin-top:8px;color:var(--text-muted);">No new posts</div>') +
+                '</div>';
+        }
+        await loadAutoNewsSeen();
+        await loadAutoNewsConfig();
+    } catch (e) {
+        addAutoNewsActivity(`❌ Auto-News error: ${e.message}`, 'error');
+        toast('❌ ' + e.message, 'error');
+        if (resultEl) resultEl.innerHTML = '<div style="color:var(--error)">' + escapeHtml(e.message) + '</div>';
+    } finally {
+        if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-bolt"></i> Run now'; }
+    }
+};
+
+
+
+
+
+
+
+
 
     window.loadAutoNewsSeen = async function() {
         const el = $('autoNewsSeenList');
@@ -6810,6 +7125,23 @@ async function initializeApp() {
     
     loadRemovedUris();
     
+    loadAutoNewsActivities();
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     // Load handlers from storage
     const savedHandlers = getFromStorage('handlers');
     if (savedHandlers && Array.isArray(savedHandlers) && savedHandlers.length > 0) {
