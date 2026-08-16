@@ -22,6 +22,7 @@ import pytz
 from PIL import Image, ImageDraw, ImageFont
 from io import BytesIO
 import textwrap
+import threading  # ← ADD THIS
 
 
 import os
@@ -238,7 +239,40 @@ def init_db():
 
 
 # Initialize database on startup
-init_db()
+# ============================================================
+# LAZY DATABASE INITIALIZATION (No startup blocking!)
+# ============================================================
+
+_db_initialized = False
+_db_init_lock = threading.Lock()
+
+def ensure_db_initialized():
+    """Lazy initialize database - runs on first request only"""
+    global _db_initialized
+    if _db_initialized:
+        return True
+    
+    with _db_init_lock:
+        if _db_initialized:
+            return True
+        
+        try:
+            print("🚀 Initializing database on first request...")
+            init_db()
+            _db_initialized = True
+            print("✅ Database initialized successfully")
+            return True
+        except Exception as e:
+            print(f"❌ Database initialization failed: {e}")
+            traceback.print_exc()
+            return False
+
+# ❌ DO NOT CALL init_db() HERE!
+# init_db()  # ← DELETE OR COMMENT OUT THIS LINE
+
+
+
+
 
 # ============================================================
 # ZERNIO CONFIGURATION
@@ -2801,6 +2835,38 @@ def zernio_accounts():
         })
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
+
+
+
+
+
+
+
+
+
+
+
+
+
+@app.before_request
+def lazy_init():
+    """Initialize everything on the first request only"""
+    ensure_db_initialized()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 @app.route('/api/zernio/post', methods=['POST'])
 def zernio_post():
