@@ -2505,11 +2505,33 @@ html, body {
             <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px;">
                 💡 Click posts to select them. Filter hides already-posted items so you don't repost by mistake.
             </div>
-            <div class="vault-filters" id="vaultFilters">
-                <button type="button" class="vault-filter-btn" data-filter="all" onclick="setVaultFilter('all')">All <span class="vault-filter-count" id="vfAll">0</span></button>
-                <button type="button" class="vault-filter-btn active not-posted" data-filter="not_posted" onclick="setVaultFilter('not_posted')">⏳ Not posted <span class="vault-filter-count" id="vfNotPosted">0</span></button>
-                <button type="button" class="vault-filter-btn posted" data-filter="posted" onclick="setVaultFilter('posted')">✅ Posted <span class="vault-filter-count" id="vfPosted">0</span></button>
-            </div>
+
+
+
+
+
+<div class="vault-selection-bar" id="vaultSelectionBar">
+    <div class="count">📋 <span id="vaultSelectedCount">0</span> selected</div>
+    <!-- Updated: Navigate to Post Now page instead of direct posting -->
+    <button class="btn btn-sm btn-instagram" onclick="goToPostNowWithSelection()">
+        <i class="fas fa-bolt"></i> Post Now
+    </button>
+    <button class="btn btn-sm btn-instagram" onclick="openScheduleModal()">
+        <i class="fas fa-calendar-plus"></i> Auto-Schedule
+    </button>
+    <button class="btn btn-sm btn-secondary" onclick="selectAllVaultItems()">✅ Select All</button>
+    <button class="btn btn-sm btn-secondary" onclick="deselectAllVaultItems()">✕ Clear</button>
+    <button class="btn btn-sm btn-secondary" onclick="showSelectionModal()">📊 Summary</button>
+</div>
+
+
+
+
+
+
+
+
+
 
             <div class="vault-selection-bar" id="vaultSelectionBar">
                 <div class="count">📋 <span id="vaultSelectedCount">0</span> selected</div>
@@ -3072,6 +3094,7 @@ html, body {
     let allPosts = [];
     let removedUris = new Set();
     let selectedUris = new Set();
+    let vaultSelectedUris = new Set(); 
     let postedUris = new Set();
     let postedPlatformsMap = {};
     let handlers = [];
@@ -3411,6 +3434,21 @@ $('loginBtn').addEventListener('click', async function() {
             body: JSON.stringify({ username, password })
         });
         const data = await res.json();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         if (data.success) {
             sessionId = data.session_id;
             setOnline(data);
@@ -3434,6 +3472,16 @@ $('loginBtn').addEventListener('click', async function() {
             loadVault();
             loadScheduled();
             toast('✅ Login successful! Session saved for all devices.', 'success');
+
+
+
+
+
+
+
+
+
+
         } else {
             toast('❌ Login failed: ' + data.error, 'error');
         }
@@ -3818,6 +3866,55 @@ function updateActiveHandlersBanner() {
 
 
 
+function goToPostNowWithSelection() {
+    // Get selected vault items
+    const selectedItems = document.querySelectorAll('.vault-item.selected');
+    
+    if (selectedItems.length === 0) {
+        toast('❌ No posts selected. Click posts in the vault to select them.', 'error');
+        return;
+    }
+    
+    // Get the URIs of selected items
+    const uris = Array.from(selectedItems).map(el => el.dataset.uri);
+    
+    // Filter to only "not posted" items
+    const unpostedUris = uris.filter(uri => !postedUris.has(uri));
+    
+    if (unpostedUris.length === 0) {
+        toast('⚠️ All selected posts are already posted. Select unposted posts only.', 'warning');
+        return;
+    }
+    
+    // Store the selected URIs in a global variable for the Post Now page
+    window._pendingPostNowSelection = unpostedUris;
+    
+    // Navigate to Post Now page
+    navigateTo('postnow');
+    
+    // After navigation, select the items in Post Now page
+    setTimeout(() => {
+        // Clear any existing selection
+        selectedPostNowPageVaultUris.clear();
+        
+        // Add the unposted URIs to selection
+        unpostedUris.forEach(uri => {
+            selectedPostNowPageVaultUris.add(uri);
+        });
+        
+        // Re-render the Post Now vault items
+        renderPostNowPageVaultItems();
+        
+        // Update the selection count
+        updatePostNowPageSelPreview();
+        
+        const count = selectedPostNowPageVaultUris.size;
+        toast(`✅ ${count} unposted post${count !== 1 ? 's' : ''} selected in Post Now`, 'success');
+        
+        // Clear the pending selection
+        window._pendingPostNowSelection = null;
+    }, 300);
+}
 
 
 
@@ -4633,18 +4730,84 @@ async function loadHandlersFromServer() {
         return list;
     }
 
-    function updateVaultFilterCounts() {
-        const all = vaultItems || [];
-        const posted = all.filter(i => postedUris.has(i.uri)).length;
-        const notPosted = all.length - posted;
-        const set = (id, n) => { const el = $(id); if (el) el.textContent = n; };
-        set('vfAll', all.length);
-        set('vfPosted', posted);
-        set('vfNotPosted', notPosted);
-        document.querySelectorAll('.vault-filter-btn').forEach(btn => {
-            btn.classList.toggle('active', btn.dataset.filter === vaultFilter);
-        });
-    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function updateVaultFilterCounts() {
+    const all = vaultItems || [];
+    const posted = all.filter(i => postedUris.has(i.uri)).length;
+    const notPosted = all.length - posted;
+    const set = (id, n) => { const el = $(id); if (el) el.textContent = n; };
+    set('vfAll', all.length);
+    set('vfPosted', posted);
+    set('vfNotPosted', notPosted);
+    // ✅ FIX: Don't re-render, just update classes
+    document.querySelectorAll('.vault-filter-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.filter === vaultFilter);
+    });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     window.setVaultFilter = function(filter) {
         vaultFilter = filter || 'all';
@@ -4660,85 +4823,170 @@ async function loadHandlersFromServer() {
 
 
 
-    function renderVault(items) {
-        vaultList.innerHTML = '';
-        const allItems = items || [];
-        updateVaultFilterCounts();
-        const filtered = getFilteredVaultItems(allItems);
 
-        if (!allItems || allItems.length === 0) {
-            vaultList.innerHTML = `<div class="empty"><i class="fas fa-archive"></i><p>Vault is empty</p></div>`;
-            $('navVaultCount').textContent = '0';
-            return;
-        }
-        $('navVaultCount').textContent = allItems.length;
 
-        if (filtered.length === 0) {
-            const msg = vaultFilter === 'not_posted' ? 'All vault posts have been posted' :
-                        vaultFilter === 'posted' ? 'No posted items yet' : 'No items';
-            vaultList.innerHTML = `<div class="empty"><i class="fas fa-filter"></i><p>${msg}</p></div>`;
-            return;
-        }
 
-        filtered.forEach(item => {
-            const div = document.createElement('div');
-            const isPosted = postedUris.has(item.uri);
-            div.className = 'vault-item' + (isPosted ? ' posted' : '');
-            div.dataset.uri = item.uri;
-            div.dataset.posted = isPosted ? '1' : '0';
-            const time = item.created_at ? new Date(item.created_at).toLocaleString() : '';
-            const avatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(item.author || 'x')}&background=4f9fff&color=fff&size=32`;
 
-            let gallery = '';
-            if (item.images && item.images.length > 0) {
-                gallery = '<div class="gallery">' + item.images.map(img => `<img src="${img.thumb || img.url}" loading="lazy" onclick="event.stopPropagation(); openLightbox('${img.url}')">`).join('') + '</div>';
-            }
-            let videoChip = '';
-            if (item.video && item.video.cid) videoChip = `<div class="video-chip">🎬 Video · ${item.video.cid.substring(0,10)}...</div>`;
 
-            const platforms = postedPlatformsMap[item.uri] || [];
-            let postedBadges = '';
-            if (isPosted && platforms.length > 0) {
-                postedBadges = `<div class="posted-badges">${platforms.map(p => `<span>✅ ${escapeHtml(p)}</span>`).join('')}</div>`;
-            } else if (isPosted) {
-                postedBadges = `<div class="posted-badges"><span>✅ Posted</span></div>`;
-            }
 
-            const hasImage = item.images && item.images.length > 0;
 
-            div.innerHTML = `
-                <div class="vh">
-                    <img src="${avatar}" alt="${escapeHtml(item.author || '')}">
-                    <span class="handle">@${escapeHtml(item.author || '')}</span>
-                    ${isPosted ? '<span class="default-badge" style="margin-left:6px;">Posted</span>' : '<span class="default-badge" style="margin-left:6px;background:rgba(245,158,11,0.15);color:var(--warning);border-color:rgba(245,158,11,0.3);">Not posted</span>'}
-                    <span class="vtime">${time}</span>
-                </div>
-                ${item.text ? `<div class="text">${escapeHtml(item.text).slice(0,140)}${(item.text||'').length>140?'…':''}</div>` : ''}
-                ${gallery}
-                ${videoChip}
-                ${postedBadges}
-                ${item.notes ? `<div class="notes">📝 ${escapeHtml(item.notes)}</div>` : ''}
-                <div class="vactions">
-                    <button class="btn btn-secondary btn-xs" onclick="event.stopPropagation(); restoreFromVault('${item.uri}')">🔄 Restore</button>
-                    <button class="btn btn-danger btn-xs" onclick="event.stopPropagation(); deleteFromVault('${item.uri}')">🗑️ Delete</button>
-                    <button class="btn btn-secondary btn-xs" onclick="event.stopPropagation(); addNote('${item.uri}')">📝 Note</button>
-                    ${hasImage ? (isPosted
-                        ? `<button class="btn btn-instagram btn-xs" disabled>✅ Posted</button>`
-                        : `<button class="btn btn-instagram btn-xs" onclick="event.stopPropagation(); openZernioModal('${item.uri}')">📸 Post Now</button>`)
-                    : ''}
-                </div>
-            `;
-            div.addEventListener('click', (e) => {
-                if (e.target.closest('.vactions') || e.target.closest('img')) return;
-                div.classList.toggle('selected');
-                updateSchedSelCount();
-                updateVaultSelectionBar();
-            });
-            vaultList.appendChild(div);
-        });
-        updateSchedSelCount();
-        updateVaultSelectionBar();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function renderVault(items) {
+    vaultList.innerHTML = '';
+    const allItems = items || [];
+    
+    // ✅ FIX: Store currently selected URIs before re-rendering
+    const selectedUris = new Set();
+    document.querySelectorAll('.vault-item.selected').forEach(el => {
+        if (el.dataset.uri) selectedUris.add(el.dataset.uri);
+    });
+    
+    updateVaultFilterCounts();
+    const filtered = getFilteredVaultItems(allItems);
+
+    if (!allItems || allItems.length === 0) {
+        vaultList.innerHTML = `<div class="empty"><i class="fas fa-archive"></i><p>Vault is empty</p></div>`;
+        $('navVaultCount').textContent = '0';
+        return;
     }
+    $('navVaultCount').textContent = allItems.length;
+
+    if (filtered.length === 0) {
+        const msg = vaultFilter === 'not_posted' ? 'All vault posts have been posted' :
+                    vaultFilter === 'posted' ? 'No posted items yet' : 'No items';
+        vaultList.innerHTML = `<div class="empty"><i class="fas fa-filter"></i><p>${msg}</p></div>`;
+        return;
+    }
+
+    filtered.forEach(item => {
+        const div = document.createElement('div');
+        const isPosted = postedUris.has(item.uri);
+        div.className = 'vault-item' + (isPosted ? ' posted' : '');
+        div.dataset.uri = item.uri;
+        div.dataset.posted = isPosted ? '1' : '0';
+        
+        // ✅ FIX: Restore selection state
+        if (selectedUris.has(item.uri)) {
+            div.classList.add('selected');
+        }
+        
+        const time = item.created_at ? new Date(item.created_at).toLocaleString() : '';
+        const avatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(item.author || 'x')}&background=4f9fff&color=fff&size=32`;
+
+        let gallery = '';
+        if (item.images && item.images.length > 0) {
+            gallery = '<div class="gallery">' + item.images.map(img => `<img src="${img.thumb || img.url}" loading="lazy" onclick="event.stopPropagation(); openLightbox('${img.url}')">`).join('') + '</div>';
+        }
+        let videoChip = '';
+        if (item.video && item.video.cid) videoChip = `<div class="video-chip">🎬 Video · ${item.video.cid.substring(0,10)}...</div>`;
+
+        const platforms = postedPlatformsMap[item.uri] || [];
+        let postedBadges = '';
+        if (isPosted && platforms.length > 0) {
+            postedBadges = `<div class="posted-badges">${platforms.map(p => `<span>✅ ${escapeHtml(p)}</span>`).join('')}</div>`;
+        } else if (isPosted) {
+            postedBadges = `<div class="posted-badges"><span>✅ Posted</span></div>`;
+        }
+
+        const hasImage = item.images && item.images.length > 0;
+
+        div.innerHTML = `
+            <div class="vh">
+                <img src="${avatar}" alt="${escapeHtml(item.author || '')}">
+                <span class="handle">@${escapeHtml(item.author || '')}</span>
+                ${isPosted ? '<span class="default-badge" style="margin-left:6px;">Posted</span>' : '<span class="default-badge" style="margin-left:6px;background:rgba(245,158,11,0.15);color:var(--warning);border-color:rgba(245,158,11,0.3);">Not posted</span>'}
+                <span class="vtime">${time}</span>
+            </div>
+            ${item.text ? `<div class="text">${escapeHtml(item.text).slice(0,140)}${(item.text||'').length>140?'…':''}</div>` : ''}
+            ${gallery}
+            ${videoChip}
+            ${postedBadges}
+            ${item.notes ? `<div class="notes">📝 ${escapeHtml(item.notes)}</div>` : ''}
+            <div class="vactions">
+                <button class="btn btn-secondary btn-xs" onclick="event.stopPropagation(); restoreFromVault('${item.uri}')">🔄 Restore</button>
+                <button class="btn btn-danger btn-xs" onclick="event.stopPropagation(); deleteFromVault('${item.uri}')">🗑️ Delete</button>
+                <button class="btn btn-secondary btn-xs" onclick="event.stopPropagation(); addNote('${item.uri}')">📝 Note</button>
+                ${hasImage ? (isPosted
+                    ? `<button class="btn btn-instagram btn-xs" disabled>✅ Posted</button>`
+                    : `<button class="btn btn-instagram btn-xs" onclick="event.stopPropagation(); openZernioModal('${item.uri}')">📸 Post Now</button>`)
+                : ''}
+            </div>
+        `;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Update vault item click handler
+div.addEventListener('click', (e) => {
+    if (e.target.closest('.vactions') || e.target.closest('img')) return;
+    const uri = div.dataset.uri;
+    if (vaultSelectedUris.has(uri)) {
+        vaultSelectedUris.delete(uri);
+        div.classList.remove('selected');
+    } else {
+        vaultSelectedUris.add(uri);
+        div.classList.add('selected');
+    }
+    updateSchedSelCount();
+    updateVaultSelectionBar();
+});
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     window.refreshVault = async function() { await loadPostedStatus(); await loadVault(); toast('🔄 Vault refreshed', 'success'); };
     window.selectAllVaultItems = function() {
@@ -5273,6 +5521,239 @@ function submitPostNow() {
 
 
 
+
+// ==============================
+// POST SELECTED VAULT ITEMS
+// ==============================
+
+async function postSelectedVaultItems() {
+    // Get all selected vault items
+    const selectedItems = document.querySelectorAll('.vault-item.selected');
+    
+    if (selectedItems.length === 0) {
+        toast('❌ No posts selected. Click posts in the vault to select them.', 'error');
+        return;
+    }
+    
+    // Check if user is logged in
+    if (!sessionId) {
+        toast('❌ Please login first', 'error');
+        return;
+    }
+    
+    // Get the actual vault items data
+    const uris = Array.from(selectedItems).map(el => el.dataset.uri);
+    const items = vaultItems.filter(v => uris.includes(v.uri));
+    
+    // Filter out already posted items
+    const unpostedItems = items.filter(item => !postedUris.has(item.uri));
+    const alreadyPosted = items.filter(item => postedUris.has(item.uri));
+    
+    if (unpostedItems.length === 0) {
+        if (alreadyPosted.length > 0) {
+            toast(`⚠️ All ${alreadyPosted.length} selected posts are already posted.`, 'warning');
+        } else {
+            toast('❌ No unposted posts selected', 'error');
+        }
+        return;
+    }
+    
+    if (alreadyPosted.length > 0) {
+        if (!confirm(`${alreadyPosted.length} selected post(s) are already posted. Post the ${unpostedItems.length} unposted ones?`)) {
+            return;
+        }
+    }
+    
+    // Check if selected items have images
+    const itemsWithImages = unpostedItems.filter(item => item.images && item.images.length > 0);
+    const itemsWithoutImages = unpostedItems.filter(item => !item.images || item.images.length === 0);
+    
+    if (itemsWithImages.length === 0) {
+        toast('❌ None of the selected posts have images', 'error');
+        return;
+    }
+    
+    if (itemsWithoutImages.length > 0) {
+        if (!confirm(`${itemsWithoutImages.length} post(s) have no images and will be skipped. Post the ${itemsWithImages.length} with images?`)) {
+            return;
+        }
+    }
+    
+    // Check if we have an Instagram account selected
+    if (!selectedPostNowAccountId && postNowAccounts.length > 0) {
+        const preferred = postNowAccounts.find(a => a.account_type === 'serpent' || a.account_type === 'easternfront');
+        selectedPostNowAccountId = preferred ? preferred.account_id : postNowAccounts[0].account_id;
+    }
+    
+    if (!selectedPostNowAccountId) {
+        toast('❌ No Instagram account found. Please connect in Zernio.', 'error');
+        return;
+    }
+    
+    // Show progress
+    const btn = document.querySelector('.vault-selection-bar .btn-instagram');
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = `<span class="spinner"></span> Posting 0/${itemsWithImages.length}...`;
+    
+    let posted = 0;
+    let failed = 0;
+    let skipped = itemsWithoutImages.length;
+    const results = [];
+    
+    for (let i = 0; i < itemsWithImages.length; i++) {
+        const item = itemsWithImages[i];
+        const imageUrl = item.images[0].url;
+        const caption = item.text || '📸 Posted via Bluesky Vault';
+        const contentType = document.querySelector('input[name="postNowPageContentType"]:checked')?.value || 'feed';
+        
+        btn.innerHTML = `<span class="spinner"></span> Posting ${i+1}/${itemsWithImages.length}...`;
+        
+        try {
+            const res = await fetch(`${API_BASE}/api/post-now`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    image_url: imageUrl,
+                    caption: caption,
+                    account_id: selectedPostNowAccountId,
+                    content_type: contentType,
+                    vault_uri: item.uri
+                })
+            });
+            const data = await res.json();
+            
+            if (data.success) {
+                posted++;
+                results.push({ uri: item.uri, status: 'success', message: data.message });
+                // Mark as posted in UI
+                postedUris.add(item.uri);
+                // Update the vault item visually
+                const vaultEl = document.querySelector(`.vault-item[data-uri="${item.uri}"]`);
+                if (vaultEl) {
+                    vaultEl.classList.add('posted');
+                    vaultEl.dataset.posted = '1';
+                    // Update the badge
+                    const badge = vaultEl.querySelector('.default-badge');
+                    if (badge) {
+                        badge.textContent = 'Posted';
+                        badge.style.background = 'rgba(34,197,94,0.15)';
+                        badge.style.color = 'var(--success)';
+                        badge.style.borderColor = 'rgba(34,197,94,0.3)';
+                    }
+                }
+            } else {
+                failed++;
+                results.push({ uri: item.uri, status: 'failed', error: data.error });
+                console.warn('Failed to post:', item.uri, data.error);
+            }
+        } catch (e) {
+            failed++;
+            results.push({ uri: item.uri, status: 'error', error: e.message });
+            console.warn('Error posting:', item.uri, e);
+        }
+        
+        // Small delay between posts
+        if (i < itemsWithImages.length - 1) {
+            await new Promise(r => setTimeout(r, 1000));
+        }
+    }
+    
+    // Show results
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+    
+    let message = `✅ Posted ${posted} post${posted !== 1 ? 's' : ''}`;
+    if (failed > 0) message += `, ${failed} failed`;
+    if (skipped > 0) message += `, ${skipped} skipped (no image)`;
+    toast(message, failed > 0 ? 'warning' : 'success');
+    
+    // Show detailed results in a modal or notification
+    if (failed > 0 || skipped > 0) {
+        showPostResults(results, posted, failed, skipped);
+    }
+    
+    // Refresh vault status
+    await loadPostedStatus();
+    renderVault(vaultItems);
+    updateVaultFilterCounts();
+    updateStats();
+}
+
+// ==============================
+// SHOW POST RESULTS
+// ==============================
+
+function showPostResults(results, posted, failed, skipped) {
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay active';
+    modal.style.display = 'flex';
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width: 500px;">
+            <h2 style="margin-bottom: 16px;">
+                <i class="fas fa-check-circle" style="color:var(--success);"></i> Post Results
+            </h2>
+            <div style="display:flex; gap:16px; margin-bottom:16px; flex-wrap:wrap;">
+                <div style="flex:1; text-align:center; background:var(--bg); padding:12px; border-radius:8px;">
+                    <div style="font-size:24px; font-weight:700; color:var(--success);">${posted}</div>
+                    <div style="font-size:11px; color:var(--text-muted);">Posted</div>
+                </div>
+                <div style="flex:1; text-align:center; background:var(--bg); padding:12px; border-radius:8px;">
+                    <div style="font-size:24px; font-weight:700; color:var(--error);">${failed}</div>
+                    <div style="font-size:11px; color:var(--text-muted);">Failed</div>
+                </div>
+                <div style="flex:1; text-align:center; background:var(--bg); padding:12px; border-radius:8px;">
+                    <div style="font-size:24px; font-weight:700; color:var(--warning);">${skipped}</div>
+                    <div style="font-size:11px; color:var(--text-muted);">Skipped (no image)</div>
+                </div>
+            </div>
+            ${results.length > 0 ? `
+                <div style="max-height:200px; overflow-y:auto; font-size:12px; border-top:1px solid var(--border); padding-top:12px;">
+                    ${results.map(r => `
+                        <div style="display:flex; align-items:center; gap:8px; padding:4px 0; border-bottom:1px solid var(--border);">
+                            <span style="color:${r.status === 'success' ? 'var(--success)' : 'var(--error)'};">
+                                ${r.status === 'success' ? '✅' : '❌'}
+                            </span>
+                            <span style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-family:monospace; font-size:10px;">
+                                ${r.uri.slice(-20)}
+                            </span>
+                            <span style="color:${r.status === 'success' ? 'var(--text-muted)' : 'var(--error)'}; font-size:10px;">
+                                ${r.status === 'success' ? 'Posted' : (r.error || 'Failed')}
+                            </span>
+                        </div>
+                    `).join('')}
+                </div>
+            ` : ''}
+            <div class="modal-actions" style="margin-top:16px;">
+                <button class="btn btn-primary" onclick="this.closest('.modal-overlay').remove()">Close</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    
+    // Close on overlay click
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.remove();
+    });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     // Load Post Now accounts
 // Load Post Now accounts
 // Load Post Now accounts
@@ -5401,52 +5882,85 @@ function renderPostNowAccounts() {
         }
     }
 
-    // Render vault items in Post Now page
-    function renderPostNowPageVaultItems() {
-        const container = document.getElementById('postNowPageVaultList');
-        if (!container) return;
+
+
+
+
+
+
+
+
+
+
+
+
+
+function renderPostNowPageVaultItems() {
+    const container = document.getElementById('postNowPageVaultList');
+    if (!container) return;
+    
+    const items = vaultItems || [];
+    if (items.length === 0) {
+        container.innerHTML = `<div class="empty" style="padding:20px;"><i class="fas fa-archive"></i><p>Vault is empty. Add posts to the vault first.</p></div>`;
+        return;
+    }
+    
+    // Check if we have pending selection from vault
+    const pendingSelection = window._pendingPostNowSelection || [];
+    
+    container.innerHTML = items.map(item => {
+        // Check if this item should be selected (either from pending selection or already selected)
+        const shouldBeSelected = pendingSelection.includes(item.uri) || selectedPostNowPageVaultUris.has(item.uri);
+        const isSelected = shouldBeSelected;
+        const hasImage = item.images && item.images.length > 0;
+        const imageUrl = hasImage ? (item.images[0].thumb || item.images[0].url) : '';
+        const text = item.text || '(no text)';
+        const isPosted = postedUris.has(item.uri);
         
-        const items = vaultItems || [];
-        if (items.length === 0) {
-            container.innerHTML = `<div class="empty" style="padding:20px;"><i class="fas fa-archive"></i><p>Vault is empty. Add posts to the vault first.</p></div>`;
-            return;
+        // If this is a pending selection item, add it to the actual selection set
+        if (shouldBeSelected && !selectedPostNowPageVaultUris.has(item.uri) && !isPosted) {
+            selectedPostNowPageVaultUris.add(item.uri);
         }
         
-
-
-
-
-
-
-
-
-
-
-
-
-container.innerHTML = items.map(item => {
-            const isSelected = selectedPostNowPageVaultUris.has(item.uri);
-            const hasImage = item.images && item.images.length > 0;
-            const imageUrl = hasImage ? (item.images[0].thumb || item.images[0].url) : '';
-            const text = item.text || '(no text)';
-            const isPosted = postedUris.has(item.uri);
-            
-            return `
-                <div class="vault-item ${isSelected ? 'selected' : ''} ${isPosted ? 'posted' : ''}" 
-                     data-uri="${item.uri}"
-                     onclick="selectPostNowPageVaultItem('${item.uri}')" 
-                     style="margin-bottom:4px;padding:10px 14px;cursor:pointer;">
-                    <div class="vh" style="margin-bottom:4px;">
-                        <input type="checkbox" ${isSelected ? 'checked' : ''} style="pointer-events:none;width:14px;height:14px;">
-                        ${imageUrl ? `<img src="${imageUrl}" style="width:32px;height:32px;border-radius:6px;object-fit:cover;">` : ''}
-                        <span class="handle" style="font-size:12px;">${escapeHtml(text.slice(0, 60))}${text.length > 60 ? '…' : ''}</span>
-                        ${isPosted ? '<span class="default-badge" style="font-size:9px;margin-left:auto;">✅ Posted</span>' : ''}
-                    </div>
+        return `
+            <div class="vault-item ${isSelected ? 'selected' : ''} ${isPosted ? 'posted' : ''}" 
+                 data-uri="${item.uri}"
+                 onclick="selectPostNowPageVaultItem('${item.uri}')" 
+                 style="margin-bottom:4px;padding:10px 14px;cursor:pointer;">
+                <div class="vh" style="margin-bottom:4px;">
+                    <input type="checkbox" ${isSelected ? 'checked' : ''} style="pointer-events:none;width:14px;height:14px;">
+                    ${imageUrl ? `<img src="${imageUrl}" style="width:32px;height:32px;border-radius:6px;object-fit:cover;">` : ''}
+                    <span class="handle" style="font-size:12px;">${escapeHtml(text.slice(0, 60))}${text.length > 60 ? '…' : ''}</span>
+                    ${isPosted ? '<span class="default-badge" style="font-size:9px;margin-left:auto;">✅ Posted</span>' : ''}
                 </div>
-            `;
-        }).join('');
-        updatePostNowPageSelPreview();
+            </div>
+        `;
+    }).join('');
+    
+    // Clear pending selection after rendering
+    if (window._pendingPostNowSelection) {
+        window._pendingPostNowSelection = null;
     }
+    
+    updatePostNowPageSelPreview();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     function updatePostNowPageSelPreview() {
         const countEl = document.getElementById('postNowPageSelCount');
@@ -7383,10 +7897,11 @@ async function verifySession(sessionId) {
 // ==============================
 
 
+// Add this to your HTML just before the closing </body> tag, or replace the existing initializeApp function
+
 async function initializeApp() {
     console.log('🦋 Bluesky Vault Scheduler loading...');
     console.log(`   Time: ${new Date().toLocaleString()}`);
-    console.log(`   API_BASE: ${API_BASE || '(empty)'}`);
     
     loadRemovedUris();
     loadAutoNewsActivities();
@@ -7404,8 +7919,23 @@ async function initializeApp() {
     }
     renderHandlers();
 
-    // STEP 1: Try to restore session from DATABASE FIRST (cross-device)
-    console.log('📌 Step 1: Checking for persistent session in database (cross-device)...');
+    // ============================================================
+    // STEP 1: Try to get handle from URL parameter (for sharing)
+    // ============================================================
+    const urlParams = new URLSearchParams(window.location.search);
+    const shareHandle = urlParams.get('handle');
+    if (shareHandle) {
+        console.log(`📌 Found handle in URL: ${shareHandle}`);
+        localStorage.setItem('bvault_handle', shareHandle);
+        // Remove from URL without reload
+        const newUrl = window.location.pathname;
+        window.history.replaceState({}, document.title, newUrl);
+    }
+
+    // ============================================================
+    // STEP 2: Try to restore session from DATABASE (cross-device)
+    // ============================================================
+    console.log('📌 Step 2: Checking for persistent session in database...');
     const restored = await restorePersistentSession();
     
     if (restored) {
@@ -7416,81 +7946,90 @@ async function initializeApp() {
         renderPosts();
         startAutoNewsStatusPolling(false);
         loadHandlersFromServer();
-        
-        // Load other data
         loadScheduled();
         setScheduleDefaults();
-        try {
-            const sf = localStorage.getItem('bvault_vault_filter');
-            if (sf && ['all','posted','not_posted'].includes(sf)) vaultFilter = sf;
-        } catch(e) {}
         loadIgAccounts();
         loadPostNowAccounts();
+        loadVault();
         
         console.log('✅ App fully initialized with restored session');
         toast('🔄 Session restored! Welcome back.', 'success');
         return;
     }
     
-    // STEP 2: If no database session, check localStorage for old session
-    console.log('📌 Step 2: No database session found, checking localStorage...');
-    const savedSessionId = getFromStorage('session_id');
-    const savedUsername = getFromStorage('username');
-    
-    if (savedSessionId && savedUsername) {
-        console.log(`   Found saved session in localStorage: ${savedSessionId}`);
-        document.getElementById('username').value = savedUsername;
-        document.getElementById('accountStatus').textContent = 'Verifying...';
-        
+    // ============================================================
+    // STEP 3: Try stored username/password from browser
+    // ============================================================
+    const savedUsername = localStorage.getItem('bvault_username');
+    const savedPassword = localStorage.getItem('bvault_password');
+    if (savedUsername && savedPassword) {
+        console.log(`📌 Attempting auto-login for ${savedUsername}...`);
         try {
-            const data = await verifySession(savedSessionId);
-            if (data && data.valid) {
-                sessionId = savedSessionId;
-                setOnline({ 
-                    handle: data.handle, 
-                    display_name: data.display_name || data.handle, 
-                    avatar: data.avatar 
-                });
-                
-                // Save handle for future database lookups
+            const res = await fetch(`${API_BASE}/api/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: savedUsername, password: savedPassword })
+            });
+            const data = await res.json();
+            if (data.success) {
+                sessionId = data.session_id;
+                setOnline(data);
                 localStorage.setItem('bvault_handle', data.handle);
-                localStorage.setItem('bvault_username', savedUsername);
+                localStorage.setItem('bvault_session_id', sessionId);
+                localStorage.setItem('bvault_user_data', JSON.stringify(data));
                 
-                console.log('✅ Session verified from memory');
-                
+                loadRemovedUris();
                 await loadSavedHandlers();
-                await loadVault();
-                await loadScheduled();
-                toast('Welcome back!', 'success');
-                
-                startAutoNewsStatusPolling(false);
-                loadHandlersFromServer();
-                
-                // Load other data
+                loadVault();
                 loadScheduled();
-                setScheduleDefaults();
-                try {
-                    const sf = localStorage.getItem('bvault_vault_filter');
-                    if (sf && ['all','posted','not_posted'].includes(sf)) vaultFilter = sf;
-                } catch(e) {}
-                loadIgAccounts();
-                loadPostNowAccounts();
-                
+                toast('✅ Auto-login successful!', 'success');
                 return;
-            } else {
-                console.log('⚠️ Saved session invalid, clearing...');
-                localStorage.removeItem('bvault_session_id');
-                localStorage.removeItem('bvault_user_data');
-                localStorage.removeItem('bvault_handle');
             }
-        } catch (e) {
-            console.warn('Session verification error:', e);
-            setOffline();
+        } catch(e) {
+            console.warn('Auto-login failed:', e);
         }
     }
     
-    // STEP 3: No session found - show offline state
-    console.log('📌 Step 3: No valid session found, showing offline state');
+    // ============================================================
+    // STEP 4: Check if username input has a value and try recovery
+    // ============================================================
+    const usernameInput = document.getElementById('username');
+    if (usernameInput && usernameInput.value) {
+        const handle = usernameInput.value.trim();
+        if (handle && handle.includes('.')) {
+            console.log(`📌 Trying to restore using username field: ${handle}`);
+            try {
+                const res = await fetch(`${API_BASE}/api/restore-session-by-handle`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ handle: handle })
+                });
+                const data = await res.json();
+                if (data.success && data.valid) {
+                    sessionId = data.session_id;
+                    setOnline({
+                        handle: data.handle,
+                        display_name: data.display_name || data.handle,
+                        avatar: data.avatar
+                    });
+                    localStorage.setItem('bvault_session_id', sessionId);
+                    localStorage.setItem('bvault_handle', data.handle);
+                    localStorage.setItem('bvault_username', handle);
+                    
+                    await loadSavedHandlers();
+                    await loadVault();
+                    await loadScheduled();
+                    toast('🔄 Session restored! Welcome back.', 'success');
+                    return;
+                }
+            } catch(e) {}
+        }
+    }
+    
+    // ============================================================
+    // STEP 5: No session found - show offline state
+    // ============================================================
+    console.log('📌 Step 5: No valid session found, showing offline state');
     setOffline();
 
     // Continue with rest of initialization (without user session)
@@ -7507,7 +8046,6 @@ async function initializeApp() {
 
     console.log('✅ App initialized (offline mode)');
 }
-
 
 
 
