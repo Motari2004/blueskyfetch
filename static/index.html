@@ -4944,23 +4944,19 @@ function renderVault(items) {
 
 
 
-// Update vault item click handler
-div.addEventListener('click', (e) => {
-    if (e.target.closest('.vactions') || e.target.closest('img')) return;
-    const uri = div.dataset.uri;
-    if (vaultSelectedUris.has(uri)) {
-        vaultSelectedUris.delete(uri);
-        div.classList.remove('selected');
-    } else {
-        vaultSelectedUris.add(uri);
-        div.classList.add('selected');
-    }
+        div.addEventListener('click', (e) => {
+            if (e.target.closest('.vactions') || e.target.closest('img')) return;
+            div.classList.toggle('selected');
+            updateSchedSelCount();
+            updateVaultSelectionBar();
+        });
+        vaultList.appendChild(div);
+    });
     updateSchedSelCount();
     updateVaultSelectionBar();
-});
 
 
-
+    
 }
 
 
